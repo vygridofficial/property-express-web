@@ -44,7 +44,7 @@ export default function AdminProperties() {
 
   // Expanded Form State
   const initialForm = {
-    title: '', category: 'Apartment', status: 'Active', isFeatured: false,
+    title: '', category: '', status: 'Active', isFeatured: false,
     price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
     address: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
     description: '', amenities: [], dynamicFilters: {}
@@ -447,7 +447,31 @@ export default function AdminProperties() {
           <button 
             className="btn" 
             style={{ background: '#ed1b24', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontWeight: 700, cursor: 'pointer' }}
-            onClick={() => { setIsDrawerOpen(true); setEditingId(null); setImages([]); setFormData(initialForm); setFormErrors([]); }}
+            onClick={() => { 
+              setIsDrawerOpen(true); 
+              setEditingId(null); 
+              setImages([]); 
+              
+              // Issue: Auto-fill category based on active tab
+              let prefilledCat = '';
+              if (activeCategory !== 'properties') {
+                const low = activeCategory.toLowerCase();
+                if (['apartments', 'flats'].includes(low)) prefilledCat = 'Apartment';
+                else if (low === 'villas') prefilledCat = 'Villa';
+                else if (['commercial', 'warehouses'].includes(low)) prefilledCat = 'Commercial';
+                else if (low === 'plots') prefilledCat = 'Plot';
+                else if (low === 'uncategorized') prefilledCat = 'Uncategorized';
+                else {
+                  // Check if it's a custom category
+                  const custom = customCategories.find(c => c.name.toLowerCase() === low);
+                  if (custom) prefilledCat = custom.name;
+                  else prefilledCat = activeCategory; // Fallback to raw string
+                }
+              }
+
+              setFormData({ ...initialForm, category: prefilledCat }); 
+              setFormErrors([]); 
+            }}
           >
             <Plus size={18} style={{ marginRight: '0.5rem' }} /> Add Property
           </button>
@@ -706,7 +730,16 @@ export default function AdminProperties() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <Label required>Category</Label>
-                      <select value={formData.category} onChange={e => handleFormChange('category', e.target.value)} style={getInputStyle('category')}>
+                      <select 
+                        value={formData.category} 
+                        onChange={e => handleFormChange('category', e.target.value)} 
+                        style={{
+                          ...getInputStyle('category'),
+                          background: (editingId === null && activeCategory !== 'properties') ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.4)',
+                          cursor: (editingId === null && activeCategory !== 'properties') ? 'not-allowed' : 'pointer'
+                        }}
+                        disabled={editingId === null && activeCategory !== 'properties'}
+                      >
                         <option value="">Select Category</option>
                         <option value="Apartment">Apartment</option>
                         <option value="Plot">Plot</option>
