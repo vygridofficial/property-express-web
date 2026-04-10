@@ -14,34 +14,49 @@ export function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 export const extractCoordsFromUrl = (url) => {
   if (!url || typeof url !== 'string') return null;
   
+  let result = null;
+
   // 1. Match @lat,lng format commonly in standard maps URLs
   const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
   if (atMatch) {
-    return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
+    result = { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
   }
   
   // 2. Match iframe pb=!2dLONG!3dLAT format
   const pbMatch = url.match(/!2d(-?\d+\.\d+).*?!3d(-?\d+\.\d+)/);
-  if (pbMatch) {
-    return { lat: parseFloat(pbMatch[2]), lng: parseFloat(pbMatch[1]) }; // Note: 2d=lng, 3d=lat
+  if (pbMatch && !result) {
+    result = { lat: parseFloat(pbMatch[2]), lng: parseFloat(pbMatch[1]) }; // Note: 2d=lng, 3d=lat
   }
 
   // 3. Match query params &query=lat,lng or q=lat,lng
   const qMatch = url.match(/[?&](?:query|q)=(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (qMatch) {
-    return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
+  if (qMatch && !result) {
+    result = { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
   }
   
-  return null;
+  if (result) {
+    // Attempt to extract place name from URL path /place/PLACE_NAME/
+    const placeMatch = url.match(/\/place\/([^/@]+)/);
+    if (placeMatch) {
+      result.label = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
+    }
+  }
+
+  return result;
 }
 
 export const getPropertyCoordinates = (property) => {
   if (!property) return null;
   if (property.mapsUrl) {
-    const exactCoords = extractCoordsFromUrl(property.mapsUrl);
-    if (exactCoords) {
+    const coords = extractCoordsFromUrl(property.mapsUrl);
+    if (coords) {
       // Use exact coordinates provided in DB document
-      return { id: property.id || `exact-${exactCoords.lat}-${exactCoords.lng}`, lat: exactCoords.lat, lng: exactCoords.lng };
+      return { 
+        id: property.id || `exact-${coords.lat}-${coords.lng}`, 
+        lat: coords.lat, 
+        lng: coords.lng,
+        label: coords.label 
+      };
     }
   }
   return null;

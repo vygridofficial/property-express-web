@@ -196,7 +196,7 @@ export default function PropertyDetail() {
               {(() => {
                 const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
                 const src = coords 
-                  ? `https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=15&output=embed`
+                  ? `https://maps.google.com/maps?q=${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}&z=15&output=embed`
                   : `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
                 
                 return (
