@@ -63,27 +63,20 @@ export default function Sidebar() {
           {!collapsed && <div className={styles.navLabel}>Properties</div>}
           <NavItem to="/admin/properties" icon={WarehouseIcon} label="All Properties" />
           <AnimatePresence mode="popLayout">
-            {sections.showFlats && (
-              <motion.div key="flat-nav" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                <NavItem to="/admin/properties/flats" icon={FlatIcon} label="Flats" />
+            {/* Base Categories */}
+            {[
+              { id: 'Apartment', label: 'Apartments', icon: FlatIcon, to: '/admin/properties/apartments' },
+              { id: 'Villa', label: 'Villas', icon: VillaIcon, to: '/admin/properties/villas' },
+              { id: 'Plot', label: 'Plots', icon: PlotIcon, to: '/admin/properties/plots' },
+              { id: 'Commercial', label: 'Commercial', icon: Building2, to: '/admin/properties/commercial' }
+            ].map(cat => (sections[cat.id] !== false) && (
+              <motion.div key={cat.id} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <NavItem to={cat.to} icon={cat.icon} label={cat.label} />
               </motion.div>
-            )}
-            {sections.showPlots && (
-              <motion.div key="plot-nav" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                <NavItem to="/admin/properties/plots" icon={PlotIcon} label="Plots" />
-              </motion.div>
-            )}
-            {sections.showWarehouses && (
-              <motion.div key="warehouse-nav" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                 <NavItem to="/admin/properties/warehouses" icon={WarehouseIcon} label="Warehouses" />
-              </motion.div>
-            )}
-            {sections.showVillas && (
-              <motion.div key="villa-nav" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                 <NavItem to="/admin/properties/villas" icon={VillaIcon} label="Villas" />
-              </motion.div>
-            )}
-            {customCategories.map((cat, idx) => (
+            ))}
+
+            {/* Custom Categories */}
+            {customCategories.map((cat, idx) => (sections[cat] !== false) && (
                 <motion.div key={`side-cat-${cat || 'custom'}-${idx}`} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
                    <NavItem to={`/admin/properties/${(cat || 'unknown').toLowerCase()}`} icon={Building2} label={cat || 'Custom'} isCustom />
               </motion.div>

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { db } from '../../firebase';
+import { db, auth } from '../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from 'firebase/firestore';
 
 const AdminContext = createContext();
@@ -7,20 +8,27 @@ const AdminContext = createContext();
 export function AdminProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [properties, setProperties] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Auth Persistence Sync
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
   
-  // Real-time Firestore Sync
+  // Real-time Properties Sync
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'properties'), (snapshot) => {
       const data = snapshot.docs.map(doc => {
         const docData = doc.data();
         let numericPrice = 0;
         
-        // Ensure numericPrice is available for filtering even if doc only has string price
         if (docData.numericPrice !== undefined) {
           numericPrice = Number(docData.numericPrice);
         } else if (docData.price) {
-          // Fallback parsing if numericPrice is missing
           const pStr = docData.price.toString().replace(/[^0-9.]/g, '');
           numericPrice = parseFloat(pStr) * (docData.price.includes('Cr') ? 10000000 : (docData.price.includes('L') ? 100000 : 1));
         }
@@ -37,6 +45,15 @@ export function AdminProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
+  // Real-time Reviews Sync (Fixes Point 6)
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'reviews'), (snapshot) => {
+      const revs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setReviews(revs);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const updatePropertyStatus = async (id, status) => {
     await updateDoc(doc(db, 'properties', id), { status });
   };
@@ -46,14 +63,7 @@ export function AdminProvider({ children }) {
   };
   
   // Section Visibility Logic
-  const [sections, setSections] = useState({
-    showFlats: true,
-    showPlots: true,
-    showWarehouses: true,
-    showVillas: true,
-    showReviews: true,
-    showContactForm: true,
-  });
+  const [sections, setSections] = useState({});
 
   // Dark mode — persisted in localStorage
   const [isDark, setIsDark] = useState(() => {
@@ -104,35 +114,41 @@ export function AdminProvider({ children }) {
 
   const clearAllNotifications = () => setNotifications([]);
 
-
   const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
+  const logout = () => {
+    auth.signOut();
+    setIsAuthenticated(false);
+  };
 
-  // Global Site Settings (Site Name, Tagline, Visibility)
+  // Global Site Settings
   const [siteSettings, setSiteSettings] = useState({
     siteName: 'Property Express',
     tagline: 'Premium Real Estate Properties',
     metaDescription: 'Discover the most premium luxury villas, apartments, and plots available.',
-    showFlats: true,
-    showPlots: true,
-    showWarehouses: true,
-    showVillas: true,
-    showReviews: true,
-    showContactForm: true,
+    visibility: {}, // Dynamic visibility map
     achievementsPropertiesSold: '1.2',
     achievementsClientSatisfaction: '4.9',
     achievementsVerifiedListings: '100',
-    achievementsExpertConsultants: '50'
+    achievementsExpertConsultants: '50',
+    // Contact Info
+    primaryPhone: '+1 (555) 123-4567',
+    whatsappBusiness: '+1 (555) 123-4567',
+    supportEmail: 'hello@propertyexpress.com',
+    officeAddress: '123 Business Avenue, Suite 100, New York, NY 10001',
+    googleMapsEmbed: '',
+    instagramUrl: 'https://instagram.com/propertyexpress',
+    facebookUrl: 'https://facebook.com/propertyexpress'
   });
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'settings', 'global'), (docSnap) => {
       if (docSnap.exists()) {
-        setSiteSettings(prev => ({ ...prev, ...docSnap.data() }));
-        // Sync visibility sections for backward compatibility in components
-        setSections(prev => ({ ...prev, ...docSnap.data() }));
-        if (docSnap.data().customCategories) {
-          setCustomCategories(docSnap.data().customCategories);
+        const data = docSnap.data();
+        setSiteSettings(prev => ({ ...prev, ...data }));
+        // Backward compatibility for sections
+        setSections(prev => ({ ...prev, ...data.visibility }));
+        if (data.customCategories) {
+          setCustomCategories(data.customCategories);
         }
       }
     });
@@ -178,7 +194,7 @@ export function AdminProvider({ children }) {
         notifications, setNotifications, markAllAsRead, deleteNotification, clearAllNotifications,
         isDark, toggleTheme,
         properties, setProperties, loading, updatePropertyStatus, deletePropertyItem,
-        siteSettings, updateSiteSettings,
+        reviews, siteSettings, updateSiteSettings,
         customCategories, addCustomCategory, deleteCustomCategory,
         deleteModalConfig, requestDeleteCustomCategory, closeDeleteModal
       }}

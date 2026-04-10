@@ -39,15 +39,15 @@
 }
 
 [data-theme='dark'] .adminLayout {
-  --admin-glass-bg:     rgba(20, 25, 40, 0.65);
-  --admin-glass-solid:  rgba(14, 18, 32, 0.97);
-  --admin-glass-border: rgba(255, 255, 255, 0.10);
-  --admin-text-main:    #f0f0f0;
-  --admin-text-body:    #e8e8e8;
-  --admin-text-muted:   #b0b0b0;
-  --admin-text-placeholder: #888888;
-  --admin-stroke:       rgba(255, 255, 255, 0.10);
-  --admin-surface:      #141928;
+  --admin-glass-bg:     rgba(15, 20, 35, 0.85);
+  --admin-glass-solid:  rgba(10, 14, 25, 0.98);
+  --admin-glass-border: rgba(255, 255, 255, 0.15);
+  --admin-text-main:    #ffffff; /* Pure white for main text */
+  --admin-text-body:    #f5f5f5; /* Off-white for body */
+  --admin-text-muted:   #cccccc; /* Light grey for muted */
+  --admin-text-placeholder: #aaaaaa;
+  --admin-stroke:       rgba(255, 255, 255, 0.15);
+  --admin-surface:      #0a0e19;
 }
 
 /* All headings follow the token */

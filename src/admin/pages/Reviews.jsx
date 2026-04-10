@@ -10,32 +10,14 @@ export default function Reviews() {
   const queryParams = new URLSearchParams(location.search);
   const filterParam = queryParams.get('filter');
 
-  const [reviews, setReviews] = useState([]);
+  const { reviews, loading } = useAdmin();
   const [activeTab, setActiveTab] = useState(filterParam ? filterParam.charAt(0).toUpperCase() + filterParam.slice(1) : 'Pending');
   const [searchTerm, setSearchTerm] = useState('');
   const [ratingFilter, setRatingFilter] = useState('All');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchReviews();
-  }, []);
-
-  const fetchReviews = async () => {
-    setLoading(true);
-    try {
-      const data = await getAllReviews();
-      setReviews(data);
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const updateStatus = async (id, newStatus) => {
     try {
       await updateReview(id, { status: newStatus });
-      setReviews(revs => revs.map(rev => rev.id === id ? { ...rev, status: newStatus } : rev));
     } catch (error) {
       console.error('Error updating review status:', error);
     }
@@ -45,7 +27,6 @@ export default function Reviews() {
     if (!window.confirm('Are you sure you want to delete this review?')) return;
     try {
       await deleteReview(id);
-      setReviews(revs => revs.filter(rev => rev.id !== id));
     } catch (error) {
       console.error('Error deleting review:', error);
     }

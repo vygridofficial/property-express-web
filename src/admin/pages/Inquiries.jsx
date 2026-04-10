@@ -209,9 +209,24 @@ export default function Inquiries() {
                               <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--admin-text-body)', background: 'rgba(255,255,255,0.4)', padding: '1.25rem', borderRadius: 8, border: '1px solid rgba(0,0,0,0.05)' }}>
                                 "{inq.message}"
                               </p>
-                              <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
-                                <button className="btn" style={{ padding: '0.75rem 1.5rem', fontSize: '0.9rem', background: '#25D366', color: 'white', border: 'none', fontWeight: 600 }}>Reply on WhatsApp</button>
-                                <button className="btn" style={{ padding: '0.75rem 1.5rem', fontSize: '0.9rem', background: '#18181a', color: 'white', border: 'none', fontWeight: 600 }}>Reply via Email</button>
+                              <div style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                                <a 
+                                  href={`https://wa.me/${inq.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${inq.name},\n\nThis is ${siteSettings?.siteName || 'Property Express'} regarding your inquiry about "${inq.propertyTitle || inq.property}". We'd love to discuss this further with you!`)}`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  className="btn" 
+                                  onClick={() => markResponded(inq.id)}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1.75rem', fontSize: '0.9rem', background: '#25D366', color: 'white', border: 'none', fontWeight: 600, textDecoration: 'none', borderRadius: 12 }}
+                                >
+                                  Reply on WhatsApp
+                                </a>
+                                <a 
+                                  href={`mailto:${inq.email}?subject=${encodeURIComponent(`Regarding your inquiry at ${siteSettings?.siteName || 'Property Express'}`)}&body=${encodeURIComponent(`Hello ${inq.name},\n\nThank you for reaching out to us about ${inq.propertyTitle || inq.property}.\n\n`)}`}
+                                  className="btn" 
+                                  onClick={() => markResponded(inq.id)}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1.75rem', fontSize: '0.9rem', background: '#18181a', color: 'white', border: 'none', fontWeight: 600, textDecoration: 'none', borderRadius: 12 }}
+                                >
+                                  Reply via Email
+                                </a>
                               </div>
                             </div>
                           </td>

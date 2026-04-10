@@ -32,6 +32,30 @@ function PublicLayout() {
   );
 }
 
+import { useAdmin } from './admin/context/AdminContext';
+
+function SEOManager() {
+  const { siteSettings } = useAdmin();
+  
+  React.useEffect(() => {
+    if (siteSettings) {
+      document.title = `${siteSettings.siteName || 'Property Express'} | ${siteSettings.tagline || 'Premium Real Estate'}`;
+      
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', siteSettings.metaDescription || '');
+      } else {
+        const meta = document.createElement('meta');
+        meta.name = 'description';
+        meta.content = siteSettings.metaDescription || '';
+        document.head.appendChild(meta);
+      }
+    }
+  }, [siteSettings]);
+
+  return null;
+}
+
 function AppContent() {
   const location = useLocation();
   const navType = useNavigationType();
@@ -70,29 +94,32 @@ function AppContent() {
   }, [location.pathname, location.key, navType]);
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname.startsWith('/admin') ? 'admin' : location.pathname}>
-        {/* Public Routes */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/properties" element={<Properties />} />
-          <Route path="/properties/:id" element={<PropertyDetail />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-        </Route>
+    <>
+      <SEOManager />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname.startsWith('/admin') ? 'admin' : location.pathname}>
+          {/* Public Routes */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/properties" element={<Properties />} />
+            <Route path="/properties/:id" element={<PropertyDetail />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+          </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="properties" element={<AdminProperties />} />
-          <Route path="properties/:category" element={<AdminProperties />} />
-          <Route path="inquiries" element={<Inquiries />} />
-          <Route path="reviews" element={<Reviews />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="contact-social" element={<ContactSocial />} />
-        </Route>
-      </Routes>
-    </AnimatePresence>
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="properties" element={<AdminProperties />} />
+            <Route path="properties/:category" element={<AdminProperties />} />
+            <Route path="inquiries" element={<Inquiries />} />
+            <Route path="reviews" element={<Reviews />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="contact-social" element={<ContactSocial />} />
+          </Route>
+        </Routes>
+      </AnimatePresence>
+    </>
   );
 }
 

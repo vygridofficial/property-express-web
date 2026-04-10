@@ -59,7 +59,7 @@ const StatCard = ({ title, value, icon, to }) => {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { isDark } = useAdmin();
+  const { isDark, properties, reviews } = useAdmin();
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(null);
   
@@ -67,7 +67,8 @@ export default function Dashboard() {
     totalProperties: 0,
     totalInquiries: 0,
     totalReviews: 0,
-    pendingReviews: 0
+    pendingReviews: 0,
+    propertyTypes: 0
   });
 
   const [pieData, setPieData] = useState([]);
@@ -75,31 +76,30 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [properties, reviews]);
 
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [props, inqs, revs] = await Promise.all([
-        getAllProperties(),
-        getAllInquiries(),
-        getAllReviews()
-      ]);
+      const inqs = await getAllInquiries();
 
       // Category breakdown for Pie Chart
-      const categories = ['Flats', 'Plots', 'Villas', 'Warehouses'];
+      const categories = ['Apartment', 'Villa', 'Plot', 'Commercial'];
+      const uniqueTypes = [...new Set(properties.map(p => p.category).filter(Boolean))];
+
       const pie = categories.map(cat => ({
         name: cat,
-        value: props.filter(p => p.category?.toLowerCase() === cat.toLowerCase() || p.category?.toLowerCase().includes(cat.toLowerCase().slice(0, -1))).length
+        value: properties.filter(p => p.category?.toLowerCase() === cat.toLowerCase() || p.category?.toLowerCase().includes(cat.toLowerCase().slice(0, -1))).length
       })).filter(item => item.value > 0);
       
       setPieData(pie.length > 0 ? pie : [{ name: 'No Data', value: 1 }]);
 
       setStats({
-        totalProperties: props.length,
+        totalProperties: properties.length,
         totalInquiries: inqs.length,
-        totalReviews: revs.length,
-        pendingReviews: revs.filter(r => r.status?.toLowerCase() === 'pending').length
+        totalReviews: reviews.length,
+        pendingReviews: reviews.filter(r => r.status?.toLowerCase() === 'pending').length,
+        propertyTypes: uniqueTypes.length
       });
 
       setRecentInquiries(inqs.slice(0, 5));

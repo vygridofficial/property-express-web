@@ -104,10 +104,67 @@ export default function Settings() {
         <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Toggle which property categories and sections appear on the public website and admin sidebar.</p>
         
         <div>
-          <ToggleRow label="Show Flats Category" stateKey="showFlats" />
-          <ToggleRow label="Show Plots Category" stateKey="showPlots" />
-          <ToggleRow label="Show Warehouses Category" stateKey="showWarehouses" />
-          <ToggleRow label="Show Villas Category" stateKey="showVillas" />
+          {/* Base Categories */}
+          {['Apartment', 'Villa', 'Plot', 'Commercial'].map(cat => (
+            <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
+              <span style={{ fontWeight: 500 }}>Show {cat}s</span>
+              <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
+                <input 
+                  type="checkbox" 
+                  checked={draft.visibility?.[cat] !== false} 
+                  onChange={() => {
+                    const newVis = { ...(draft.visibility || {}) };
+                    newVis[cat] = draft.visibility?.[cat] === false;
+                    setDraft(prev => ({ ...prev, visibility: newVis }));
+                  }} 
+                  style={{ opacity: 0, width: 0, height: 0 }} 
+                />
+                <span style={{ 
+                  position: 'absolute', cursor: 'pointer', inset: 0, 
+                  background: draft.visibility?.[cat] !== false ? '#18181a' : 'rgba(0,0,0,0.1)', 
+                  borderRadius: 34, transition: '0.4s' 
+                }}>
+                  <span style={{ 
+                    position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
+                    background: 'white', borderRadius: '50%', transition: '0.4s',
+                    transform: draft.visibility?.[cat] !== false ? 'translateX(22px)' : 'translateX(0)'
+                  }}></span>
+                </span>
+              </label>
+            </div>
+          ))}
+
+          {/* Custom Categories */}
+          {(draft.customCategories || []).map(cat => (
+            <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
+              <span style={{ fontWeight: 500 }}>Show {cat}</span>
+              <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
+                <input 
+                  type="checkbox" 
+                  checked={draft.visibility?.[cat] !== false} 
+                  onChange={() => {
+                    const newVis = { ...(draft.visibility || {}) };
+                    newVis[cat] = draft.visibility?.[cat] === false;
+                    setDraft(prev => ({ ...prev, visibility: newVis }));
+                  }} 
+                  style={{ opacity: 0, width: 0, height: 0 }} 
+                />
+                <span style={{ 
+                  position: 'absolute', cursor: 'pointer', inset: 0, 
+                  background: draft.visibility?.[cat] !== false ? '#18181a' : 'rgba(0,0,0,0.1)', 
+                  borderRadius: 34, transition: '0.4s' 
+                }}>
+                  <span style={{ 
+                    position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
+                    background: 'white', borderRadius: '50%', transition: '0.4s',
+                    transform: draft.visibility?.[cat] !== false ? 'translateX(22px)' : 'translateX(0)'
+                  }}></span>
+                </span>
+              </label>
+            </div>
+          ))}
+
+          {/* Fixed Sections */}
           <ToggleRow label="Show Customer Reviews" stateKey="showReviews" />
           <ToggleRow label="Show Contact Form" stateKey="showContactForm" />
         </div>
