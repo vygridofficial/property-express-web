@@ -390,6 +390,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
         </div>
 
         <div className={styles.listingsGrid}>
+          {filteredImages.length > 0
             ? filteredImages.map((property, i) => (
               <PropertyListingCard key={property.id} property={property} index={i} />
             ))
