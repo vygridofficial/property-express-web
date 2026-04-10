@@ -36,6 +36,16 @@ export default function AdminProperties() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Bug Fix: Reset scroll on navigation (prevents ghost white space)
+  useEffect(() => {
+    const content = document.querySelector(`.${styles.mainContent}`);
+    if (content) content.scrollTo(0, 0);
+    else window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  // Loading Guard: Prevent blank screens or laggy partial renders
+  const isDataLoading = contextLoading || (properties.length === 0 && !contextLoading && loading);
   
   // Image Upload State
   const [images, setImages] = useState([]);
@@ -116,20 +126,20 @@ export default function AdminProperties() {
   const pathSegments = location.pathname.split('/');
   const activeCategory = decodeURIComponent(pathSegments[pathSegments.length - 1]);
 
-  const getPageIcon = () => {
+  const pageHeader = useMemo(() => {
     const low = activeCategory.toLowerCase();
-    if (low === 'apartments' || low === 'flats') return <FlatIcon size={32} />;
-    if (low === 'villas') return <VillaIcon size={32} />;
-    if (low === 'commercial' || low === 'warehouses') return <WarehouseIcon size={32} />;
-    if (low === 'plots') return <PlotIcon size={32} />;
-    return <WarehouseIcon size={32} />;
-  };
+    let icon = <WarehouseIcon size={32} />;
+    if (low === 'apartments' || low === 'flats') icon = <FlatIcon size={32} />;
+    else if (low === 'villas') icon = <VillaIcon size={32} />;
+    else if (low === 'commercial' || low === 'warehouses') icon = <WarehouseIcon size={32} />;
+    else if (low === 'plots') icon = <PlotIcon size={32} />;
 
-  const getPageTitle = () => {
-    if (activeCategory === 'properties') return 'All Properties';
-    if (activeCategory === 'Uncategorized') return 'Uncategorized';
-    return activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1);
-  };
+    let title = activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1);
+    if (activeCategory === 'properties') title = 'All Properties';
+    else if (activeCategory === 'Uncategorized') title = 'Uncategorized';
+
+    return { icon, title };
+  }, [activeCategory]);
 
   const uniqueLocations = useMemo(() => {
     const locs = properties.map(p => p.address || p.location).filter(Boolean);
@@ -431,8 +441,8 @@ export default function AdminProperties() {
       {/* Header Area */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {getPageIcon()}
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.04em', margin: 0 }}>{getPageTitle()}</h2>
+          {pageHeader.icon}
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.04em', margin: 0 }}>{pageHeader.title}</h2>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           {activeCategory === 'properties' && (
@@ -535,9 +545,14 @@ export default function AdminProperties() {
 
       {/* Main Table / Mobile Cards */}
       <div className={styles.glassCard} style={{ minHeight: 400, padding: isMobile ? '0.75rem' : '1.5rem' }}>
-        {loading ? (
+        {isDataLoading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {[...Array(5)].map((_, idx) => <div key={idx} style={{ height: 60, borderRadius: 12, background: 'rgba(0,0,0,0.06)', animation: 'shimmer 2s infinite' }} />)}
+            {[...Array(5)].map((_, idx) => (
+              <div key={idx} style={{ height: 80, borderRadius: 16, background: 'rgba(0,0,0,0.03)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)', animation: 'shimmer 1.5s infinite' }} />
+              </div>
+            ))}
+            <style>{`@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }`}</style>
           </div>
         ) : filteredProperties.length === 0 ? (
            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, color: 'var(--admin-text-muted)' }}>

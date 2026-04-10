@@ -38,7 +38,7 @@ export default function AdminLayout() {
   return (
     <div className={styles.adminLayout}>
       <div className={styles.adminCanvas} />
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {!isAuthenticated ? (
           <motion.div
             key="login"
@@ -64,7 +64,7 @@ export default function AdminLayout() {
             <div className={styles.mainContent} style={{ overflowY: 'auto' }}>
               <TopNavbar />
               <main className={styles.pageContainer}>
-                <AnimatePresence>
+                <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={location.pathname}
                     initial={{ opacity: 0, y: 10 }}
