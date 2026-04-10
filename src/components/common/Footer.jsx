@@ -93,7 +93,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.footerBottom}>
-          <p>&copy; 2026 Property Express. All Rights Reserved.</p>
+          <p>&copy; 2026 Property Express. All Rights Reserved. | Designed and Developed by <a href="https://vygrid.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', fontWeight: 'bold', textDecoration: 'underline' }}>Vygrid</a></p>
         </div>
       </div>
     </footer>
