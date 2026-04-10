@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'fra
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
-import { getCoordinatesForLocation, getDistanceFromLatLonInKm } from '../utils/geo';
+import { getPropertyCoordinates, getDistanceFromLatLonInKm } from '../utils/geo';
 import { formatPrice } from '../utils/formatPrice';
 import styles from './CategoryHero.module.css';
 
@@ -83,9 +83,16 @@ function PropertyListingCard({ property, index }) {
         <img src={displayImage} alt={property.title} className={styles.listingImg} />
       </div>
       <div className={styles.listingContent}>
-        <div className={styles.listingPrice}>
-          {displayPrice}
-          {property.status === 'For Rent' && <span className={styles.perMonth}> /mo</span>}
+        <div className={styles.listingPrice} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            {displayPrice}
+            {property.status === 'For Rent' && <span className={styles.perMonth}> /mo</span>}
+          </div>
+          {property._distance !== undefined && property._distance < 999999 && (
+            <span style={{ fontSize: '0.75rem', color: '#ed1b24', fontWeight: 700, background: 'rgba(237,27,36,0.1)', padding: '4px 8px', borderRadius: '12px' }}>
+              {property._distance < 1 ? '< 1' : Math.round(property._distance)} km away
+            </span>
+          )}
         </div>
         <div className={styles.titleWrap}>
           <h3 className={styles.listingTitle}>{property.title}</h3>
@@ -182,7 +189,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
 
   // Local filter state
   const [localFilters, setLocalFilters] = useState({
-    location: window.sessionStorage.getItem('isLocationDetected') === 'true' ? 'My Location' : '',
+    location: '', // Default to all so user can see properties before intentionally clamping strictly to 50km
     priceMax: '',
     ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, '']))
   });
@@ -213,20 +220,25 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
       }
     });
 
-    // Haversine Geospatial Sorting
+    // Haversine Geospatial Sorting & Strict Radial Enforcement
     if (localFilters.location === 'My Location') {
       const centerCache = window.sessionStorage.getItem('mapCenter');
       if (centerCache) {
         try {
           const center = JSON.parse(centerCache);
           result.forEach(img => {
-            const coords = getCoordinatesForLocation(img.location || img.address);
+            const coords = getPropertyCoordinates(img);
             if (coords) {
               img._distance = getDistanceFromLatLonInKm(center.lat, center.lng, coords.lat, coords.lng);
             } else {
               img._distance = 999999;
             }
           });
+          
+          // Strict Max 50km Radius filter
+          result = result.filter(img => img._distance <= 50);
+
+          // Arrange from Nearest to Farthest
           result.sort((a, b) => a._distance - b._distance);
         } catch(e) {}
       }
@@ -378,11 +390,21 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
         </div>
 
         <div className={styles.listingsGrid}>
-          {filteredImages.length > 0
             ? filteredImages.map((property, i) => (
               <PropertyListingCard key={property.id} property={property} index={i} />
             ))
-            : <p className={styles.noResults}>No properties match your filters.</p>
+            : (
+              <div className={styles.noResults} style={{ textAlign: 'center', padding: '4rem 2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                <p style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.5rem' }}>No properties found within 50km.</p>
+                <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>We couldn't find any {categoryTitle.toLowerCase()} near your current location.</p>
+                <button 
+                  onClick={() => setLocalFilters(prev => ({ ...prev, location: '' }))}
+                  style={{ background: 'white', color: 'black', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Show All Properties
+                </button>
+              </div>
+            )
           }
         </div>
       </motion.section>

@@ -292,7 +292,7 @@ export default function AdminProperties() {
     };
 
     const handleSaveProperty = async () => {
-      const required = ['title', 'category', 'status', 'price', 'area', 'address'];
+      const required = ['title', 'category', 'status', 'price', 'area', 'address', 'mapsUrl'];
       const newErrors = [];
       required.forEach(req => { if (!formData[req]) newErrors.push(req); });
       
@@ -677,8 +677,9 @@ export default function AdminProperties() {
                     <input type="text" placeholder="Enter full address..." value={formData.address} onChange={e => handleFormChange('address', e.target.value)} style={getInputStyle('address')} />
                   </div>
                   <div>
-                    <Label>Google Maps Embed URL</Label>
-                    <input type="text" placeholder="Paste Google Maps embed URL..." value={formData.mapsUrl} onChange={e => handleFormChange('mapsUrl', e.target.value)} style={getInputStyle('mapsUrl')} />
+                    <Label required>Google Maps Embed URL</Label>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '0.5rem', marginTop: '-0.25rem' }}>A Google Maps link is compulsory to enable our high-precision radial clustering filters.</p>
+                    <input type="text" placeholder="Paste standard or embed Google Maps URL..." value={formData.mapsUrl} onChange={e => handleFormChange('mapsUrl', e.target.value)} style={getInputStyle('mapsUrl')} />
                   </div>
                 </div>
 

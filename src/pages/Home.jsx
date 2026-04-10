@@ -12,7 +12,7 @@ import styles from './Home.module.css';
 
 import { useInView } from 'framer-motion';
 
-import { getCoordinatesForLocation, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
+import { getPropertyCoordinates, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
 
 const InteractiveCluster = ({ cluster, isMobile }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -153,8 +153,6 @@ export default function Home() {
       setIsLocationDetected(true);
       sessionStorage.setItem('isLocationDetected', 'true');
       setIsDetecting(false);
-      // reverse properties array to simulate finding new nearby properties
-      setFeatured(prev => [...prev].reverse());
     }, (error) => {
       console.error("Error getting location", error);
       alert("Unable to retrieve your location. Please check browser permissions.");
@@ -221,20 +219,20 @@ export default function Home() {
     // First, filter by 50km radius if coords are known
     const radiusFiltered = featured.filter(prop => {
       if (!isLocationDetected) return true; // Show all if location isn't detected or before detecting
-      const coords = getCoordinatesForLocation(prop.location);
+      const coords = getPropertyCoordinates(prop);
       if (!coords) return false; // If location is totally unknown, hide it to maintain strict radius rules
       const dist = getDistanceFromLatLonInKm(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
-      return dist <= 100;
+      return dist <= 50;
     });
 
-    // Group geographically properly to avoid overlaps
     const grouped = radiusFiltered.reduce((acc, prop) => {
-      const coords = getCoordinatesForLocation(prop.location);
+      const coords = getPropertyCoordinates(prop);
       if (!coords) return acc;
 
-      const locId = coords.id;
+      // Round to 3 decimal places (~110m) to allow tight clustering of nearby exact points
+      const locId = `${coords.lat.toFixed(3)},${coords.lng.toFixed(3)}`;
       if (!acc[locId]) {
-        acc[locId] = { location: locId, coords, properties: [] };
+        acc[locId] = { location: prop.location || prop.address, coords, properties: [] };
       }
       acc[locId].properties.push(prop);
       return acc;
