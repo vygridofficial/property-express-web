@@ -127,18 +127,18 @@ export default function MobileBottomNav() {
                           </div>
                         ))}
                         {customCategories.map(cat => (
-                          <div key={cat} style={{ position: 'relative', width: '100%' }}>
+                          <div key={cat.name} style={{ position: 'relative', width: '100%' }}>
                             <NavLink
-                              to={`/admin/properties/${cat.toLowerCase()}`}
+                              to={`/admin/properties/${(cat.name || 'unknown').toLowerCase()}`}
                               onClick={() => setDrawerOpen(false)}
                               className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
                               style={{ borderRadius: 12, padding: '0.75rem 1rem', flexDirection: 'column', alignItems: 'flex-start', gap: '0.4rem', width: '100%' }}
                             >
                               <Building2 size={18} />
-                              <span style={{ fontSize: '0.875rem', fontWeight: 600, width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat}</span>
+                              <span style={{ fontSize: '0.875rem', fontWeight: 600, width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat.name}</span>
                             </NavLink>
                             <button
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); requestDeleteCustomCategory(cat); setDrawerOpen(false); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); requestDeleteCustomCategory(cat.name); setDrawerOpen(false); }}
                               style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'transparent', border: 'none', color: 'var(--admin-text-muted)' }}
                             >
                               <Trash2 size={16} />
