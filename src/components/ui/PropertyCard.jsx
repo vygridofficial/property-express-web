@@ -49,7 +49,9 @@ export default function PropertyCard({ property }) {
         <div className={styles.price}>
           {displayPrice} {status === 'For Rent' && <span className={styles.perMonth}>/mo</span>}
         </div>
-        <h3 className={styles.title}>{title}</h3>
+        <div className={styles.titleWrap}>
+          <h3 className={styles.title}>{title}</h3>
+        </div>
         <div className={styles.location}>
           <MapPin size={16} /> {displayLocation}
         </div>

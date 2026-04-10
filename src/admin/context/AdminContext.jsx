@@ -131,6 +131,9 @@ export function AdminProvider({ children }) {
         setSiteSettings(prev => ({ ...prev, ...docSnap.data() }));
         // Sync visibility sections for backward compatibility in components
         setSections(prev => ({ ...prev, ...docSnap.data() }));
+        if (docSnap.data().customCategories) {
+          setCustomCategories(docSnap.data().customCategories);
+        }
       }
     });
     return () => unsubscribe();
@@ -151,14 +154,17 @@ export function AdminProvider({ children }) {
     setDeleteModalConfig({ isOpen: false, category: '' });
   };
 
-  const addCustomCategory = (name) => {
-    if (name && !customCategories.includes(name.trim()) && !['Flat', 'Villa', 'Plot', 'Warehouse'].includes(name.trim())) {
-      setCustomCategories(prev => [...prev, name.trim()]);
+  const addCustomCategory = async (name) => {
+    const trimmed = name?.trim();
+    if (trimmed && !customCategories.includes(trimmed) && !['Apartment', 'Villa', 'Plot', 'Commercial'].includes(trimmed)) {
+      const updated = [...customCategories, trimmed];
+      await updateSiteSettings({ customCategories: updated });
     }
   };
 
-  const deleteCustomCategory = (name, action = 'delete', destCategory = '') => {
-    setCustomCategories(prev => prev.filter(c => c !== name));
+  const deleteCustomCategory = async (name, action = 'delete', destCategory = '') => {
+    const updated = customCategories.filter(c => c !== name);
+    await updateSiteSettings({ customCategories: updated });
     if (action === 'delete') {
       // Logic for deleting properties of this category would go here
     }

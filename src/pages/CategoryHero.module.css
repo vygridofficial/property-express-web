@@ -303,12 +303,24 @@
   color: #999;
 }
 
+.titleWrap {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
 .listingTitle {
   font-size: 1.15rem;
   font-weight: 600;
   color: #1a1a1a;
-  margin-bottom: 0.4rem;
+  white-space: nowrap;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+/* Animation removed per request */
 
 .listingLocation {
   font-size: 0.85rem;

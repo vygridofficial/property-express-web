@@ -39,7 +39,8 @@ export default function AdminProperties() {
     title: '', category: 'Flat', status: 'Active', isFeatured: false,
     price: '', area: '', bedrooms: '', bathrooms: '',
     address: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
-    description: '', amenities: []
+    address: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
+    description: '', amenities: [], dynamicFilters: {}
   };
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState([]);
@@ -47,6 +48,23 @@ export default function AdminProperties() {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [showToast, setShowToast] = useState('');
   const [previewImages, setPreviewImages] = useState([]); // Added to fix ReferenceError
+  const [dynKey, setDynKey] = useState('');
+  const [dynVal, setDynVal] = useState('');
+
+  const addDynamicFilter = () => {
+    if (dynKey.trim() && dynVal.trim()) {
+      setFormData(prev => ({ ...prev, dynamicFilters: { ...(prev.dynamicFilters || {}), [dynKey.trim()]: dynVal.trim() }}));
+      setDynKey('');
+      setDynVal('');
+    }
+  };
+  const removeDynamicFilter = (k) => {
+    setFormData(prev => {
+      const cnf = { ...(prev.dynamicFilters || {}) };
+      delete cnf[k];
+      return { ...prev, dynamicFilters: cnf };
+    });
+  };
 
   // Pre-fill form when editing
   useEffect(() => {
@@ -67,6 +85,7 @@ export default function AdminProperties() {
         agentPhoto:  selectedProperty.agentPhoto || null,
         description: selectedProperty.description || '',
         amenities:   selectedProperty.amenities || [],
+        dynamicFilters: selectedProperty.dynamicFilters || {},
       });
         setImages(selectedProperty.imageUrls || [selectedProperty.image] || []);
     }
@@ -268,7 +287,6 @@ export default function AdminProperties() {
       const required = ['title', 'category', 'status', 'price', 'area', 'address'];
       const newErrors = [];
       required.forEach(req => { if (!formData[req]) newErrors.push(req); });
-      if (images.length === 0 && !editingId) newErrors.push('images');
       
       if (newErrors.length > 0) {
         setFormErrors(newErrors);
@@ -298,6 +316,15 @@ export default function AdminProperties() {
               : `₹${(numericPriceValue / 100000).toFixed(1)}L`;
           }
 
+          const DEFAULT_UNSPLASH = {
+            Flat: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+            Apartment: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+            Villa: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+            Commercial: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+            Plot: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
+          };
+          const fallbackImage = DEFAULT_UNSPLASH[formData.category] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80';
+
           const finalData = {
             title: formData.title,
             category: formData.category,
@@ -316,9 +343,10 @@ export default function AdminProperties() {
             agentPhoto: uploadedAgentPhotoUrl,
             description: formData.description,
             amenities: formData.amenities,
+            dynamicFilters: formData.dynamicFilters || {},
             updatedAt: new Date(),
-            image: uploadedImageUrls[0] || (editingId ? selectedProperty.image : 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'),
-            imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : (editingId ? selectedProperty.imageUrls : [uploadedImageUrls[0]]),
+            image: uploadedImageUrls[0] || (editingId ? selectedProperty.image : fallbackImage),
+            imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : (editingId ? selectedProperty.imageUrls : [fallbackImage]),
           };
           
           if (editingId) {
@@ -344,7 +372,8 @@ export default function AdminProperties() {
             agentPhone: '+91 98765 43210',
             agentPhoto: '',
             description: '',
-            amenities: ['Parking', 'Security', 'Gated Community']
+            amenities: ['Parking', 'Security', 'Gated Community'],
+            dynamicFilters: {}
           });
           setImages([]);
           setIsDrawerOpen(false);
@@ -434,9 +463,9 @@ export default function AdminProperties() {
           {activeCategory === 'properties' && (
             <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
                <option value="All">Category: All</option>
-               <option value="Flat">Flat</option>
+               <option value="Apartment">Apartment</option>
                <option value="Villa">Villa</option>
-               <option value="Warehouse">Warehouse</option>
+               <option value="Commercial">Commercial</option>
                <option value="Plot">Plot</option>
                {customCategories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -702,6 +731,28 @@ export default function AdminProperties() {
                        </span>
                     ))}
                     <input type="text" placeholder="Type custom amenity & press Enter..." value={customAmenity} onChange={e => setCustomAmenity(e.target.value)} onKeyDown={handleCustomAmenity} style={{ ...getInputStyle('customAmenity'), padding: '0.4rem 1rem', width: 220, borderRadius: 20 }} />
+                  </div>
+                </div>
+
+                {/* Section 6.5 - Dynamic Filters */}
+                <SectionHeading>Section 6.5 — Dynamic Attributes (Optional)</SectionHeading>
+                <div>
+                  <Label>Custom Property Attributes</Label>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '1rem' }}>Add custom metrics like "Furnishing: Fully Furnished" which will automatically build out new filtering dropdowns on the frontend.</p>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.5rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
+                    <input type="text" placeholder="e.g. Furnishing" value={dynKey} onChange={e => setDynKey(e.target.value)} style={getInputStyle('dynKey')} />
+                    <input type="text" placeholder="e.g. Fully Furnished" value={dynVal} onChange={e => setDynVal(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter'){ e.preventDefault(); addDynamicFilter(); } }} style={getInputStyle('dynVal')} />
+                    <button className="btn" onClick={(e) => { e.preventDefault(); addDynamicFilter(); }} style={{ height: 43, background: '#18181a', color: 'white', borderRadius: 12, padding: '0 1.5rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}>Add</button>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {Object.entries(formData.dynamicFilters || {}).map(([k, v]) => (
+                       <span key={k} style={{ padding: '0.4rem 0.8rem', borderRadius: 8, background: 'rgba(0,0,0,0.05)', border: '1px solid var(--admin-stroke)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
+                         <strong style={{ color: 'var(--admin-text-muted)' }}>{k}:</strong> {v} 
+                         <X size={14} style={{ cursor: 'pointer', color: '#ed1b24', marginLeft: '0.25rem' }} onClick={() => removeDynamicFilter(k)} />
+                       </span>
+                    ))}
                   </div>
                 </div>
 

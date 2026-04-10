@@ -78,11 +78,23 @@
   font-weight: normal;
 }
 
+.titleWrap {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
 .title {
   font-size: 1.5rem;
-  margin-bottom: 0.5rem;
   font-weight: 400;
+  white-space: nowrap;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+/* Animation removed per request */
 
 .location {
   color: var(--color-text-light);

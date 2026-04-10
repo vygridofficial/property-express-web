@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'fra
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
+import { getCoordinatesForLocation, getDistanceFromLatLonInKm } from '../utils/geo';
 import styles from './CategoryHero.module.css';
 
 // Floating positions for 4 images: top-left, top-right, center-left, bottom-right
@@ -88,7 +89,9 @@ function PropertyListingCard({ property, index }) {
           {displayPrice}
           {property.status === 'For Rent' && <span className={styles.perMonth}> /mo</span>}
         </div>
-        <h3 className={styles.listingTitle}>{property.title}</h3>
+        <div className={styles.titleWrap}>
+          <h3 className={styles.listingTitle}>{property.title}</h3>
+        </div>
         <p className={styles.listingLocation}>📍 {property.location}</p>
         <div className={styles.listingFeatures}>
           {(property.beds > 0 || property.bedrooms > 0) && (
@@ -145,9 +148,27 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     return () => mq.removeEventListener('change', handler);
   }, []);
 
+  // Dynamic Filters Parsing
+  const { dynamicKeys, dynamicOptions } = React.useMemo(() => {
+    const keys = new Set();
+    const opts = {};
+    images.forEach(p => {
+      if (p.dynamicFilters) {
+        Object.entries(p.dynamicFilters).forEach(([k, v]) => {
+          keys.add(k);
+          if (!opts[k]) opts[k] = new Set();
+          opts[k].add(v);
+        });
+      }
+    });
+    const finalKeys = Array.from(keys);
+    finalKeys.forEach(k => opts[k] = Array.from(opts[k]));
+    return { dynamicKeys: finalKeys, dynamicOptions: opts };
+  }, [images]);
+
   // Local filter state
   const [localFilters, setLocalFilters] = useState({
-    location: '',
+    location: window.sessionStorage.getItem('isLocationDetected') === 'true' ? 'My Location' : '',
     priceMax: '',
     ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, '']))
   });
@@ -157,15 +178,47 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     setLocalFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // Apply filters to images (client-side, simple)
-  const filteredImages = images.filter(img => {
-    if (localFilters.location && img.location !== localFilters.location) return false;
-    if (localFilters.priceMax) {
-      const numericPrice = img.price;
-      if (numericPrice > parseFloat(localFilters.priceMax)) return false;
+  // Apply filters to images & sort by haversine distance
+  const filteredImages = React.useMemo(() => {
+    let result = [...images];
+
+    // Filter Location (except My Location which implies proximity sorting)
+    if (localFilters.location && localFilters.location !== 'My Location') {
+      result = result.filter(img => img.location === localFilters.location || img.address === localFilters.location);
     }
-    return true;
-  });
+    
+    // Filter Price
+    if (localFilters.priceMax) {
+      result = result.filter(img => (img.numericPrice || 0) <= parseFloat(localFilters.priceMax));
+    }
+
+    // Filter Dynamic Keys
+    dynamicKeys.forEach(k => {
+      if (localFilters[k]) {
+        result = result.filter(img => img.dynamicFilters && img.dynamicFilters[k] === localFilters[k]);
+      }
+    });
+
+    // Haversine Geospatial Sorting
+    if (localFilters.location === 'My Location') {
+      const centerCache = window.sessionStorage.getItem('mapCenter');
+      if (centerCache) {
+        try {
+          const center = JSON.parse(centerCache);
+          result.forEach(img => {
+            const coords = getCoordinatesForLocation(img.location || img.address);
+            if (coords) {
+              img._distance = getDistanceFromLatLonInKm(center.lat, center.lng, coords.lat, coords.lng);
+            } else {
+              img._distance = 999999;
+            }
+          });
+          result.sort((a, b) => a._distance - b._distance);
+        } catch(e) {}
+      }
+    }
+    return result;
+  }, [images, localFilters, dynamicKeys]);
 
   // Title: scale up as you scroll, then fade out
   const titleScale = useTransform(scrollYProgress, [0, 0.4, 0.8], [1, isMobile ? 1.05 : 1.3, isMobile ? 0.9 : 0.7]);
@@ -241,7 +294,8 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
               <label>Location</label>
               <select name="location" value={localFilters.location} onChange={handleFilterChange}>
                 <option value="">All Locations</option>
-                {[...new Set(images.map(i => i.location))].map(loc => (
+                {window.sessionStorage.getItem('isLocationDetected') === 'true' && <option value="My Location">My Location</option>}
+                {[...new Set(images.map(i => i.location || i.address).filter(Boolean))].map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
               </select>
@@ -250,13 +304,12 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
               <label>Max Price</label>
               <select name="priceMax" value={localFilters.priceMax} onChange={handleFilterChange}>
                 <option value="">No Max</option>
-                <option value="500000">Up to $500k</option>
-                <option value="1000000">Up to $1M</option>
-                <option value="2000000">Up to $2M</option>
-                <option value="5000000">Up to $5M</option>
+                <option value="5000000">Up to ₹50L</option>
+                <option value="10000000">Up to ₹1Cr</option>
+                <option value="50000000">Up to ₹5Cr</option>
               </select>
             </div>
-            {taxonomy?.subFilters?.length > 0 && (
+            {(taxonomy?.subFilters?.length > 0 || dynamicKeys.length > 0) && (
               <button
                 className={styles.subFilterToggle}
                 onClick={() => setShowSubFilters(v => !v)}
@@ -271,7 +324,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
           </div>
 
           <AnimatePresence>
-            {showSubFilters && taxonomy?.subFilters && (
+            {showSubFilters && (
               <motion.div
                 className={styles.subFilterRow}
                 initial={{ height: 0, opacity: 0 }}
@@ -280,12 +333,26 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
                 style={{ overflow: 'hidden' }}
                 transition={{ duration: 0.3 }}
               >
-                {taxonomy.subFilters.map(sf => (
+                {/* Fallback Static Subfilters */}
+                {taxonomy?.subFilters && taxonomy.subFilters.map(sf => (
                   <div key={sf.key} className={styles.filterGroup}>
                     <label>{sf.label}</label>
                     <select name={sf.key} value={localFilters[sf.key] || ''} onChange={handleFilterChange}>
                       <option value="">Any {sf.label}</option>
                       {sf.options.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+                
+                {/* Dynamically Injected Admin Subfilters */}
+                {dynamicKeys.map(key => (
+                  <div key={key} className={styles.filterGroup}>
+                    <label>{key}</label>
+                    <select name={key} value={localFilters[key] || ''} onChange={handleFilterChange}>
+                      <option value="">Any {key}</option>
+                      {dynamicOptions[key].map(opt => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>

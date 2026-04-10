@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Building, Store, Map } from 'lucide-react';
+import { Home, Building, Store, Map, LayoutGrid } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { getPropertiesByCategory } from '../services/propertyService';
+import { getPropertiesByCategory, getSiteSettings } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import CategoryHero from './CategoryHero';
 import styles from './Properties.module.css';
@@ -41,9 +41,28 @@ const CATEGORIES = [
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
   const catId = searchParams.get('category');
-  const selectedCategory = CATEGORIES.find(c => c.id === catId) || null;
+  const [dynamicCategories, setDynamicCategories] = useState(CATEGORIES);
+  const selectedCategory = dynamicCategories.find(c => c.id === catId) || null;
   const [categoryProperties, setCategoryProperties] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getSiteSettings().then(data => {
+      if (data && data.customCategories) {
+        const customObjects = data.customCategories.map(cat => ({
+          id: cat,
+          title: cat,
+          icon: LayoutGrid,
+          desc: `Explore ${cat} listings`,
+          img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'
+        }));
+        
+        const existing = CATEGORIES.map(c => c.id.toLowerCase());
+        const fresh = customObjects.filter(c => !existing.includes(c.id.toLowerCase()));
+        setDynamicCategories([...CATEGORIES, ...fresh]);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (catId) {
@@ -109,7 +128,7 @@ export default function Properties() {
               {/* ── Desktop grid (hidden on mobile via CSS) ──── */}
               <div className="container">
                 <div className={styles.catGrid}>
-                  {CATEGORIES.map((cat, i) => (
+                  {dynamicCategories.map((cat, i) => (
                     <motion.div
                       key={cat.id}
                       variants={revealVariants}

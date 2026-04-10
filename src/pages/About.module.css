@@ -1,9 +1,10 @@
 .pageWrap {
   min-height: 100vh;
+  background: var(--color-bg);
 }
 
 .pageHeader {
-  height: 40vh;
+  height: 45vh;
   min-height: 400px;
   display: flex;
   align-items: center;
@@ -16,7 +17,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.3) 100%);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.2) 100%);
 }
 
 .headerContent {
@@ -28,49 +29,72 @@
 .headerContent h1 {
   color: white;
   margin-bottom: 1rem;
+  font-size: 3.5rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
 }
 
-.statsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+.storySection {
+  max-width: 720px;
+  padding: 4rem 0;
 }
 
-.statCard {
-  background: var(--glass-bg);
-  padding: 2rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: var(--glass-blur);
-  text-align: center;
-}
-
-.statNum {
-  font-size: 2.5rem;
+.storySection h2 {
+  font-size: 2.75rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin-bottom: 2rem;
   color: var(--color-primary);
-  font-weight: 300;
-  margin-bottom: 0.5rem;
 }
 
-.statLabel {
+.storyText {
   color: var(--color-text-light);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
 }
 
 .valueCard {
   background: white;
-  padding: 3rem 2rem;
+  padding: 4rem 2.5rem;
   border-radius: var(--radius-lg);
   text-align: center;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   transition: var(--transition);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .valueCard:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
 }
 
 .valueIcon {
-  color: var(--color-accent-blue);
-  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.valueCard h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 768px) {
+  .headerContent h1 {
+    font-size: 2.5rem;
+  }
+  
+  .storySection {
+    padding: 2rem 0;
+  }
+  
+  .storySection h2 {
+    font-size: 2rem;
+  }
 }

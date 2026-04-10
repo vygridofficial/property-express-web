@@ -22,12 +22,15 @@ export default function About() {
 
       <section className="section">
         <div className="container">
-          <motion.div variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport} style={{ maxWidth: '720px' }}>
+          <motion.div 
+            className={styles.storySection}
+            variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
+          >
             <h2>Our Story</h2>
-            <p style={{ color: 'var(--color-text-light)', marginTop: '1.5rem', fontSize: '1.1rem' }}>
+            <p className={styles.storyText}>
               Founded in 2020, Property Express started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region's leading exclusive real estate agency.
             </p>
-            <p style={{ color: 'var(--color-text-light)', marginTop: '1rem', fontSize: '1.1rem' }}>
+            <p className={styles.storyText}>
               We believe that finding a home should be an inspiring journey, not a stressful task. That's why we don't rely on external agents—every property listed is verified and managed by our in-house experts.
             </p>
           </motion.div>
@@ -45,7 +48,6 @@ export default function About() {
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', marginTop: '3rem' }}>
             {[
               { icon: Target, title: 'Mission-Driven' },
-              { icon: Lightbulb, title: 'Innovative' },
               { icon: Users, title: 'Client-First' },
               { icon: CheckCircle, title: 'Transparent' }
             ].map((val, i) => (
