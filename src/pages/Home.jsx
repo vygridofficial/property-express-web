@@ -10,10 +10,33 @@ import GtaMarker from '../components/ui/GtaMarker';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './Home.module.css';
 
+import { useInView } from 'framer-motion';
+
 const CountUp = ({ end, decimals = 0, suffix = "" }) => {
   const ref = React.useRef(null);
-  // ... (existing CountUp code)
-  return <span ref={ref}>{(0).toFixed(decimals)}{suffix}</span>;
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!isInView) return;
+    let startTimestamp = null;
+    const duration = 2000; // 2 seconds
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      // easeOutQuart
+      const ease = 1 - Math.pow(1 - progress, 4);
+      setCount(ease * end);
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        setCount(end);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [end, isInView]);
+
+  return <span ref={ref}>{count.toFixed(decimals)}{suffix}</span>;
 };
 
 export default function Home() {

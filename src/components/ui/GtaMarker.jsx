@@ -5,7 +5,11 @@ import { Home } from 'lucide-react';
 import styles from './GtaMarker.module.css';
 
 export default function GtaMarker({ property, style, delay, mobileCompact }) {
-  const { id, price, images, title } = property;
+  if (!property) return null;
+
+  const { id, price, images, title, image } = property;
+  const displayPrice = typeof price === 'string' ? price : `₹${price?.toLocaleString() || 0}`;
+  const displayImages = images && images.length > 0 ? images : (image ? [image] : ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80']);
 
   if (mobileCompact) {
     return (
@@ -18,7 +22,7 @@ export default function GtaMarker({ property, style, delay, mobileCompact }) {
         transition={{ delay: delay, duration: 0.4 }}
       >
         <Link to={`/properties/${id}`} className={styles.compactPin}>
-          ${price.toLocaleString()}
+          {displayPrice}
         </Link>
       </motion.div>
     );
@@ -36,10 +40,10 @@ export default function GtaMarker({ property, style, delay, mobileCompact }) {
     >
       <Link to={`/properties/${id}`} className={styles.pinCard}>
         <div className={styles.pinCardPrice}>
-          <Home size={14} /> ${price.toLocaleString()}
+          <Home size={14} /> {displayPrice}
         </div>
         <div className={styles.pinCardImg}>
-          <img src={images[0]} alt={title} />
+          <img src={displayImages[0]} alt={title} />
         </div>
       </Link>
     </motion.div>

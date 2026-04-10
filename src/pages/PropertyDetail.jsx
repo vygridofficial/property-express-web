@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
+import { submitLead } from '../services/leadService';
 import { MOCK_AGENTS } from '../data/mockProperties';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './PropertyDetail.module.css';
@@ -24,6 +25,12 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState(null);
   const [agent, setAgent] = useState(null);
   const [formStatus, setFormStatus] = useState('idle');
+  const [inquiryForm, setInquiryForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    message: 'I am interested in Property Express listing...'
+  });
 
   useEffect(() => {
     getPropertyById(id).then(data => {
@@ -54,11 +61,28 @@ export default function PropertyDetail() {
     allImages[2] || safeImg
   ];
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setFormStatus('success');
-    e.target.reset();
-    setTimeout(() => setFormStatus('idle'), 5000);
+    setFormStatus('submitting');
+    try {
+      await submitLead({
+        name: inquiryForm.name,
+        phone: inquiryForm.phone,
+        email: inquiryForm.email,
+        message: inquiryForm.message,
+        propertyId: property.id,
+        propertyTitle: property.title,
+        category: property.category || '',
+        status: 'new'
+      });
+      setFormStatus('success');
+      setInquiryForm({ name: '', phone: '', email: '', message: 'I am interested in Property Express listing...' });
+      setTimeout(() => setFormStatus('idle'), 5000);
+    } catch (error) {
+      console.error('Inquiry submission failed:', error);
+      setFormStatus('error');
+      setTimeout(() => setFormStatus('idle'), 4000);
+    }
   };
 
   return (
@@ -165,19 +189,43 @@ export default function PropertyDetail() {
               <div className={styles.contactFormWrap}>
                 <h4 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', fontWeight: '400' }}>Interested in this property?</h4>
                 <form className={styles.contactForm} onSubmit={handleFormSubmit}>
-                  <input type="text" placeholder="Your Name" required />
-                  <input type="tel" placeholder="Phone Number" required />
-                  <input type="email" placeholder="Email Address" required />
-                  <textarea 
-                    rows="2" 
-                    placeholder="Message" 
-                    defaultValue={`I am interested in Property Express listing...`}
+                  <input
+                    type="text"
+                    placeholder="Your Name"
                     required
+                    value={inquiryForm.name}
+                    onChange={e => setInquiryForm(f => ({ ...f, name: e.target.value }))}
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    required
+                    value={inquiryForm.phone}
+                    onChange={e => setInquiryForm(f => ({ ...f, phone: e.target.value }))}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    required
+                    value={inquiryForm.email}
+                    onChange={e => setInquiryForm(f => ({ ...f, email: e.target.value }))}
+                  />
+                  <textarea
+                    rows="2"
+                    placeholder="Message"
+                    required
+                    value={inquiryForm.message}
+                    onChange={e => setInquiryForm(f => ({ ...f, message: e.target.value }))}
                   ></textarea>
-                  
+
                   <div className={styles.actionButtons}>
-                    <button type="submit" className="btn" style={{ background: '#4a4a4a', color: 'white', border: 'none', padding: '0.85rem' }}>
-                      Request Info
+                    <button
+                      type="submit"
+                      className="btn"
+                      disabled={formStatus === 'submitting'}
+                      style={{ background: '#4a4a4a', color: 'white', border: 'none', padding: '0.85rem', opacity: formStatus === 'submitting' ? 0.7 : 1 }}
+                    >
+                      {formStatus === 'submitting' ? 'Sending...' : 'Request Info'}
                     </button>
                     {agent && (
                       <a href={`tel:${agent.phone.replace(/\D/g, '')}`} className="btn btn-outline" style={{ background: 'white' }}>
@@ -185,7 +233,7 @@ export default function PropertyDetail() {
                       </a>
                     )}
                     {agent && (
-                      <a 
+                      <a
                         href={`https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`I am interested in ${property.title}`)}`}
                         target="_blank"
                         rel="noreferrer"
@@ -195,7 +243,16 @@ export default function PropertyDetail() {
                       </a>
                     )}
                   </div>
-                  {formStatus === 'success' && <div style={{ color: 'green', marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>Enquiry has been submitted! Our team will contact you shortly.</div>}
+                  {formStatus === 'success' && (
+                    <div style={{ color: 'green', marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                      ✓ Enquiry submitted! Our team will contact you shortly.
+                    </div>
+                  )}
+                  {formStatus === 'error' && (
+                    <div style={{ color: '#ed1b24', marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                      Something went wrong. Please try again.
+                    </div>
+                  )}
                 </form>
               </div>
             </div>
