@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { MessageCircle, Phone, MapPin, X, Share2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MessageCircle, X, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getSiteSettings } from '../../services/propertyService';
 import styles from './WhatsAppBubble.module.css';
 
-// Inline brand SVGs (Instagram & Facebook removed from lucide-react v1.x)
 const InstagramIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -20,39 +20,76 @@ const FacebookIcon = ({ size = 20 }) => (
 
 export default function WhatsAppBubble() {
   const [isOpen, setIsOpen] = useState(false);
+  const [settings, setSettings] = useState(null);
+
+  // Fetch siteSettings from Firebase so social links are always up to date
+  useEffect(() => {
+    getSiteSettings().then(data => {
+      if (data) setSettings(data);
+    });
+  }, []);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
+  // Build action list from Firebase — only include links that are configured
+  const whatsappNum = (settings?.whatsappBusiness || settings?.primaryPhone || '').replace(/\D/g, '');
+  const instagramUrl = settings?.instagramUrl || '';
+  const facebookUrl = settings?.facebookUrl || '';
+
   const actions = [
-    { id: 'instagram', icon: <InstagramIcon size={20} />, href: 'https://instagram.com/propertyexpress', color: '#E1306C' },
-    { id: 'whatsapp', icon: <MessageCircle size={20} />, href: 'https://wa.me/15551234567', color: '#25D366' },
-    { id: 'facebook', icon: <FacebookIcon size={20} />, href: 'https://facebook.com/propertyexpress', color: '#4267B2' }
+    instagramUrl && {
+      id: 'instagram',
+      icon: <InstagramIcon size={20} />,
+      href: instagramUrl,
+      color: '#E1306C',
+      label: 'Instagram',
+    },
+    whatsappNum && {
+      id: 'whatsapp',
+      icon: <MessageCircle size={20} />,
+      href: `https://wa.me/${whatsappNum}`,
+      color: '#25D366',
+      label: 'WhatsApp',
+    },
+    facebookUrl && {
+      id: 'facebook',
+      icon: <FacebookIcon size={20} />,
+      href: facebookUrl,
+      color: '#4267B2',
+      label: 'Facebook',
+    },
+  ].filter(Boolean);
+
+  // Use fallbacks if Firebase hasn't loaded yet (so bubble still appears)
+  const displayActions = actions.length > 0 ? actions : [
+    { id: 'whatsapp', icon: <MessageCircle size={20} />, href: '#', color: '#25D366', label: 'WhatsApp' },
   ];
 
   return (
     <div className={styles.floatingActions}>
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             className={styles.expandedMenu}
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.8 }}
             transition={{ duration: 0.2 }}
           >
-            {actions.map((action, i) => (
+            {displayActions.map((action, i) => (
               <motion.a
                 key={action.id}
                 href={action.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={action.label}
                 className={styles.subBtn}
                 style={{ backgroundColor: action.color, color: 'white' }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: (actions.length - 1 - i) * 0.04 }}
+                transition={{ delay: (displayActions.length - 1 - i) * 0.04 }}
               >
                 {action.icon}
               </motion.a>
@@ -61,7 +98,7 @@ export default function WhatsAppBubble() {
         )}
       </AnimatePresence>
 
-      <motion.button 
+      <motion.button
         className={styles.floatBtn}
         onClick={toggleMenu}
         title="Contact Us"

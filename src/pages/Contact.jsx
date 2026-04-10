@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, MessageCircle } from 'lucide-react';
+import { submitLead } from '../services/leadService';
+import { getSiteSettings } from '../services/propertyService';
+import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
+import styles from './Contact.module.css';
 
 const InstagramIcon = ({ size = 24, color = "currentColor" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -15,13 +19,19 @@ const FacebookIcon = ({ size = 24, color = "currentColor" }) => (
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
   </svg>
 );
-import { submitLead } from '../services/leadService';
-import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
-import styles from './Contact.module.css';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [status, setStatus] = useState('idle');
+
+  // ── Fetch live contact & social data from Firebase ──
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    getSiteSettings().then(data => {
+      if (data) setSettings(data);
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,44 +46,53 @@ export default function Contact() {
     }
   };
 
+  // Build contact items dynamically from Firebase settings, with fallbacks
+  const phone = settings?.primaryPhone || '';
+  const whatsapp = settings?.whatsappBusiness || settings?.primaryPhone || '';
+  const email = settings?.supportEmail || '';
+  const address = settings?.officeAddress || '';
+  const instagramUrl = settings?.instagramUrl || '';
+  const facebookUrl = settings?.facebookUrl || '';
+  const whatsappClean = whatsapp.replace(/\D/g, '');
+
   const contactItems = [
-    {
+    address && {
       icon: <MapPin size={22} />,
       label: 'Office Location',
-      value: '123 Business Avenue, Suite 100\nNew York, NY 10001',
-      href: null,
+      value: address,
+      href: settings?.googleMapsEmbed || null,
     },
-    {
+    phone && {
       icon: <Phone size={22} />,
       label: 'Phone',
-      value: '+1 (555) 123-4567',
-      href: 'tel:+15551234567',
+      value: phone,
+      href: `tel:${phone.replace(/\s/g, '')}`,
     },
-    {
+    whatsapp && {
       icon: <MessageCircle size={22} />,
       label: 'WhatsApp',
-      value: '+1 (555) 123-4567',
-      href: 'https://wa.me/15551234567',
+      value: whatsapp,
+      href: `https://wa.me/${whatsappClean}`,
     },
-    {
+    email && {
       icon: <Mail size={22} />,
       label: 'Email',
-      value: 'hello@propertyexpress.com',
-      href: 'https://mail.google.com/mail/?view=cm&fs=1&to=hello@propertyexpress.com',
+      value: email,
+      href: `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`,
     },
-    {
+    instagramUrl && {
       icon: <InstagramIcon size={22} />,
       label: 'Instagram',
-      value: '@propertyexpress',
-      href: 'https://instagram.com/propertyexpress',
+      value: instagramUrl.replace(/^https?:\/\/(www\.)?instagram\.com\/?/, '@').replace(/\/$/, ''),
+      href: instagramUrl,
     },
-    {
+    facebookUrl && {
       icon: <FacebookIcon size={22} />,
       label: 'Facebook',
-      value: 'Property Express',
-      href: 'https://facebook.com/propertyexpress',
+      value: facebookUrl.replace(/^https?:\/\/(www\.)?facebook\.com\/?/, '').replace(/\/$/, '') || 'Facebook',
+      href: facebookUrl,
     },
-  ];
+  ].filter(Boolean); // Remove items with no data
 
   return (
     <motion.div
@@ -105,26 +124,39 @@ export default function Contact() {
               </p>
 
               <div className={styles.contactInfoList}>
-                {contactItems.map((item, i) => (
-                  <div key={i} className={styles.contactItem}>
-                    <div className={styles.iconWrap}>{item.icon}</div>
-                    <div className={styles.contactItemText}>
-                      <span className={styles.contactLabel}>{item.label}</span>
-                      {item.href ? (
-                        <a 
-                          href={item.href} 
-                          className={styles.contactValue} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          {item.value}
-                        </a>
-                      ) : (
-                        <span className={styles.contactValue} style={{ whiteSpace: 'pre-line' }}>{item.value}</span>
-                      )}
+                {contactItems.length === 0 ? (
+                  // Loading skeleton while Firebase data loads
+                  [...Array(4)].map((_, i) => (
+                    <div key={i} className={styles.contactItem} style={{ opacity: 0.4 }}>
+                      <div className={styles.iconWrap} style={{ background: 'rgba(0,0,0,0.06)', borderRadius: '50%', width: 44, height: 44 }} />
+                      <div className={styles.contactItemText}>
+                        <span className={styles.contactLabel} style={{ background: 'rgba(0,0,0,0.06)', borderRadius: 4, display: 'block', height: 12, width: 80 }} />
+                        <span className={styles.contactValue} style={{ background: 'rgba(0,0,0,0.06)', borderRadius: 4, display: 'block', height: 16, width: 160, marginTop: 6 }} />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  contactItems.map((item, i) => (
+                    <div key={i} className={styles.contactItem}>
+                      <div className={styles.iconWrap}>{item.icon}</div>
+                      <div className={styles.contactItemText}>
+                        <span className={styles.contactLabel}>{item.label}</span>
+                        {item.href ? (
+                          <a
+                            href={item.href}
+                            className={styles.contactValue}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {item.value}
+                          </a>
+                        ) : (
+                          <span className={styles.contactValue} style={{ whiteSpace: 'pre-line' }}>{item.value}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </motion.div>
 
@@ -141,7 +173,7 @@ export default function Contact() {
                 </div>
                 <div className={styles.formGroup}>
                   <label>Phone Number</label>
-                  <input type="tel" placeholder="+1 (555) 000-0000" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                  <input type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                 </div>
                 <div className={styles.formGroup}>
                   <label>Email Address</label>
@@ -154,7 +186,7 @@ export default function Contact() {
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={status === 'submitting'}>
                   {status === 'submitting' ? 'Sending…' : 'Submit Enquiry'}
                 </button>
-                {status === 'success' && <p style={{ color: 'green', marginTop: '1rem', textAlign: 'center', fontWeight: 'bold' }}>Enquiry has been submitted! Our team will contact you shortly.</p>}
+                {status === 'success' && <p style={{ color: 'green', marginTop: '1rem', textAlign: 'center', fontWeight: 'bold' }}>Enquiry submitted! Our team will contact you shortly.</p>}
                 {status === 'error'   && <p style={{ color: 'red',   marginTop: '1rem', textAlign: 'center' }}>Something went wrong. Please try again.</p>}
               </form>
             </motion.div>

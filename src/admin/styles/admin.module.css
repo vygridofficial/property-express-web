@@ -409,3 +409,66 @@
   }
 }
 
+/* ─── Issue 9: Dark Mode — Override all hardcoded black/grey elements ─── */
+[data-theme='dark'] .adminLayout input,
+[data-theme='dark'] .adminLayout select,
+[data-theme='dark'] .adminLayout textarea {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: var(--admin-text-main) !important;
+  color-scheme: dark;
+}
+
+[data-theme='dark'] .adminLayout input::placeholder,
+[data-theme='dark'] .adminLayout textarea::placeholder {
+  color: var(--admin-text-placeholder) !important;
+}
+
+[data-theme='dark'] .adminLayout input:focus,
+[data-theme='dark'] .adminLayout select:focus,
+[data-theme='dark'] .adminLayout textarea:focus {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  outline: none;
+}
+
+/* Glass card dark mode — ensure text elements are readable */
+[data-theme='dark'] .glassCard {
+  background: rgba(20, 25, 45, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Table rows in dark mode */
+[data-theme='dark'] .adminLayout tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Buttons with transparent background in dark mode */
+[data-theme='dark'] .adminLayout button[style*="background: transparent"],
+[data-theme='dark'] .adminLayout button[style*="background:transparent"] {
+  color: var(--admin-text-main) !important;
+}
+
+/* Select dropdown option text in dark mode */
+[data-theme='dark'] .adminLayout option {
+  background: #0d0f1a;
+  color: #ffffff;
+}
+
+/* Bottom area with borders */
+[data-theme='dark'] .adminLayout [style*="border-top: 1px solid rgba(0,0,0"],
+[data-theme='dark'] .adminLayout [style*="borderTop: '1px solid rgba(0,0,0"] {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Stat count labels on dashboard */
+[data-theme='dark'] .adminLayout h3[style*="color: var(--admin-text-muted)"] {
+  color: var(--admin-text-muted) !important;
+}
+
+/* Status badge backgrounds in dark mode — ensure text stays readable */
+[data-theme='dark'] .adminLayout span[style*="rgba(46,204,113"] {
+  background: rgba(46, 204, 113, 0.18) !important;
+}
+[data-theme='dark'] .adminLayout span[style*="rgba(237,27,36"] {
+  background: rgba(237, 27, 36, 0.18) !important;
+}

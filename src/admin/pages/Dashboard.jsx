@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
-import { ArrowRight } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { ArrowRight, LayoutGrid } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
-import { getAllProperties } from '../../services/propertyService';
 import { getAllInquiries } from '../../services/inquiryService';
-import { getAllReviews } from '../../services/reviewService';
 import styles from '../styles/admin.module.css';
 
 /* ─── Glass Tooltip for Charts ─── */
@@ -59,7 +57,7 @@ const StatCard = ({ title, value, icon, to }) => {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { isDark, properties, reviews } = useAdmin();
+  const { isDark, properties, reviews, customCategories } = useAdmin();
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(null);
   
@@ -83,15 +81,20 @@ export default function Dashboard() {
     try {
       const inqs = await getAllInquiries();
 
-      // Category breakdown for Pie Chart
-      const categories = ['Apartment', 'Villa', 'Plot', 'Commercial'];
-      const uniqueTypes = [...new Set(properties.map(p => p.category).filter(Boolean))];
+      // Issue 8: Count all unique property types (base 4 + custom)
+      const BASE_CATEGORIES = ['Apartment', 'Villa', 'Plot', 'Commercial'];
+      const totalPropertyTypes = BASE_CATEGORIES.length + (customCategories?.length || 0);
 
-      const pie = categories.map(cat => ({
+      // Category breakdown for Pie Chart — include custom categories
+      const allCategoryNames = [
+        ...BASE_CATEGORIES,
+        ...(customCategories || []).map(c => c.name)
+      ];
+      const pie = allCategoryNames.map(cat => ({
         name: cat,
-        value: properties.filter(p => p.category?.toLowerCase() === cat.toLowerCase() || p.category?.toLowerCase().includes(cat.toLowerCase().slice(0, -1))).length
+        value: properties.filter(p => p.category?.toLowerCase() === cat.toLowerCase()).length
       })).filter(item => item.value > 0);
-      
+
       setPieData(pie.length > 0 ? pie : [{ name: 'No Data', value: 1 }]);
 
       setStats({
@@ -99,7 +102,7 @@ export default function Dashboard() {
         totalInquiries: inqs.length,
         totalReviews: reviews.length,
         pendingReviews: reviews.filter(r => r.status?.toLowerCase() === 'pending').length,
-        propertyTypes: uniqueTypes.length
+        propertyTypes: totalPropertyTypes
       });
 
       setRecentInquiries(inqs.slice(0, 5));
@@ -147,7 +150,7 @@ export default function Dashboard() {
       >
         <StatCard title="Total Properties" value={stats.totalProperties} icon="🏘️" to="/admin/properties" />
         <StatCard title="Total Enquiries" value={stats.totalInquiries} icon="📩" to="/admin/inquiries" />
-        <StatCard title="Page Views" value={45200} icon="👁️" to="/admin/settings" />
+        <StatCard title="Property Types" value={stats.propertyTypes} icon="🏷️" to="/admin/settings" />
         <StatCard title="Pending Reviews" value={stats.pendingReviews} icon="⭐" to="/admin/reviews?filter=pending" />
       </motion.div>
 

@@ -3,8 +3,11 @@ import { collection, getDocs, getDoc, query, where, doc, updateDoc, deleteDoc, a
 
 const PROPERTIES_COLLECTION = 'properties';
 
-export const getFeaturedProperties = async () => {
-  const q = query(collection(db, PROPERTIES_COLLECTION), where("isFeatured", "==", true));
+export const getFeaturedProperties = async (includeInactive = false) => {
+  let q = query(collection(db, PROPERTIES_COLLECTION), where("isFeatured", "==", true));
+  if (!includeInactive) {
+    q = query(q, where("status", "==", "Active"));
+  }
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
@@ -15,9 +18,13 @@ export const getSiteSettings = async () => {
   return null;
 };
 
-export const getAllProperties = async (filters = {}) => {
+export const getAllProperties = async (filters = {}, includeInactive = false) => {
   const snapshot = await getDocs(collection(db, PROPERTIES_COLLECTION));
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  if (!includeInactive) {
+    results = results.filter(p => p.status === "Active");
+  }
 
   if (filters.location && filters.location !== "") {
     results = results.filter(p => p.location === filters.location);
@@ -52,6 +59,13 @@ export const deleteProperty = async (id) => {
   return await deleteDoc(docRef);
 };
 
+export const migratePropertiesCategory = async (oldCat, newCat) => {
+  const q = query(collection(db, PROPERTIES_COLLECTION), where("category", "==", oldCat));
+  const snapshot = await getDocs(q);
+  const batch = snapshot.docs.map(d => updateDoc(doc(db, PROPERTIES_COLLECTION, d.id), { category: newCat }));
+  await Promise.all(batch);
+};
+
 const CATEGORY_SYNONYMS = {
   Apartment: ['Apartment', 'Flat'],
   Flat: ['Flat', 'Apartment'],
@@ -60,15 +74,19 @@ const CATEGORY_SYNONYMS = {
   Plot: ['Plot', 'Land']
 };
 
-export const getPropertiesByCategory = async (category) => {
+export const getPropertiesByCategory = async (category, includeInactive = false) => {
   const normalizedCategory = category?.toString().trim() || '';
   const synonyms = CATEGORY_SYNONYMS[normalizedCategory] || [normalizedCategory];
   
   // Use 'in' query to fetch all synonym matches in one go
-  const q = query(
+  let q = query(
     collection(db, PROPERTIES_COLLECTION), 
     where("category", "in", synonyms)
   );
+
+  if (!includeInactive) {
+    q = query(q, where("status", "==", "Active"));
+  }
   
   const snapshot = await getDocs(q);
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -79,7 +97,11 @@ export const getPropertiesByCategory = async (category) => {
     const normalizedSyns = synonyms.map(s => s.toLowerCase());
     results = allSnapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(p => normalizedSyns.includes((p.category || '').toLowerCase()));
+      .filter(p => {
+        const matchesCat = normalizedSyns.includes((p.category || '').toLowerCase());
+        const matchesStatus = includeInactive || p.status === "Active";
+        return matchesCat && matchesStatus;
+      });
   }
 
   return results;

@@ -136,28 +136,28 @@ export default function Settings() {
 
           {/* Custom Categories */}
           {(draft.customCategories || []).map(cat => (
-            <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
-              <span style={{ fontWeight: 500 }}>Show {cat}</span>
+            <div key={cat.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
+              <span style={{ fontWeight: 500 }}>Show {cat.name}</span>
               <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
                 <input 
                   type="checkbox" 
-                  checked={draft.visibility?.[cat] !== false} 
+                  checked={draft.visibility?.[cat.name] !== false} 
                   onChange={() => {
                     const newVis = { ...(draft.visibility || {}) };
-                    newVis[cat] = draft.visibility?.[cat] === false;
+                    newVis[cat.name] = draft.visibility?.[cat.name] === false;
                     setDraft(prev => ({ ...prev, visibility: newVis }));
                   }} 
                   style={{ opacity: 0, width: 0, height: 0 }} 
                 />
                 <span style={{ 
                   position: 'absolute', cursor: 'pointer', inset: 0, 
-                  background: draft.visibility?.[cat] !== false ? '#18181a' : 'rgba(0,0,0,0.1)', 
+                  background: draft.visibility?.[cat.name] !== false ? '#18181a' : 'rgba(0,0,0,0.1)', 
                   borderRadius: 34, transition: '0.4s' 
                 }}>
                   <span style={{ 
                     position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
                     background: 'white', borderRadius: '50%', transition: '0.4s',
-                    transform: draft.visibility?.[cat] !== false ? 'translateX(22px)' : 'translateX(0)'
+                    transform: draft.visibility?.[cat.name] !== false ? 'translateX(22px)' : 'translateX(0)'
                   }}></span>
                 </span>
               </label>

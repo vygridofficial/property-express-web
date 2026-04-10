@@ -48,18 +48,18 @@ export default function Properties() {
 
   useEffect(() => {
     getSiteSettings().then(data => {
-      if (data && data.customCategories) {
-        const customObjects = data.customCategories.map(cat => ({
-          id: cat,
-          title: cat,
+      if (data) {
+        const visibleBase = CATEGORIES.filter(cat => data.visibility?.[cat.id] !== false);
+        const customObjects = (data.customCategories || []).map(cat => ({
+          id: cat.name,
+          title: cat.name,
           icon: LayoutGrid,
-          desc: `Explore ${cat} listings`,
-          img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'
-        }));
+          desc: `Explore ${cat.name} listings`,
+          img: cat.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
+          isVisible: data.visibility?.[cat.name] !== false
+        })).filter(cat => cat.isVisible);
         
-        const existing = CATEGORIES.map(c => c.id.toLowerCase());
-        const fresh = customObjects.filter(c => !existing.includes(c.id.toLowerCase()));
-        setDynamicCategories([...CATEGORIES, ...fresh]);
+        setDynamicCategories([...visibleBase, ...customObjects]);
       }
     });
   }, []);

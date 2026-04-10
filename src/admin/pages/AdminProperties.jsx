@@ -36,9 +36,8 @@ export default function AdminProperties() {
 
   // Expanded Form State
   const initialForm = {
-    title: '', category: 'Flat', status: 'Active', isFeatured: false,
-    price: '', area: '', bedrooms: '', bathrooms: '',
-    address: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
+    title: '', category: 'Apartment', status: 'Active', isFeatured: false,
+    price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
     address: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
     description: '', amenities: [], dynamicFilters: {}
   };
@@ -66,19 +65,31 @@ export default function AdminProperties() {
     });
   };
 
-  // Pre-fill form when editing
+  // Additional states for Custom Category Modal
+  const [isCatModalOpen, setIsCatModalOpen] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatFilters, setNewCatFilters] = useState('');
+
   useEffect(() => {
     if (editingId && selectedProperty) {
+      // Issue 13: pre-fill price using the stored numericPrice so the field never resets.
+      // numericPrice is a raw number (e.g. 5000000). The save handler converts it back
+      // to a formatted string (₹50L / ₹5Cr) and stores both.
+      const priceForField = selectedProperty.numericPrice > 0
+        ? selectedProperty.numericPrice
+        : '';
+
       setFormData({
-        title:       selectedProperty.title,
-        category:    selectedProperty.category,
-        status:      selectedProperty.status,
+        title:       selectedProperty.title || '',
+        category:    selectedProperty.category || 'Apartment',
+        status:      selectedProperty.status || 'Active',
         isFeatured:  selectedProperty.isFeatured || false,
-        price:       selectedProperty.price,
+        price:       priceForField,
         area:        selectedProperty.area || '',
+        areaUnit:    selectedProperty.areaUnit || 'sqft',
         bedrooms:    selectedProperty.bedrooms || '',
         bathrooms:   selectedProperty.bathrooms || '',
-        address:     selectedProperty.address || selectedProperty.location,
+        address:     selectedProperty.address || selectedProperty.location || '',
         mapsUrl:     selectedProperty.mapsUrl || '',
         agentName:   selectedProperty.agentName || '',
         agentPhone:  selectedProperty.agentPhone || '',
@@ -87,33 +98,28 @@ export default function AdminProperties() {
         amenities:   selectedProperty.amenities || [],
         dynamicFilters: selectedProperty.dynamicFilters || {},
       });
-        setImages(selectedProperty.imageUrls || [selectedProperty.image] || []);
+      // Pre-fill existing images (Cloudinary URLs or base64 previews)
+      setImages(selectedProperty.imageUrls || (selectedProperty.image ? [selectedProperty.image] : []));
     }
   }, [editingId, selectedProperty]);
 
   const pathSegments = location.pathname.split('/');
   const activeCategory = decodeURIComponent(pathSegments[pathSegments.length - 1]);
 
-  // Handle Loading state correctly across context updates
-  // const isActuallyLoading = loading || contextLoading;
-
-  useEffect(() => {
-    // setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [activeCategory]);
-
   const getPageIcon = () => {
-    if (activeCategory === 'flats') return <FlatIcon size={32} />;
-    if (activeCategory === 'villas') return <VillaIcon size={32} />;
-    if (activeCategory === 'warehouses') return <WarehouseIcon size={32} />;
-    if (activeCategory === 'plots') return <PlotIcon size={32} />;
+    const low = activeCategory.toLowerCase();
+    if (low === 'apartments' || low === 'flats') return <FlatIcon size={32} />;
+    if (low === 'villas') return <VillaIcon size={32} />;
+    if (low === 'commercial' || low === 'warehouses') return <WarehouseIcon size={32} />;
+    if (low === 'plots') return <PlotIcon size={32} />;
     return <WarehouseIcon size={32} />;
   };
 
-  const getPageTitle = () => activeCategory === 'properties' ? 'All Properties' : activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1);
+  const getPageTitle = () => {
+    if (activeCategory === 'properties') return 'All Properties';
+    if (activeCategory === 'Uncategorized') return 'Uncategorized';
+    return activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1);
+  };
 
   const uniqueLocations = useMemo(() => {
     const locs = properties.map(p => p.address || p.location).filter(Boolean);
@@ -423,14 +429,7 @@ export default function AdminProperties() {
             <button 
               className="btn" 
               style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer' }}
-              onClick={() => {
-                const newCat = window.prompt("Enter new custom category name:");
-              if (newCat && newCat.trim()) {
-                addCustomCategory(newCat);
-                setShowToast('Custom category added!');
-                setTimeout(() => setShowToast(''), 2500);
-              }
-            }}
+              onClick={() => setIsCatModalOpen(true)}
             >
               + Custom Type
             </button>
@@ -463,11 +462,12 @@ export default function AdminProperties() {
           {activeCategory === 'properties' && (
             <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
                <option value="All">Category: All</option>
-               <option value="Apartment">Apartment</option>
-               <option value="Villa">Villa</option>
-               <option value="Commercial">Commercial</option>
-               <option value="Plot">Plot</option>
-               {customCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                <option value="Apartment">Apartment</option>
+                <option value="Villa">Villa</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Plot">Plot</option>
+                <option value="Uncategorized">Uncategorized</option>
+                {customCategories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
             </select>
           )}
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
@@ -615,7 +615,8 @@ export default function AdminProperties() {
                         <option value="Plot">Plot</option>
                         <option value="Commercial">Commercial</option>
                         <option value="Villa">Villa</option>
-                        {customCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                        <option value="Uncategorized">Uncategorized</option>
+                        {customCategories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
                     <div>
@@ -817,6 +818,66 @@ export default function AdminProperties() {
           >
             <span style={{ background: '#2ecc71', color: 'white', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0 }}>✓</span>
             {showToast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Custom Category Creation Modal */}
+      <AnimatePresence>
+        {isCatModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}
+            onClick={() => setIsCatModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className={styles.glassCard}
+              style={{ width: '100%', maxWidth: 450, padding: '2.5rem' }}
+            >
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: '0.5rem' }}>New Property Type</h2>
+              <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>Define a new property category. Price and Location filters will be added automatically.</p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <Label required>Type Name</Label>
+                  <input 
+                    type="text" placeholder="e.g. Penthouse, Studio..." 
+                    value={newCatName} onChange={e => setNewCatName(e.target.value)} 
+                    style={getInputStyle()} 
+                  />
+                </div>
+                <div>
+                  <Label>Additional Filters (Optional)</Label>
+                  <input 
+                    type="text" placeholder="e.g. Furnishing, Floor No (comma separated)" 
+                    value={newCatFilters} onChange={e => setNewCatFilters(e.target.value)} 
+                    style={getInputStyle()} 
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.5rem' }}>Separate multiple custom parameters with commas.</p>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                  <button className="btn" onClick={() => setIsCatModalOpen(false)} style={{ flex: 1, background: 'rgba(0,0,0,0.05)', border: 'none', padding: '1rem', fontWeight: 600 }}>Cancel</button>
+                  <button 
+                    className="btn" 
+                    style={{ flex: 1, background: '#ed1b24', color: 'white', border: 'none', padding: '1rem', fontWeight: 700 }}
+                    onClick={() => {
+                      if (!newCatName.trim()) return;
+                      const filtersArray = newCatFilters.split(',').map(f => f.trim()).filter(Boolean);
+                      addCustomCategory(newCatName, filtersArray);
+                      setIsCatModalOpen(false);
+                      setNewCatName('');
+                      setNewCatFilters('');
+                      setShowToast('Property Type Created!');
+                      setTimeout(() => setShowToast(''), 2500);
+                    }}
+                  >
+                    Create Type
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

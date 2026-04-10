@@ -9,7 +9,7 @@ import logo from '../../assets/logo.png';
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const { sections, logout, customCategories, requestDeleteCustomCategory } = useAdmin();
+  const { sections, logout, customCategories, requestDeleteCustomCategory, properties } = useAdmin();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -76,11 +76,18 @@ export default function Sidebar() {
             ))}
 
             {/* Custom Categories */}
-            {customCategories.map((cat, idx) => (sections[cat] !== false) && (
-                <motion.div key={`side-cat-${cat || 'custom'}-${idx}`} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                   <NavItem to={`/admin/properties/${(cat || 'unknown').toLowerCase()}`} icon={Building2} label={cat || 'Custom'} isCustom />
+            {customCategories.map((cat, idx) => (sections[cat.name] !== false) && (
+                <motion.div key={`side-cat-${cat.name || 'custom'}-${idx}`} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                   <NavItem to={`/admin/properties/${(cat.name || 'unknown').toLowerCase()}`} icon={Building2} label={cat.name || 'Custom'} isCustom />
               </motion.div>
             ))}
+
+            {/* Uncategorized (Fix for Point 11) */}
+            {properties.some(p => p.category === 'Uncategorized') && (
+              <motion.div key="uncategorized-nav" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <NavItem to="/admin/properties/uncategorized" icon={WarehouseIcon} label="Uncategorized" />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 
@@ -88,7 +95,7 @@ export default function Sidebar() {
           {!collapsed && <div className={styles.navLabel}>Management</div>}
           <NavItem to="/admin/inquiries" icon={MessageSquare} label="Enquiries" />
           <AnimatePresence mode="popLayout">
-            {sections.showReviews && (
+            {sections.showReviews !== false && (
               <motion.div key="review-nav" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
                 <NavItem to="/admin/reviews" icon={Star} label="Reviews" />
               </motion.div>
@@ -98,13 +105,8 @@ export default function Sidebar() {
 
         <div className={styles.navGroup}>
           {!collapsed && <div className={styles.navLabel}>Settings</div>}
-          <AnimatePresence mode="popLayout">
-            {sections.showContactForm && (
-              <motion.div key="contact-nav" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                 <NavItem to="/admin/contact-social" icon={LinkIcon} label="Contact & Social" />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Contact & Social is always visible — it's a core admin page */}
+          <NavItem to="/admin/contact-social" icon={LinkIcon} label="Contact & Social" />
           <NavItem to="/admin/settings" icon={Settings} label="Site Settings" />
         </div>
       </nav>

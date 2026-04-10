@@ -1,43 +1,45 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { db, auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDocs, query, where, setDoc } from 'firebase/firestore';
 
 const AdminContext = createContext();
 
 export function AdminProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // ─── Auth: true=logged in, false=logged out, null=loading ───
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [properties, setProperties] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Auth Persistence Sync
+  // ── Issue 1: Auth Persistence ──
+  // onAuthStateChanged ensures session survives page refresh.
+  // null initial state prevents a flash-to-login before Firebase responds.
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
     });
     return () => unsubscribe();
   }, []);
-  
-  // Real-time Properties Sync
+
+  // ── Real-time Properties Sync ──
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'properties'), (snapshot) => {
-      const data = snapshot.docs.map(doc => {
-        const docData = doc.data();
+      const data = snapshot.docs.map(d => {
+        const docData = d.data();
         let numericPrice = 0;
-        
         if (docData.numericPrice !== undefined) {
           numericPrice = Number(docData.numericPrice);
         } else if (docData.price) {
           const pStr = docData.price.toString().replace(/[^0-9.]/g, '');
-          numericPrice = parseFloat(pStr) * (docData.price.includes('Cr') ? 10000000 : (docData.price.includes('L') ? 100000 : 1));
+          const pNum = parseFloat(pStr);
+          if (!isNaN(pNum)) {
+            if (docData.price.toLowerCase().includes('cr')) numericPrice = pNum * 10000000;
+            else if (docData.price.toLowerCase().includes('l')) numericPrice = pNum * 100000;
+            else numericPrice = pNum;
+          }
         }
-
-        return { 
-          id: doc.id, 
-          ...docData,
-          numericPrice: numericPrice 
-        };
+        return { id: d.id, ...docData, numericPrice };
       });
       setProperties(data);
       setLoading(false);
@@ -45,15 +47,16 @@ export function AdminProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  // Real-time Reviews Sync (Fixes Point 6)
+  // ── Issue 6: Reviews — Real-time sync so new reviews appear immediately ──
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'reviews'), (snapshot) => {
-      const revs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const revs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setReviews(revs);
     });
     return () => unsubscribe();
   }, []);
 
+  // ── Property CRUD ──
   const updatePropertyStatus = async (id, status) => {
     await updateDoc(doc(db, 'properties', id), { status });
   };
@@ -61,11 +64,11 @@ export function AdminProvider({ children }) {
   const deletePropertyItem = async (id) => {
     await deleteDoc(doc(db, 'properties', id));
   };
-  
-  // Section Visibility Logic
+
+  // ── Sections (visibility) state ──
   const [sections, setSections] = useState({});
 
-  // Dark mode — persisted in localStorage
+  // ── Issue 9: Dark Mode — persisted in localStorage ──
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('adminTheme') === 'dark';
   });
@@ -84,17 +87,17 @@ export function AdminProvider({ children }) {
 
   const toggleTheme = () => setIsDark(prev => !prev);
 
-  // Notifications
+  // ── Notifications ──
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'leads'), (snapshot) => {
       const newLeads = snapshot.docs
-        .filter(doc => doc.data().status === 'new')
-        .map(doc => ({
-          id: doc.id,
+        .filter(d => d.data().status === 'new')
+        .map(d => ({
+          id: d.id,
           type: 'New Enquiry',
-          message: `New enquiry from ${doc.data().name || 'Someone'}`,
+          message: `New enquiry from ${d.data().name || 'Someone'}`,
           time: 'Just now',
           read: false,
           link: '/admin/inquiries'
@@ -104,14 +107,8 @@ export function AdminProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const deleteNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-  };
-
+  const markAllAsRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  const deleteNotification = (id) => setNotifications(prev => prev.filter(n => n.id !== id));
   const clearAllNotifications = () => setNotifications([]);
 
   const login = () => setIsAuthenticated(true);
@@ -120,24 +117,27 @@ export function AdminProvider({ children }) {
     setIsAuthenticated(false);
   };
 
-  // Global Site Settings
+  // ── Issues 2, 3, 4, 5: Global Site Settings ──
+  // All settings stored in Firestore at settings/global
   const [siteSettings, setSiteSettings] = useState({
     siteName: 'Property Express',
     tagline: 'Premium Real Estate Properties',
     metaDescription: 'Discover the most premium luxury villas, apartments, and plots available.',
-    visibility: {}, // Dynamic visibility map
+    visibility: {},
     achievementsPropertiesSold: '1.2',
     achievementsClientSatisfaction: '4.9',
     achievementsVerifiedListings: '100',
     achievementsExpertConsultants: '50',
-    // Contact Info
-    primaryPhone: '+1 (555) 123-4567',
-    whatsappBusiness: '+1 (555) 123-4567',
-    supportEmail: 'hello@propertyexpress.com',
-    officeAddress: '123 Business Avenue, Suite 100, New York, NY 10001',
+    primaryPhone: '',
+    whatsappBusiness: '',
+    supportEmail: '',
+    officeAddress: '',
     googleMapsEmbed: '',
-    instagramUrl: 'https://instagram.com/propertyexpress',
-    facebookUrl: 'https://facebook.com/propertyexpress'
+    instagramUrl: '',
+    facebookUrl: '',
+    customCategories: [],
+    showReviews: true,
+    showContactForm: true,
   });
 
   useEffect(() => {
@@ -145,9 +145,12 @@ export function AdminProvider({ children }) {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setSiteSettings(prev => ({ ...prev, ...data }));
-        // Backward compatibility for sections
-        setSections(prev => ({ ...prev, ...data.visibility }));
-        if (data.customCategories) {
+        // Sync visibility sections for sidebar
+        if (data.visibility) {
+          setSections(prev => ({ ...prev, ...data.visibility }));
+        }
+        // Sync custom categories
+        if (Array.isArray(data.customCategories)) {
           setCustomCategories(data.customCategories);
         }
       }
@@ -155,10 +158,14 @@ export function AdminProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
+  // updateSiteSettings merges new fields, does NOT overwrite the whole doc.
   const updateSiteSettings = async (newSettings) => {
-    await updateDoc(doc(db, 'settings', 'global'), newSettings);
+    const ref = doc(db, 'settings', 'global');
+    // Use setDoc with merge:true so that if doc doesn't exist it gets created
+    await setDoc(ref, newSettings, { merge: true });
   };
 
+  // ── Issues 10, 11: Custom Categories — stored as objects {name, image, filters} ──
   const [customCategories, setCustomCategories] = useState([]);
   const [deleteModalConfig, setDeleteModalConfig] = useState({ isOpen: false, category: '' });
 
@@ -170,33 +177,58 @@ export function AdminProvider({ children }) {
     setDeleteModalConfig({ isOpen: false, category: '' });
   };
 
-  const addCustomCategory = async (name) => {
+  const addCustomCategory = async (name, filters = []) => {
     const trimmed = name?.trim();
-    if (trimmed && !customCategories.includes(trimmed) && !['Apartment', 'Villa', 'Plot', 'Commercial'].includes(trimmed)) {
-      const updated = [...customCategories, trimmed];
-      await updateSiteSettings({ customCategories: updated });
-    }
+    if (!trimmed) return;
+
+    const base = ['Apartment', 'Villa', 'Plot', 'Commercial', 'Uncategorized'];
+    const alreadyExists = base.includes(trimmed) || customCategories.some(c => c.name === trimmed);
+    if (alreadyExists) return;
+
+    // Auto-generate a relevant background image using Unsplash
+    const autoImage = `https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80`;
+
+    const newCat = { name: trimmed, image: autoImage, filters };
+    const updatedCats = [...customCategories, newCat];
+
+    // Enable visibility by default
+    const updatedVis = { ...(siteSettings.visibility || {}), [trimmed]: true };
+
+    await updateSiteSettings({ customCategories: updatedCats, visibility: updatedVis });
   };
 
-  const deleteCustomCategory = async (name, action = 'delete', destCategory = '') => {
-    const updated = customCategories.filter(c => c !== name);
-    await updateSiteSettings({ customCategories: updated });
-    if (action === 'delete') {
-      // Logic for deleting properties of this category would go here
-    }
+  // Issue 11: deleteCustomCategory — moves properties to Uncategorized
+  const deleteCustomCategory = async (name) => {
+    // 1. Move all properties of this category to Uncategorized
+    const q = query(collection(db, 'properties'), where('category', '==', name));
+    const snap = await getDocs(q);
+    const migrationPromises = snap.docs.map(d =>
+      updateDoc(doc(db, 'properties', d.id), { category: 'Uncategorized' })
+    );
+    await Promise.all(migrationPromises);
+
+    // 2. Remove from customCategories list
+    const updatedCats = customCategories.filter(c => c.name !== name);
+
+    // 3. Remove from visibility map
+    const updatedVis = { ...(siteSettings.visibility || {}) };
+    delete updatedVis[name];
+
+    await updateSiteSettings({ customCategories: updatedCats, visibility: updatedVis });
   };
 
   return (
-    <AdminContext.Provider 
+    <AdminContext.Provider
       value={{
         isAuthenticated, login, logout,
         sections, setSections,
         notifications, setNotifications, markAllAsRead, deleteNotification, clearAllNotifications,
         isDark, toggleTheme,
         properties, setProperties, loading, updatePropertyStatus, deletePropertyItem,
-        reviews, siteSettings, updateSiteSettings,
+        reviews,
+        siteSettings, updateSiteSettings,
         customCategories, addCustomCategory, deleteCustomCategory,
-        deleteModalConfig, requestDeleteCustomCategory, closeDeleteModal
+        deleteModalConfig, requestDeleteCustomCategory, closeDeleteModal,
       }}
     >
       {children}

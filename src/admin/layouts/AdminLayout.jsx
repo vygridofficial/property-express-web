@@ -11,11 +11,33 @@ import styles from '../styles/admin.module.css';
 
 export default function AdminLayout() {
   const location = useLocation();
+  // isAuthenticated is null while Firebase is resolving, false when logged out, true when logged in
   const { isAuthenticated } = useAdmin();
+
+  // Show nothing while Firebase is resolving auth state (prevents flash-to-login on refresh)
+  if (isAuthenticated === null) {
+    return (
+      <div className={styles.adminLayout} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div className={styles.adminCanvas} />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}
+        >
+          <div style={{
+            width: 40, height: 40, border: '3px solid rgba(0,0,0,0.1)',
+            borderTop: '3px solid #ed1b24', borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite'
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.adminLayout}>
-      <div className={styles.adminCanvas}></div>
+      <div className={styles.adminCanvas} />
       <AnimatePresence mode="wait">
         {!isAuthenticated ? (
           <motion.div

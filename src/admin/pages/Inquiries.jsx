@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, ChevronDown, ChevronUp, X, MessageSquare, Trash2 } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, X, MessageSquare, Trash2, Phone, Mail } from 'lucide-react';
 import { getAllInquiries, updateInquiry, deleteInquiry } from '../../services/inquiryService';
+import { useAdmin } from '../context/AdminContext';
 import styles from '../styles/admin.module.css';
 
 export default function Inquiries() {
@@ -10,11 +11,13 @@ export default function Inquiries() {
   const queryParams = new URLSearchParams(location.search);
   const expandedIdParam = queryParams.get('expanded');
 
+  // Issue 7: siteSettings needed for WhatsApp/Email reply templates
+  const { siteSettings } = useAdmin();
+
   const [inquiries, setInquiries] = useState([]);
   const [expandedRow, setExpandedRow] = useState(expandedIdParam);
   const [loading, setLoading] = useState(true);
 
-  // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -65,12 +68,10 @@ export default function Inquiries() {
 
   const getStatusStyle = (status) => {
     const s = status?.toLowerCase();
-    switch(s) {
-      case 'new': return { background: 'rgba(24,24,26,0.1)', color: '#18181a' };
-      case 'responded': return { background: 'rgba(46,204,113,0.1)', color: '#2ecc71' };
-      case 'closed': return { background: 'rgba(85,85,85,0.1)', color: '#555555' };
-      default: return { background: 'rgba(0,0,0,0.05)', color: '#888' };
-    }
+    if (s === 'new') return { background: 'rgba(237,27,36,0.1)', color: '#ed1b24' };
+    if (s === 'responded') return { background: 'rgba(46,204,113,0.1)', color: '#2ecc71' };
+    if (s === 'closed') return { background: 'rgba(85,85,85,0.1)', color: '#888' };
+    return { background: 'rgba(0,0,0,0.05)', color: '#888' };
   };
 
   const filteredInqs = inquiries.filter(inq => {
@@ -87,34 +88,55 @@ export default function Inquiries() {
     return matchSearch && matchStatus && matchCategory;
   });
 
+  // Issue 7: Build WhatsApp & Email links with contact data from Firebase siteSettings
+  const buildWhatsAppUrl = (inq) => {
+    const phone = (inq.phone || '').replace(/[^0-9]/g, '');
+    const companyName = siteSettings?.siteName || 'Property Express';
+    const message = encodeURIComponent(
+      `Hello ${inq.name},\n\nThis is ${companyName} regarding your enquiry about "${inq.propertyTitle || inq.property}".\n\nWe'd love to connect with you and discuss your requirements.`
+    );
+    return `https://wa.me/${phone}?text=${message}`;
+  };
+
+  const buildEmailUrl = (inq) => {
+    const companyName = siteSettings?.siteName || 'Property Express';
+    const subject = encodeURIComponent(`Re: Your Enquiry at ${companyName}`);
+    const body = encodeURIComponent(
+      `Hello ${inq.name},\n\nThank you for reaching out to ${companyName} regarding "${inq.propertyTitle || inq.property}".\n\nWe'd be happy to assist you further.\n\nBest regards,\n${companyName} Team`
+    );
+    return `mailto:${inq.email || ''}?subject=${subject}&body=${body}`;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      
+
       {/* Top Bar Actions */}
       <div className={styles.glassCard} style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 280 }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
           <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }} />
-          <input 
-            type="text" placeholder="Search enquiries..." 
+          <input
+            type="text" placeholder="Search enquiries..."
             value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-            style={{ width: '100%', paddingLeft: '2.5rem' }} 
+            style={{ width: '100%', paddingLeft: '2.5rem' }}
           />
           {searchTerm && <X size={16} onClick={() => setSearchTerm('')} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--admin-text-muted)' }} />}
         </div>
-        
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} style={{ padding: '0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+
+        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
+          style={{ padding: '0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600, fontFamily: 'Outfit, sans-serif', color: 'var(--admin-text-main)' }}>
           <option value="All">Category: All</option>
-          <option value="Flat">Flats</option>
-          <option value="Plot">Plots</option>
-          <option value="Warehouse">Warehouses</option>
+          <option value="Apartment">Apartments</option>
           <option value="Villa">Villas</option>
+          <option value="Plot">Plots</option>
+          <option value="Commercial">Commercial</option>
         </select>
 
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+          style={{ padding: '0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600, fontFamily: 'Outfit, sans-serif', color: 'var(--admin-text-main)' }}>
           <option value="All">Status: All</option>
-          <option value="New">New</option>
-          <option value="Responded">Responded</option>
-          <option value="Closed">Closed</option>
+          <option value="new">New</option>
+          <option value="responded">Responded</option>
+          <option value="closed">Closed</option>
         </select>
       </div>
 
@@ -122,59 +144,62 @@ export default function Inquiries() {
       <div className={styles.glassCard}>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {[...Array(4)].map((_, idx) => <div key={idx} style={{ height: 60, borderRadius: 12, background: 'rgba(0,0,0,0.06)', animation: 'shimmer 2s infinite' }} />)}
+            {[...Array(4)].map((_, idx) => <div key={idx} style={{ height: 60, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />)}
           </div>
         ) : filteredInqs.length === 0 ? (
           <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--admin-text-muted)', fontWeight: 300 }}>
-            <MessageSquare size={48} opacity={0.2} style={{ marginBottom: '1rem' }} />
+            <MessageSquare size={48} opacity={0.2} style={{ marginBottom: '1rem', display: 'block', margin: '0 auto 1rem' }} />
             <p>No enquiries match your filters.</p>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
-            <motion.table variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }} initial="hidden" animate="show" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <motion.table
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+              initial="hidden" animate="show"
+              style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 600 }}
+            >
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--admin-stroke)' }}>
-                  <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Name</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Phone</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Property</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Category</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Date</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Status</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}></th>
+                  {['Name', 'Phone', 'Property', 'Category', 'Date', 'Status', ''].map((h, idx) => (
+                    <th key={`th-${idx}`} style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredInqs.map((inq, i) => (
                   <React.Fragment key={inq.id}>
-                    <motion.tr 
+                    <motion.tr
                       variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }}
                       onClick={() => setExpandedRow(expandedRow === inq.id ? null : inq.id)}
-                      style={{ 
-                        borderBottom: expandedRow === inq.id ? 'none' : '1px solid var(--admin-stroke)', 
-                        background: expandedRow === inq.id ? 'rgba(0,0,0,0.04)' : (i % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.02)'),
-                        borderLeft: inq.status === 'New' ? '2px solid #ed1b24' : '2px solid transparent', // Highlight unread
+                      style={{
+                        borderBottom: expandedRow === inq.id ? 'none' : '1px solid var(--admin-stroke)',
+                        background: expandedRow === inq.id ? 'rgba(0,0,0,0.04)' : (i % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.015)'),
+                        borderLeft: inq.status?.toLowerCase() === 'new' ? '3px solid #ed1b24' : '3px solid transparent',
                         cursor: 'pointer',
-                        transition: 'background 0.2s'
+                        transition: 'background 0.2s',
                       }}
                     >
-                      <td style={{ padding: '1rem', fontWeight: 600 }}>{inq.name}</td>
-                      <td style={{ padding: '1rem', fontWeight: 400, fontVariantNumeric: 'tabular-nums' }}>{inq.phone}</td>
-                      <td style={{ padding: '1rem', fontWeight: 400 }}>{inq.propertyTitle || inq.property}</td>
+                      <td style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-main)' }}>{inq.name}</td>
+                      <td style={{ padding: '1rem', fontWeight: 400, fontVariantNumeric: 'tabular-nums', color: 'var(--admin-text-body)' }}>{inq.phone}</td>
+                      <td style={{ padding: '1rem', fontWeight: 400, color: 'var(--admin-text-body)' }}>{inq.propertyTitle || inq.property}</td>
                       <td style={{ padding: '1rem', fontWeight: 300, color: 'var(--admin-text-muted)' }}>{inq.category}</td>
                       <td style={{ padding: '1rem', fontWeight: 300, color: 'var(--admin-text-muted)', fontVariantNumeric: 'tabular-nums' }}>
                         {inq.createdAt?.toDate ? inq.createdAt.toDate().toLocaleDateString() : inq.date}
                       </td>
-                      <td style={{ padding: '1rem' }} onClick={(e) => e.stopPropagation()}>
-                        <select 
-                          value={inq.status} 
+                      <td style={{ padding: '1rem' }} onClick={e => e.stopPropagation()}>
+                        <select
+                          value={inq.status}
                           onChange={(e) => {
-                            if (e.target.value === 'responded') markResponded(inq.id);
-                            else if (e.target.value === 'closed') markClosed(inq.id);
-                            else updateInquiry(inq.id, { status: e.target.value });
+                            const val = e.target.value;
+                            if (val === 'responded') markResponded(inq.id);
+                            else if (val === 'closed') markClosed(inq.id);
+                            else updateInquiry(inq.id, { status: val });
                           }}
                           style={{
-                            padding: '0.35rem 0.85rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', 
-                            letterSpacing: '0.05em', border: 'none', outline: 'none', cursor: 'pointer', appearance: 'none',
+                            padding: '0.35rem 0.85rem', borderRadius: '20px', fontSize: '0.75rem',
+                            fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+                            border: 'none', outline: 'none', cursor: 'pointer', appearance: 'none',
+                            fontFamily: 'Outfit, sans-serif',
                             ...getStatusStyle(inq.status)
                           }}
                         >
@@ -185,7 +210,7 @@ export default function Inquiries() {
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'right' }}>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
-                          <button onClick={(e) => { e.stopPropagation(); handleDelete(inq.id); }} className={styles.iconBtn} style={{ color: 'var(--admin-text-muted)' }}>
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(inq.id); }} className={styles.iconBtn}>
                             <Trash2 size={16} />
                           </button>
                           <button className={styles.iconBtn}>
@@ -194,39 +219,74 @@ export default function Inquiries() {
                         </div>
                       </td>
                     </motion.tr>
-                    {/* Expandable row */}
+
+                    {/* Expandable row with message + Reply buttons */}
                     <AnimatePresence>
                       {expandedRow === inq.id && (
                         <motion.tr
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          style={{ background: 'rgba(0,0,0,0.04)', borderLeft: inq.status === 'New' ? '2px solid #ed1b24' : '2px solid transparent' }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          style={{
+                            background: 'rgba(0,0,0,0.02)',
+                            borderLeft: inq.status?.toLowerCase() === 'new' ? '3px solid #ed1b24' : '3px solid transparent',
+                          }}
                         >
                           <td colSpan="7" style={{ padding: 0, borderBottom: '1px solid var(--admin-stroke)' }}>
-                            <div style={{ padding: '0 2rem 2rem 2rem' }}>
-                              <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem' }}>Message</h4>
-                              <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--admin-text-body)', background: 'rgba(255,255,255,0.4)', padding: '1.25rem', borderRadius: 8, border: '1px solid rgba(0,0,0,0.05)' }}>
-                                "{inq.message}"
+                            <div style={{ padding: '1.5rem 2rem 2rem' }}>
+                              {/* Message */}
+                              <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.75rem' }}>
+                                Message
+                              </h4>
+                              <p style={{ fontSize: '0.95rem', lineHeight: 1.7, color: 'var(--admin-text-body)', background: 'rgba(255,255,255,0.4)', padding: '1.25rem', borderRadius: 10, border: '1px solid var(--admin-stroke)', marginBottom: '1.5rem' }}>
+                                "{inq.message || 'No message provided.'}"
                               </p>
-                              <div style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                                <a 
-                                  href={`https://wa.me/${inq.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${inq.name},\n\nThis is ${siteSettings?.siteName || 'Property Express'} regarding your inquiry about "${inq.propertyTitle || inq.property}". We'd love to discuss this further with you!`)}`}
-                                  target="_blank" rel="noopener noreferrer"
-                                  className="btn" 
-                                  onClick={() => markResponded(inq.id)}
-                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1.75rem', fontSize: '0.9rem', background: '#25D366', color: 'white', border: 'none', fontWeight: 600, textDecoration: 'none', borderRadius: 12 }}
-                                >
-                                  Reply on WhatsApp
-                                </a>
-                                <a 
-                                  href={`mailto:${inq.email}?subject=${encodeURIComponent(`Regarding your inquiry at ${siteSettings?.siteName || 'Property Express'}`)}&body=${encodeURIComponent(`Hello ${inq.name},\n\nThank you for reaching out to us about ${inq.propertyTitle || inq.property}.\n\n`)}`}
-                                  className="btn" 
-                                  onClick={() => markResponded(inq.id)}
-                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1.75rem', fontSize: '0.9rem', background: '#18181a', color: 'white', border: 'none', fontWeight: 600, textDecoration: 'none', borderRadius: 12 }}
-                                >
-                                  Reply via Email
-                                </a>
+
+                              {/* Issue 7: WhatsApp & Email reply buttons */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+                                {/* WhatsApp button — uses phone number from enquiry */}
+                                {inq.phone && (
+                                  <a
+                                    href={buildWhatsAppUrl(inq)}
+                                    target="_blank" rel="noopener noreferrer"
+                                    onClick={() => markResponded(inq.id)}
+                                    style={{
+                                      display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                                      padding: '0.7rem 1.5rem', background: '#25D366', color: 'white',
+                                      borderRadius: 10, fontWeight: 600, fontSize: '0.9rem',
+                                      textDecoration: 'none', border: 'none', cursor: 'pointer',
+                                      fontFamily: 'Outfit, sans-serif',
+                                    }}
+                                  >
+                                    <Phone size={16} />
+                                    Reply on WhatsApp
+                                  </a>
+                                )}
+
+                                {/* Email button — uses email from enquiry */}
+                                {inq.email && (
+                                  <a
+                                    href={buildEmailUrl(inq)}
+                                    onClick={() => markResponded(inq.id)}
+                                    style={{
+                                      display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                                      padding: '0.7rem 1.5rem', background: '#18181a', color: 'white',
+                                      borderRadius: 10, fontWeight: 600, fontSize: '0.9rem',
+                                      textDecoration: 'none', border: 'none', cursor: 'pointer',
+                                      fontFamily: 'Outfit, sans-serif',
+                                    }}
+                                  >
+                                    <Mail size={16} />
+                                    Reply via Email
+                                  </a>
+                                )}
+
+                                {/* If no contact info available */}
+                                {!inq.phone && !inq.email && (
+                                  <span style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontStyle: 'italic' }}>
+                                    No contact info available to reply.
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </td>

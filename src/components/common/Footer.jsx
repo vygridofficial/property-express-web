@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import { getSiteSettings } from '../../services/propertyService';
 import styles from './Footer.module.css';
 import logo from '../../assets/logo.png';
 
@@ -25,21 +26,46 @@ const XIcon = () => (
 );
 
 export default function Footer() {
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    getSiteSettings().then(data => {
+      if (data) setSettings(data);
+    });
+  }, []);
+
+  const phone = settings?.primaryPhone || '';
+  const email = settings?.supportEmail || '';
+  const address = settings?.officeAddress || '';
+  const facebookUrl = settings?.facebookUrl || '';
+  const instagramUrl = settings?.instagramUrl || '';
+
   return (
     <footer className={styles.footer}>
       <div className="container">
         <div className={styles.footerGrid}>
           <div className={styles.footerCol}>
             <Link to="/" className={styles.logo}>
-              <img src={logo} alt="Property Express" className={styles.logoImg} />
+              <img src={logo} alt={settings?.siteName || "Property Express"} className={styles.logoImg} />
             </Link>
             <p className={styles.footerDesc}>
-              Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight.
+              {settings?.metaDescription || "Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight."}
             </p>
             <div className={`flex ${styles.socialLinks}`}>
-              <a href="https://facebook.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FacebookIcon /></a>
-              <a href="https://instagram.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><InstagramIcon /></a>
-              <a href="https://twitter.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><XIcon /></a>
+              {facebookUrl && (
+                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                  <FacebookIcon />
+                </a>
+              )}
+              {instagramUrl && (
+                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <InstagramIcon />
+                </a>
+              )}
+              {/* Keeping a default X icon as a placeholder unless there's a field for it */}
+              <a href="https://twitter.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                <XIcon />
+              </a>
             </div>
           </div>
 
@@ -49,7 +75,9 @@ export default function Footer() {
               <Link to="/">Home</Link>
               <Link to="/properties">Properties</Link>
               <Link to="/about">About Us</Link>
-              <Link to="/contact">Contact</Link>
+              {settings?.visibility?.showContactForm !== false && (
+                <Link to="/contact">Contact</Link>
+              )}
             </div>
           </div>
 
@@ -66,34 +94,46 @@ export default function Footer() {
           <div className={styles.footerCol}>
             <h4>Contact Info</h4>
             <div className={styles.footerLinks}>
-              <a 
-                href="https://www.google.com/maps/search/?api=1&query=123+Business+Avenue+Suite+100+New+York+NY+10001" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className={styles.contactItem}
-              >
-                <MapPin size={18} /> 
-                <span>123 Business Avenue, Suite 100, New York, NY 10001</span>
-              </a>
-              <a href="tel:+15551234567" className={styles.contactItem}>
-                <Phone size={18} /> 
-                <span>+1 (555) 123-4567</span>
-              </a>
-              <a 
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@propertyexpress.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className={styles.contactItem}
-              >
-                <Mail size={18} /> 
-                <span>hello@propertyexpress.com</span>
-              </a>
+              {address && (
+                <a 
+                  href={settings?.googleMapsEmbed || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={styles.contactItem}
+                >
+                  <MapPin size={18} /> 
+                  <span>{address}</span>
+                </a>
+              )}
+              {phone && (
+                <a href={`tel:${phone.replace(/\s/g, '')}`} className={styles.contactItem}>
+                  <Phone size={18} /> 
+                  <span>{phone}</span>
+                </a>
+              )}
+              {email && (
+                <a 
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={styles.contactItem}
+                >
+                  <Mail size={18} /> 
+                  <span>{email}</span>
+                </a>
+              )}
+              {/* Fallback values if nothing set yet */}
+              {!address && !phone && !email && (
+                <span className={styles.contactItem} style={{ color: 'var(--text-muted)' }}>
+                  Contact details not yet configured.
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         <div className={styles.footerBottom}>
-          <p>&copy; 2026 Property Express. All Rights Reserved. | Designed and Developed by <a href="https://vygrid.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', fontWeight: 'bold', textDecoration: 'underline' }}>Vygrid</a></p>
+          <p>&copy; {new Date().getFullYear()} {settings?.siteName || "Property Express"}. All Rights Reserved. | Designed and Developed by <a href="https://vygrid.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', fontWeight: 'bold', textDecoration: 'underline' }}>Vygrid</a></p>
         </div>
       </div>
     </footer>
