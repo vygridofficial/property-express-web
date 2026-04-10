@@ -203,24 +203,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
   const filteredImages = React.useMemo(() => {
     let result = [...images];
 
-    // Filter Location (except My Location which implies proximity sorting)
-    if (localFilters.location && localFilters.location !== 'My Location') {
-      result = result.filter(img => img.location === localFilters.location || img.address === localFilters.location);
-    }
-    
-    // Filter Price
-    if (localFilters.priceMax) {
-      result = result.filter(img => (img.numericPrice || 0) <= parseFloat(localFilters.priceMax));
-    }
-
-    // Filter Dynamic Keys
-    dynamicKeys.forEach(k => {
-      if (localFilters[k]) {
-        result = result.filter(img => img.dynamicFilters && img.dynamicFilters[k] === localFilters[k]);
-      }
-    });
-
-    // Haversine Geospatial Sorting & Strict Radial Enforcement
+    // Filter Location (Radial enforcement only)
     if (localFilters.location === 'My Location') {
       const centerCache = window.sessionStorage.getItem('mapCenter');
       if (centerCache) {
@@ -243,20 +226,32 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
         } catch(e) {}
       }
     }
+    
+    // Filter Price
+    if (localFilters.priceMax) {
+      result = result.filter(img => (img.numericPrice || 0) <= parseFloat(localFilters.priceMax));
+    }
+
+    // Filter Dynamic Keys
+    dynamicKeys.forEach(k => {
+      if (localFilters[k]) {
+        result = result.filter(img => img.dynamicFilters && img.dynamicFilters[k] === localFilters[k]);
+      }
+    });
     return result;
   }, [images, localFilters, dynamicKeys]);
 
   // Title: scale up as you scroll, then fade out
-  const titleScale = useTransform(scrollYProgress, [0, 0.4, 0.8], [1, isMobile ? 1.05 : 1.3, isMobile ? 0.9 : 0.7]);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.5, 0.85], [1, 0.8, 0]);
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, isMobile ? -30 : -120]);
+  const titleScale = useTransform(scrollYProgress, [0, 0.3, 0.6], [1, isMobile ? 1.05 : 1.3, isMobile ? 0.9 : 0.7]);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.4, 0.7], [1, 0.8, 0]);
+  const titleY = useTransform(scrollYProgress, [0, 0.8], [0, isMobile ? -30 : -120]);
 
   const springTitleScale = useSpring(titleScale, { stiffness: 60, damping: 22 });
   const springTitleOpacity = useSpring(titleOpacity, { stiffness: 80, damping: 28 });
   const springTitleY = useSpring(titleY, { stiffness: 60, damping: 22 });
 
-  // Listings reveal opacity
-  const listingsOpacity = useTransform(scrollYProgress, [isMobile ? 0.1 : 0.5, isMobile ? 0.4 : 0.85], [0, 1]);
+  // Listings reveal opacity - start earlier (at 20% scroll or even immediately on mobile)
+  const listingsOpacity = useTransform(scrollYProgress, [isMobile ? 0.05 : 0.25, isMobile ? 0.3 : 0.6], [0, 1]);
   const listingsSpring = useSpring(listingsOpacity, { stiffness: 60, damping: 25 });
 
   return (
@@ -317,13 +312,10 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
         <div className={styles.filterWrap}>
           <div className={styles.filterRow}>
             <div className={styles.filterGroup}>
-              <label>Location</label>
+              <label>Geo Filtering</label>
               <select name="location" value={localFilters.location} onChange={handleFilterChange}>
-                <option value="">All Locations</option>
-                {window.sessionStorage.getItem('isLocationDetected') === 'true' && <option value="My Location">My Location</option>}
-                {[...new Set(images.map(i => i.location || i.address).filter(Boolean))].map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
+                <option value="">Off (Show All)</option>
+                {window.sessionStorage.getItem('isLocationDetected') === 'true' && <option value="My Location">On (Within 50km)</option>}
               </select>
             </div>
             <div className={styles.filterGroup}>

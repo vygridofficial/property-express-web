@@ -4,7 +4,7 @@
 
 /* ── Hero Panel ─────────────────────────────────────────── */
 .heroPanel {
-  height: 200vh;
+  height: 140vh;
   /* Extra height gives scroll room */
   position: relative;
 }
@@ -90,13 +90,13 @@
 
 .listingsSection {
   background: #f5f5f5;
-  padding: 5rem 2rem 8rem;
+  padding: 3rem 2rem 8rem;
   will-change: opacity;
 }
 
 .listingsHeader {
   max-width: 1200px;
-  margin: 0 auto 3rem;
+  margin: 0 auto 1.5rem;
 }
 
 .listingsHeader h2 {
@@ -363,7 +363,7 @@
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 768px) {
   .heroPanel {
-    height: 100vh; /* Restores the scroll space needed for parallax */
+    height: 80vh; /* Restores the scroll space needed for parallax */
   }
 
   /* Make floating images larger and wider */
