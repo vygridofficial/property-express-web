@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'fra
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
+import { KERALA_DISTRICTS } from '../data/districts';
 import { getPropertyCoordinates, getDistanceFromLatLonInKm } from '../utils/geo';
 import { formatPrice } from '../utils/formatPrice';
 import styles from './CategoryHero.module.css';
@@ -120,7 +121,7 @@ function PropertyListingCard({ property, index }) {
   );
 }
 
-export default function CategoryHero({ categoryId, categoryTitle, onBack, liveProperties = [] }) {
+export default function CategoryHero({ categoryId, categoryTitle, onBack, liveProperties, siteSettings }) {
   const containerRef = useRef(null);
   const heroRef = useRef(null);
 
@@ -129,8 +130,26 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     offset: ['start start', 'end start'],
   });
 
-  // Always use live properties from Firestore.
-  const baseProperties = liveProperties;
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+  const [showSubFilters, setShowSubFilters] = useState(false);
+  
+  const taxonomy = React.useMemo(() => {
+    // 1. Check if DB has custom taxonomy for this category
+    if (siteSettings?.taxonomy?.[categoryId]) {
+      return siteSettings.taxonomy[categoryId];
+    }
+    // 2. Fall back to static FILTER_TAXONOMY
+    return FILTER_TAXONOMY[categoryId] || { subFilters: [] };
+  }, [categoryId, siteSettings]);
+
+  const [localFilters, setLocalFilters] = useState({
+    district: '',
+    location: '',
+    priceMax: '',
+    ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, '']))
+  });
+
+  const baseProperties = liveProperties || [];
 
   const images = baseProperties.map(p => {
     // Robust price normalization
@@ -158,16 +177,23 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     };
   });
 
-  const taxonomy = FILTER_TAXONOMY[categoryId];
-
-  const [isMobile, setIsMobile] = useState(false);
+  // Sync filters when category changes
   React.useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
     setIsMobile(mq.matches);
     const handler = (e) => setIsMobile(e.matches);
     mq.addEventListener('change', handler);
+    
+    setLocalFilters({
+      district: '',
+      location: '',
+      priceMax: '',
+      ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, '']))
+    });
+    setShowSubFilters(false);
+    
     return () => mq.removeEventListener('change', handler);
-  }, []);
+  }, [categoryId, taxonomy]);
 
   // Dynamic Filters Parsing
   const { dynamicKeys, dynamicOptions } = React.useMemo(() => {
@@ -187,14 +213,6 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     return { dynamicKeys: finalKeys, dynamicOptions: opts };
   }, [images]);
 
-  // Local filter state
-  const [localFilters, setLocalFilters] = useState({
-    location: '', // Default to all so user can see properties before intentionally clamping strictly to 50km
-    priceMax: '',
-    ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, '']))
-  });
-  const [showSubFilters, setShowSubFilters] = useState(false);
-
   const handleFilterChange = (e) => {
     setLocalFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -202,6 +220,11 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
   // Apply filters to images & sort by haversine distance
   const filteredImages = React.useMemo(() => {
     let result = [...images];
+    
+    // Filter District
+    if (localFilters.district) {
+      result = result.filter(img => (img.district || '').toLowerCase() === localFilters.district.toLowerCase());
+    }
 
     // Filter Location (Radial enforcement only)
     if (localFilters.location === 'My Location') {
@@ -232,12 +255,46 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
       result = result.filter(img => (img.numericPrice || 0) <= parseFloat(localFilters.priceMax));
     }
 
-    // Filter Dynamic Keys
-    dynamicKeys.forEach(k => {
+    // Filter Subfilters (Taxonomy & Dynamic)
+    const allSubFilterKeys = new Set([
+      ...(taxonomy?.subFilters || []).map(sf => sf.key),
+      ...dynamicKeys
+    ]);
+
+    allSubFilterKeys.forEach(k => {
       if (localFilters[k]) {
-        result = result.filter(img => img.dynamicFilters && img.dynamicFilters[k] === localFilters[k]);
+        const filterVal = localFilters[k].toString().toLowerCase();
+        
+        result = result.filter(img => {
+          // 1. Check top-level property
+          const topVal = img[k];
+          if (topVal !== undefined && topVal !== null && topVal.toString().toLowerCase() === filterVal) return true;
+
+          // 2. Check dynamicFilters
+          const dynVal = img.dynamicFilters?.[k];
+          if (dynVal !== undefined && dynVal !== null && dynVal.toString().toLowerCase() === filterVal) return true;
+
+          // 3. Special Case: BHK / Bedrooms mapping
+          if (k === 'bhk') {
+            const bedCount = parseInt(img.bedrooms || img.beds || 0);
+            if (filterVal === 'studio' && bedCount <= 1) return true;
+            if (filterVal.includes('bhk')) {
+              const numericMatch = filterVal.match(/\d+/);
+              if (numericMatch) {
+                const targetBeds = parseInt(numericMatch[0]);
+                if (filterVal.includes('+')) {
+                  return bedCount >= targetBeds;
+                }
+                return bedCount === targetBeds;
+              }
+            }
+          }
+
+          return false;
+        });
       }
     });
+
     return result;
   }, [images, localFilters, dynamicKeys]);
 
@@ -327,6 +384,15 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
                 <option value="50000000">Up to ₹5Cr</option>
               </select>
             </div>
+            <div className={styles.filterGroup}>
+              <label>District</label>
+              <select name="district" value={localFilters.district} onChange={handleFilterChange}>
+                <option value="">All Districts</option>
+                {KERALA_DISTRICTS.map(dist => (
+                  <option key={dist} value={dist}>{dist}</option>
+                ))}
+              </select>
+            </div>
             {(taxonomy?.subFilters?.length > 0 || dynamicKeys.length > 0) && (
               <button
                 className={styles.subFilterToggle}
@@ -344,6 +410,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
           <AnimatePresence>
             {showSubFilters && (
               <motion.div
+                key="sub-filters-row"
                 className={styles.subFilterRow}
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -388,13 +455,27 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
             ))
             : (
               <div className={styles.noResults} style={{ textAlign: 'center', padding: '4rem 2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                <p style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.5rem' }}>No properties found within 50km.</p>
-                <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>We couldn't find any {categoryTitle.toLowerCase()} near your current location.</p>
+                <p style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  {localFilters.district 
+                    ? `No properties found in ${localFilters.district}` 
+                    : localFilters.location === 'My Location' 
+                      ? 'No properties found within 50km' 
+                      : 'No properties found'
+                  }
+                </p>
+                <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
+                  {localFilters.district 
+                    ? `We couldn't find any ${categoryTitle.toLowerCase()} in the ${localFilters.district} district matching your criteria.` 
+                    : localFilters.location === 'My Location'
+                      ? `We couldn't find any ${categoryTitle.toLowerCase()} near your current location.`
+                      : `Try adjusting your filters to find more ${categoryTitle.toLowerCase()}.`
+                  }
+                </p>
                 <button 
-                  onClick={() => setLocalFilters(prev => ({ ...prev, location: '' }))}
+                  onClick={() => setLocalFilters({ district: '', location: '', priceMax: '', ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, ''])) })}
                   style={{ background: 'white', color: 'black', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
                 >
-                  Show All Properties
+                  Clear All Filters
                 </button>
               </div>
             )

@@ -45,10 +45,12 @@ export default function Properties() {
   const selectedCategory = dynamicCategories.find(c => c.id === catId) || null;
   const [categoryProperties, setCategoryProperties] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [siteSettings, setSiteSettings] = useState(null);
 
   useEffect(() => {
     getSiteSettings().then(data => {
       if (data) {
+        setSiteSettings(data);
         const visibleBase = CATEGORIES.filter(cat => data.visibility?.[cat.id] !== false);
         const customObjects = (data.customCategories || []).map(cat => ({
           id: cat.name,
@@ -179,6 +181,7 @@ export default function Properties() {
                 categoryTitle={selectedCategory.title}
                 onBack={handleBack}
                 liveProperties={categoryProperties}
+                siteSettings={siteSettings}
               />
             )}
           </motion.div>

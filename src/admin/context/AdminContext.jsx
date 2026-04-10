@@ -143,6 +143,7 @@ export function AdminProvider({ children }) {
     customCategories: [],
     showReviews: true,
     showContactForm: true,
+    taxonomy: {},
   });
 
   useEffect(() => {
@@ -162,6 +163,13 @@ export function AdminProvider({ children }) {
     });
     return () => unsubscribe();
   }, []);
+
+  // updateCategoryTaxonomy merges new filters for a specific category
+  const updateCategoryTaxonomy = async (categoryName, subFilters) => {
+    const ref = doc(db, 'settings', 'global');
+    const newTaxonomy = { ...(siteSettings.taxonomy || {}), [categoryName]: { subFilters } };
+    await setDoc(ref, { taxonomy: newTaxonomy }, { merge: true });
+  };
 
   // updateSiteSettings merges new fields, does NOT overwrite the whole doc.
   const updateSiteSettings = async (newSettings) => {
@@ -231,6 +239,7 @@ export function AdminProvider({ children }) {
         siteSettings, updateSiteSettings,
         customCategories, addCustomCategory, deleteCustomCategory,
         deleteModalConfig, requestDeleteCustomCategory, closeDeleteModal,
+        updateCategoryTaxonomy,
       }}
     >
       {children}

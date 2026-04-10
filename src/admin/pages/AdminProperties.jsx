@@ -6,6 +6,8 @@ import { FlatIcon, PlotIcon, WarehouseIcon, VillaIcon } from '../components/icon
 import { useAdmin } from '../context/AdminContext';
 import { addProperty, updateProperty, deleteProperty } from '../../services/propertyService';
 import styles from '../styles/admin.module.css';
+import { KERALA_DISTRICTS } from '../../data/districts';
+import FilterManagementModal from '../components/FilterManagementModal';
 
 const PRESET_AMENITIES = [
   'Swimming Pool', '24/7 Security', 'Private Garage', 'Central AC / Heating',
@@ -26,10 +28,12 @@ export default function AdminProperties() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [priceFilter, setPriceFilter] = useState('All');
   const [locFilter, setLocFilter] = useState('All');
+  const [distFilter, setDistFilter] = useState('All');
   const [catFilter, setCatFilter] = useState('All');
   const [sortOrder, setSortOrder] = useState('Newest First');
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const [expandedRowId, setExpandedRowId] = useState(null);
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 767);
@@ -56,7 +60,7 @@ export default function AdminProperties() {
   const initialForm = {
     title: '', category: '', status: 'Active', isFeatured: false,
     price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
-    address: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
+    address: '', district: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
     description: '', amenities: [], dynamicFilters: {}
   };
   const [formData, setFormData] = useState(initialForm);
@@ -110,6 +114,7 @@ export default function AdminProperties() {
         bedrooms:    selectedProperty.bedrooms || '',
         bathrooms:   selectedProperty.bathrooms || '',
         address:     selectedProperty.address || selectedProperty.location || '',
+        district:    selectedProperty.district || '',
         mapsUrl:     selectedProperty.mapsUrl || '',
         agentName:   selectedProperty.agentName || '',
         agentPhone:  selectedProperty.agentPhone || '',
@@ -201,6 +206,7 @@ export default function AdminProperties() {
       const matchStatus = statusFilter === 'All' || p.status === statusFilter;
       const matchLoc = locFilter === 'All' || loc === locFilter.toLowerCase();
       const matchCat = catFilter === 'All' || p.category.toLowerCase() === catFilter.toLowerCase();
+      const matchDist = distFilter === 'All' || (p.district || '').toLowerCase() === distFilter.toLowerCase();
       
       let matchPrice = true;
       if (priceFilter === 'Under ₹50L') matchPrice = (p.numericPrice || 0) < 5000000;
@@ -208,7 +214,7 @@ export default function AdminProperties() {
       if (priceFilter === '₹1Cr–₹5Cr') matchPrice = (p.numericPrice || 0) > 10000000 && (p.numericPrice || 0) <= 50000000;
       if (priceFilter === 'Above ₹5Cr') matchPrice = (p.numericPrice || 0) > 50000000;
       
-      return matchRouteCat && matchSearch && matchStatus && matchLoc && matchCat && matchPrice;
+      return matchRouteCat && matchSearch && matchStatus && matchLoc && matchDist && matchCat && matchPrice;
     }).sort((a, b) => {
       if (sortOrder === 'Price: Low to High') return a.numericPrice - b.numericPrice;
       if (sortOrder === 'Price: High to Low') return b.numericPrice - a.numericPrice;
@@ -217,9 +223,9 @@ export default function AdminProperties() {
   }, [properties, activeCategory, searchTerm, statusFilter, locFilter, catFilter, priceFilter, sortOrder]);
 
   const clearFilters = () => {
-    setSearchTerm(''); setStatusFilter('All'); setPriceFilter('All'); setLocFilter('All'); setCatFilter('All'); setSortOrder('Newest First');
+    setSearchTerm(''); setStatusFilter('All'); setPriceFilter('All'); setLocFilter('All'); setDistFilter('All'); setCatFilter('All'); setSortOrder('Newest First');
   };
-  const hasActiveFilters = searchTerm || statusFilter !== 'All' || priceFilter !== 'All' || locFilter !== 'All' || catFilter !== 'All' || sortOrder !== 'Newest First';
+  const hasActiveFilters = searchTerm || statusFilter !== 'All' || priceFilter !== 'All' || locFilter !== 'All' || distFilter !== 'All' || catFilter !== 'All' || sortOrder !== 'Newest First';
 
   // --- Image Upload Logic ---
     const uploadToCloudinary = async (base64) => {
@@ -310,7 +316,7 @@ export default function AdminProperties() {
     };
 
     const handleSaveProperty = async () => {
-      const required = ['title', 'category', 'status', 'price', 'area', 'address', 'mapsUrl'];
+      const required = ['title', 'category', 'status', 'price', 'area', 'address', 'district', 'mapsUrl'];
       const newErrors = [];
       required.forEach(req => { if (!formData[req]) newErrors.push(req); });
       
@@ -363,6 +369,7 @@ export default function AdminProperties() {
             bathrooms: formData.bathrooms,
             location: formData.address,
             address: formData.address,
+            district: formData.district,
             mapsUrl: formData.mapsUrl,
             agentName: formData.agentName,
             agentPhone: formData.agentPhone,
@@ -393,6 +400,7 @@ export default function AdminProperties() {
             bedrooms: 2,
             bathrooms: 2,
             address: '',
+            district: '',
             mapsUrl: '',
             agentName: 'Vikram Singh',
             agentPhone: '+91 98765 43210',
@@ -452,6 +460,15 @@ export default function AdminProperties() {
               onClick={() => setIsCatModalOpen(true)}
             >
               + Custom Type
+            </button>
+          )}
+          {activeCategory !== 'properties' && (
+            <button 
+              className="btn" 
+              style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              onClick={() => setIsFiltersModalOpen(true)}
+            >
+              <Edit2 size={16} /> Edit Filters
             </button>
           )}
           <button 
@@ -530,6 +547,10 @@ export default function AdminProperties() {
             <option value="All">Location: All</option>
             {uniqueLocations.map(loc => <option key={loc} value={loc.toLowerCase()}>{loc}</option>)}
           </select>
+          <select value={distFilter} onChange={e => setDistFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+            <option value="All">District: All</option>
+            {KERALA_DISTRICTS.map(dist => <option key={dist} value={dist}>{dist}</option>)}
+          </select>
           <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
             <option value="Newest First">Newest First</option>
             <option value="Price: Low to High">Price: Low to High</option>
@@ -557,7 +578,15 @@ export default function AdminProperties() {
         ) : filteredProperties.length === 0 ? (
            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, color: 'var(--admin-text-muted)' }}>
               <Search size={48} opacity={0.2} style={{ marginBottom: '1rem' }} />
-              <p>No properties match your exact filters.</p>
+              <p style={{ fontWeight: 600, color: 'var(--admin-text-main)', marginBottom: '0.25rem' }}>
+                {distFilter !== 'All' 
+                  ? `No properties found in ${distFilter}` 
+                  : catFilter !== 'All'
+                    ? `No ${catFilter} units found`
+                    : 'No matching properties'
+                }
+              </p>
+              <p style={{ fontSize: '0.85rem' }}>Try adjusting your filters or search terms.</p>
            </div>
         ) : isMobile ? (
           /* Mobile Card View (Pill Cards) */
@@ -738,9 +767,16 @@ export default function AdminProperties() {
                 {/* Section 1 */}
                 <SectionHeading>Section 1 — Basic Information</SectionHeading>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <div>
+                   <div>
                     <Label required>Property Title</Label>
                     <input type="text" placeholder="Enter property title..." value={formData.title} onChange={e => handleFormChange('title', e.target.value)} style={getInputStyle('title')} />
+                  </div>
+                  <div>
+                    <Label required>District</Label>
+                    <select value={formData.district} onChange={e => handleFormChange('district', e.target.value)} style={getInputStyle('district')}>
+                      <option value="">Select District</option>
+                      {KERALA_DISTRICTS.map(dist => <option key={dist} value={dist}>{dist}</option>)}
+                    </select>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
@@ -1065,6 +1101,25 @@ export default function AdminProperties() {
           </motion.div>
         )}
       </AnimatePresence>
+      <FilterManagementModal 
+        isOpen={isFiltersModalOpen}
+        onClose={() => setIsFiltersModalOpen(false)}
+        categoryName={resolveCategoryFromSlug(activeCategory, customCategories)}
+      />
     </>
   );
+}
+
+// Helper to resolve internal category ID from URL slug
+function resolveCategoryFromSlug(slug, customCategories) {
+  if (!slug || slug === 'properties') return null;
+  const low = slug.toLowerCase();
+  if (['apartments', 'flats'].includes(low)) return 'Apartment';
+  if (low === 'villas') return 'Villa';
+  if (['commercial', 'warehouses'].includes(low)) return 'Commercial';
+  if (low === 'plots') return 'Plot';
+  if (low === 'uncategorized') return 'Uncategorized';
+  
+  const custom = customCategories.find(c => c.name.toLowerCase() === low);
+  return custom ? custom.name : slug;
 }
