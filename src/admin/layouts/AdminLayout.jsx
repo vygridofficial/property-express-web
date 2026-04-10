@@ -64,13 +64,13 @@ export default function AdminLayout() {
             <div className={styles.mainContent} style={{ overflowY: 'auto' }}>
               <TopNavbar />
               <main className={styles.pageContainer}>
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   <motion.div
                     key={location.pathname}
-                    initial={{ opacity: 0, y: 16 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -16 }}
-                    transition={{ duration: 0.3 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
                   >
                     <Outlet />
                   </motion.div>

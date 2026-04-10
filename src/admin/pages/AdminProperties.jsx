@@ -28,6 +28,14 @@ export default function AdminProperties() {
   const [locFilter, setLocFilter] = useState('All');
   const [catFilter, setCatFilter] = useState('All');
   const [sortOrder, setSortOrder] = useState('Newest First');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+  const [expandedRowId, setExpandedRowId] = useState(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Image Upload State
   const [images, setImages] = useState([]);
@@ -501,8 +509,8 @@ export default function AdminProperties() {
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className={styles.glassCard} style={{ minHeight: 400 }}>
+      {/* Main Table / Mobile Cards */}
+      <div className={styles.glassCard} style={{ minHeight: 400, padding: isMobile ? '0.75rem' : '1.5rem' }}>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {[...Array(5)].map((_, idx) => <div key={idx} style={{ height: 60, borderRadius: 12, background: 'rgba(0,0,0,0.06)', animation: 'shimmer 2s infinite' }} />)}
@@ -512,7 +520,94 @@ export default function AdminProperties() {
               <Search size={48} opacity={0.2} style={{ marginBottom: '1rem' }} />
               <p>No properties match your exact filters.</p>
            </div>
+        ) : isMobile ? (
+          /* Mobile Card View (Pill Cards) */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {filteredProperties.map((prop) => {
+              const isExpanded = expandedRowId === prop.id;
+              return (
+                <motion.div
+                  key={prop.id}
+                  layout
+                  onClick={() => setExpandedRowId(isExpanded ? null : prop.id)}
+                  style={{
+                    background: 'var(--admin-glass-bg)',
+                    border: '1px solid var(--admin-glass-border)',
+                    borderRadius: isExpanded ? 24 : 40,
+                    padding: isExpanded ? '1.25rem' : '0.75rem 1.5rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prop.title}</h4>
+                      <p style={{ margin: '0.2rem 0 0', fontSize: '0.75rem', color: 'var(--admin-text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>{prop.category}</p>
+                    </div>
+                    <div style={{ flexShrink: 0, marginLeft: '0.5rem', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                      <Plus size={18} />
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        style={{ marginTop: '1.25rem', borderTop: '1px solid var(--admin-stroke)', paddingTop: '1.25rem' }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Location</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 500, textAlign: 'right' }}>{prop.address || prop.location}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Price</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ed1b24' }}>{prop.price}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Status</span>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); togglePropertyStatus(prop.id, prop.status); }}
+                              style={{ padding: '0.25rem 0.75rem', borderRadius: 20, fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', background: prop.status === 'Active' ? 'rgba(46,204,113,0.1)' : 'rgba(85,85,85,0.1)', color: prop.status === 'Active' ? '#2ecc71' : '#555555', border: 'none', cursor: 'pointer' }}>
+                              {prop.status}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                          <button 
+                            className="btn" 
+                            style={{ flex: 1, background: '#18181a', color: 'white', border: 'none', borderRadius: 12, padding: '0.75rem', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                            onClick={(e) => { 
+                              e.stopPropagation();
+                              setSelectedProperty(prop);
+                              setEditingId(prop.id); 
+                              setIsDrawerOpen(true); 
+                              setFormErrors([]);
+                            }}
+                          >
+                            <Edit2 size={16} /> Edit
+                          </button>
+                          <button 
+                            className="btn" 
+                            style={{ flex: 1, background: 'rgba(237,27,36,0.1)', color: '#ed1b24', border: 'none', borderRadius: 12, padding: '0.75rem', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteProperty(prop.id); }}
+                          >
+                            <Trash2 size={16} /> Delete
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
         ) : (
+          /* Desktop Table View */
           <div style={{ overflowX: 'auto' }}>
             <motion.table initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }} style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>

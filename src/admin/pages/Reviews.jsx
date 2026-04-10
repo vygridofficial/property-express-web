@@ -11,8 +11,14 @@ export default function Reviews() {
   const queryParams = new URLSearchParams(location.search);
   const filterParam = queryParams.get('filter');
 
-  // Issue 6: reviews come from AdminContext real-time listener — no local fetch needed
   const { reviews, loading } = useAdmin();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [activeTab, setActiveTab] = useState(
     filterParam ? filterParam.charAt(0).toUpperCase() + filterParam.slice(1) : 'Pending'
@@ -61,17 +67,39 @@ export default function Reviews() {
       <div className={styles.glassCard} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', boxSizing: 'border-box', minWidth: 0 }}>
 
         {/* Status Tabs */}
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.4)', padding: '0.25rem', borderRadius: 40, border: '1px solid var(--admin-stroke)', overflowX: 'auto', width: '100%', boxSizing: 'border-box', scrollbarWidth: 'none', minWidth: 0 }}>
-          {['Pending', 'Approved', 'Rejected'].map(tab => (
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: isMobile ? 'wrap' : 'nowrap',
+          gap: '0.5rem', 
+          background: isMobile ? 'transparent' : 'rgba(255,255,255,0.4)', 
+          padding: isMobile ? '0' : '0.25rem', 
+          borderRadius: isMobile ? 0 : 40, 
+          border: isMobile ? 'none' : '1px solid var(--admin-stroke)', 
+          overflowX: isMobile ? 'visible' : 'auto', 
+          width: '100%', 
+          boxSizing: 'border-box', 
+          scrollbarWidth: 'none', 
+          minWidth: 0,
+          justifyContent: isMobile ? 'center' : 'flex-start'
+        }}>
+          {['Approved', 'Pending', 'Rejected'].map((tab, idx) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
-                flex: 1, whiteSpace: 'nowrap', padding: '0.6rem 1.25rem', borderRadius: 30, border: 'none',
-                cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.3s ease',
+                flex: isMobile && tab === 'Rejected' ? '0 1 60%' : (isMobile ? '1 1 45%' : 1),
+                whiteSpace: 'nowrap', 
+                padding: '0.6rem 1.25rem', 
+                borderRadius: 30, 
+                border: isMobile ? '1px solid var(--admin-stroke)' : 'none',
+                cursor: 'pointer', 
+                fontWeight: 600, 
+                fontSize: '0.85rem', 
+                transition: 'all 0.3s ease',
                 fontFamily: 'Outfit, sans-serif',
-                background: activeTab === tab ? '#18181a' : 'transparent',
+                background: activeTab === tab ? '#18181a' : (isMobile ? 'var(--admin-glass-bg)' : 'transparent'),
                 color: activeTab === tab ? '#fff' : 'var(--admin-text-muted)',
+                order: isMobile && tab === 'Rejected' ? 3 : (tab === 'Approved' ? 1 : 2)
               }}
             >
               {tab}

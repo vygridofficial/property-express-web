@@ -17,6 +17,13 @@ export default function Inquiries() {
   const [inquiries, setInquiries] = useState([]);
   const [expandedRow, setExpandedRow] = useState(expandedIdParam);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -140,8 +147,8 @@ export default function Inquiries() {
         </select>
       </div>
 
-      {/* Main Table Card */}
-      <div className={styles.glassCard}>
+      {/* Main Table / Mobile Cards Card */}
+      <div className={styles.glassCard} style={{ padding: isMobile ? '0.75rem' : '1.5rem' }}>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {[...Array(4)].map((_, idx) => <div key={idx} style={{ height: 60, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />)}
@@ -150,6 +157,132 @@ export default function Inquiries() {
           <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--admin-text-muted)', fontWeight: 300 }}>
             <MessageSquare size={48} opacity={0.2} style={{ marginBottom: '1rem', display: 'block', margin: '0 auto 1rem' }} />
             <p>No enquiries match your filters.</p>
+          </div>
+        ) : isMobile ? (
+          /* Mobile Card View (Pill Cards) */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {filteredInqs.map((inq) => {
+              const isExpanded = expandedRow === inq.id;
+              return (
+                <motion.div
+                  key={inq.id}
+                  layout
+                  onClick={() => setExpandedRow(isExpanded ? null : inq.id)}
+                  style={{
+                    background: 'var(--admin-glass-bg)',
+                    border: '1px solid var(--admin-glass-border)',
+                    borderRadius: isExpanded ? 24 : 40,
+                    padding: isExpanded ? '1.25rem' : '0.85rem 1.5rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                    overflow: 'hidden',
+                    borderLeft: inq.status?.toLowerCase() === 'new' ? '4px solid #ed1b24' : '1px solid var(--admin-glass-border)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inq.name}</h4>
+                      <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', color: 'var(--admin-text-muted)', fontWeight: 500 }}>{inq.phone}</p>
+                    </div>
+                    <div style={{ flexShrink: 0, marginLeft: '0.5rem', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                      <ChevronDown size={18} />
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        style={{ marginTop: '1.25rem', borderTop: '1px solid var(--admin-stroke)', paddingTop: '1.25rem' }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          <div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Property Enquiry For</span>
+                            <p style={{ margin: '0.25rem 0 0', fontSize: '0.9rem', fontWeight: 600 }}>{inq.propertyTitle || inq.property}</p>
+                          </div>
+                          
+                          <div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Client Message</span>
+                            <p style={{ margin: '0.5rem 0 0', fontSize: '0.9rem', lineHeight: 1.6, background: 'rgba(0,0,0,0.02)', padding: '1rem', borderRadius: 12 }}>"{inq.message || 'No message provided.'}"</p>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                             <div>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Status</span>
+                                <div style={{ marginTop: '0.25rem' }} onClick={e => e.stopPropagation()}>
+                                  <select
+                                    value={inq.status}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      if (val === 'responded') markResponded(inq.id);
+                                      else if (val === 'closed') markClosed(inq.id);
+                                      else updateInquiry(inq.id, { status: val });
+                                    }}
+                                    style={{
+                                      padding: '0.35rem 0.85rem', borderRadius: '20px', fontSize: '0.75rem',
+                                      fontWeight: 700, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'pointer', appearance: 'none',
+                                      ...getStatusStyle(inq.status)
+                                    }}
+                                  >
+                                    <option value="new">New</option>
+                                    <option value="responded">Responded</option>
+                                    <option value="closed">Closed</option>
+                                  </select>
+                                </div>
+                             </div>
+                             <div style={{ textAlign: 'right' }}>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Received On</span>
+                                <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem' }}>{inq.createdAt?.toDate ? inq.createdAt.toDate().toLocaleDateString() : inq.date}</p>
+                             </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              {inq.phone && (
+                                <a
+                                  href={buildWhatsAppUrl(inq)}
+                                  target="_blank" rel="noopener noreferrer"
+                                  onClick={(e) => { e.stopPropagation(); markResponded(inq.id); }}
+                                  style={{
+                                    flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                    padding: '0.75rem', background: '#25D366', color: 'white',
+                                    borderRadius: 12, fontWeight: 600, fontSize: '0.85rem', textDecoration: 'none'
+                                  }}
+                                >
+                                  <Phone size={14} /> WhatsApp
+                                </a>
+                              )}
+                              {inq.email && (
+                                <a
+                                  href={buildEmailUrl(inq)}
+                                  onClick={(e) => { e.stopPropagation(); markResponded(inq.id); }}
+                                  style={{
+                                    flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                    padding: '0.75rem', background: '#18181a', color: 'white',
+                                    borderRadius: 12, fontWeight: 600, fontSize: '0.85rem', textDecoration: 'none'
+                                  }}
+                                >
+                                  <Mail size={14} /> Email
+                                </a>
+                              )}
+                            </div>
+                            <button 
+                              className="btn" 
+                              style={{ width: '100%', border: '1px solid var(--admin-stroke)', color: '#ed1b24', background: 'transparent', padding: '0.75rem', borderRadius: 12, fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                              onClick={(e) => { e.stopPropagation(); handleDelete(inq.id); }}
+                            >
+                              <Trash2 size={16} /> Delete Inquiry
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
