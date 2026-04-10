@@ -346,7 +346,7 @@ export default function Home() {
 
       {/* Stats Section */}
       <section className="section">
-        <div className="container" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+        <div className="container" style={{ paddingTop: isMobile ? '0' : '2rem', paddingBottom: isMobile ? '0' : '2rem' }}>
           <motion.div
             className={styles.bentoGrid}
             variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
