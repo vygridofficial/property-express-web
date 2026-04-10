@@ -69,6 +69,8 @@ export default function AdminProperties() {
   const [isCatModalOpen, setIsCatModalOpen] = useState(false);
   const [newCatName, setNewCatName] = useState('');
   const [newCatFilters, setNewCatFilters] = useState('');
+  const [newCatImage, setNewCatImage] = useState(null);
+  const [isCreatingType, setIsCreatingType] = useState(false);
 
   useEffect(() => {
     if (editingId && selectedProperty) {
@@ -857,23 +859,61 @@ export default function AdminProperties() {
                   <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.5rem' }}>Separate multiple custom parameters with commas.</p>
                 </div>
                 
+                <div>
+                  <Label required>Category Background Image</Label>
+                  <input 
+                    type="file" accept="image/*" 
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = ev => setNewCatImage(ev.target.result);
+                        reader.readAsDataURL(e.target.files[0]);
+                      }
+                    }} 
+                    style={{ ...getInputStyle(), padding: '0.5rem' }} 
+                  />
+                  {newCatImage && (
+                    <div style={{ marginTop: '0.75rem', width: 120, height: 75, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--admin-stroke)' }}>
+                      <img src={newCatImage} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  )}
+                </div>
+                
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                  <button className="btn" onClick={() => setIsCatModalOpen(false)} style={{ flex: 1, background: 'rgba(0,0,0,0.05)', border: 'none', padding: '1rem', fontWeight: 600 }}>Cancel</button>
+                  <button className="btn" onClick={() => { setIsCatModalOpen(false); setNewCatImage(null); }} style={{ flex: 1, background: 'rgba(0,0,0,0.05)', border: 'none', padding: '1rem', fontWeight: 600 }} disabled={isCreatingType}>Cancel</button>
                   <button 
                     className="btn" 
-                    style={{ flex: 1, background: '#ed1b24', color: 'white', border: 'none', padding: '1rem', fontWeight: 700 }}
-                    onClick={() => {
-                      if (!newCatName.trim()) return;
-                      const filtersArray = newCatFilters.split(',').map(f => f.trim()).filter(Boolean);
-                      addCustomCategory(newCatName, filtersArray);
-                      setIsCatModalOpen(false);
-                      setNewCatName('');
-                      setNewCatFilters('');
-                      setShowToast('Property Type Created!');
-                      setTimeout(() => setShowToast(''), 2500);
+                    style={{ flex: 1, background: '#ed1b24', color: 'white', border: 'none', padding: '1rem', fontWeight: 700, opacity: (!newCatName.trim() || !newCatImage || isCreatingType) ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: (!newCatName.trim() || !newCatImage || isCreatingType) ? 'not-allowed' : 'pointer' }}
+                    disabled={!newCatName.trim() || !newCatImage || isCreatingType}
+                    onClick={async () => {
+                      if (!newCatName.trim() || !newCatImage) return;
+                      setIsCreatingType(true);
+                      try {
+                        const finalImageUrl = await uploadToCloudinary(newCatImage);
+                        const filtersArray = newCatFilters.split(',').map(f => f.trim()).filter(Boolean);
+                        
+                        await addCustomCategory(newCatName, filtersArray, finalImageUrl);
+                        
+                        setIsCatModalOpen(false);
+                        setNewCatName('');
+                        setNewCatFilters('');
+                        setNewCatImage(null);
+                        setShowToast('Property Type Created!');
+                        setTimeout(() => setShowToast(''), 2500);
+                      } catch (err) {
+                        console.error('Error creating type:', err);
+                        alert('Failed to upload image or create type.');
+                      } finally {
+                        setIsCreatingType(false);
+                      }
                     }}
                   >
-                    Create Type
+                    {isCreatingType ? (
+                      <>
+                        <div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                        Creating...
+                      </>
+                    ) : 'Create Type'}
                   </button>
                 </div>
               </div>

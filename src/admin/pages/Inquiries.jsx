@@ -221,17 +221,13 @@ export default function Inquiries() {
                     </motion.tr>
 
                     {/* Expandable row with message + Reply buttons */}
-                    <AnimatePresence>
-                      {expandedRow === inq.id && (
-                        <motion.tr
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          style={{
-                            background: 'rgba(0,0,0,0.02)',
-                            borderLeft: inq.status?.toLowerCase() === 'new' ? '3px solid #ed1b24' : '3px solid transparent',
-                          }}
-                        >
+                    {expandedRow === inq.id && (
+                      <tr
+                        style={{
+                          background: 'rgba(0,0,0,0.02)',
+                          borderLeft: inq.status?.toLowerCase() === 'new' ? '3px solid #ed1b24' : '3px solid transparent',
+                        }}
+                      >
                           <td colSpan="7" style={{ padding: 0, borderBottom: '1px solid var(--admin-stroke)' }}>
                             <div style={{ padding: '1.5rem 2rem 2rem' }}>
                               {/* Message */}
@@ -290,9 +286,8 @@ export default function Inquiries() {
                               </div>
                             </div>
                           </td>
-                        </motion.tr>
-                      )}
-                    </AnimatePresence>
+                      </tr>
+                    )}
                   </React.Fragment>
                 ))}
               </tbody>

@@ -110,27 +110,23 @@ export default function Reviews() {
       </div>
 
       {/* Review Cards Grid */}
-      <motion.div layout style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '1.5rem' }}>
-        <AnimatePresence mode="popLayout">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '1.5rem' }}>
           {loading ? (
             [...Array(3)].map((_, idx) => (
-              <motion.div key={`skel-${idx}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              <div key={`skel-${idx}`}
                 style={{ height: 200, borderRadius: 20, background: 'rgba(0,0,0,0.06)' }} />
             ))
           ) : filteredReviews.length === 0 ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: 'var(--admin-text-muted)', fontWeight: 300 }}>
+            <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: 'var(--admin-text-muted)', fontWeight: 300 }}>
               <MessageSquare size={48} opacity={0.2} style={{ marginBottom: '1rem', display: 'block', margin: '0 auto 1rem' }} />
               <p>No {activeTab.toLowerCase()} reviews found.</p>
-            </motion.div>
+            </div>
           ) : (
             filteredReviews.map((review, i) => (
               <motion.div
                 key={review.id}
-                layout
                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
                 className={styles.glassCard}
                 style={{ display: 'flex', flexDirection: 'column', width: '100%', boxSizing: 'border-box', overflow: 'hidden', minWidth: 0 }}
@@ -178,8 +174,7 @@ export default function Reviews() {
               </motion.div>
             ))
           )}
-        </AnimatePresence>
-      </motion.div>
+      </div>
 
     </div>
   );

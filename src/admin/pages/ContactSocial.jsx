@@ -4,6 +4,22 @@ import { Phone, Mail, MapPin, Link, Check } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import styles from '../styles/admin.module.css';
 
+const InputGroup = ({ icon: Icon, label, placeholder, stateKey, value, onChange }) => (
+  <div>
+    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>{label}</label>
+    <div style={{ position: 'relative' }}>
+      <Icon size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }} />
+      <input 
+        type="text" 
+        placeholder={placeholder} 
+        value={value || ''} 
+        onChange={(e) => onChange(stateKey, e.target.value)}
+        style={{ width: '100%', paddingLeft: '2.5rem' }} 
+      />
+    </div>
+  </div>
+);
+
 export default function ContactSocial() {
   const { siteSettings, updateSiteSettings } = useAdmin();
   const [draft, setDraft] = useState(siteSettings);
@@ -33,41 +49,25 @@ export default function ContactSocial() {
     }
   };
 
-  const InputGroup = ({ icon: Icon, label, placeholder, stateKey }) => (
-    <div>
-      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>{label}</label>
-      <div style={{ position: 'relative' }}>
-        <Icon size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }} />
-        <input 
-          type="text" 
-          placeholder={placeholder} 
-          value={draft[stateKey] || ''} 
-          onChange={(e) => handleInputChange(stateKey, e.target.value)}
-          style={{ width: '100%', paddingLeft: '2.5rem' }} 
-        />
-      </div>
-    </div>
-  );
-
   return (
     <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay: 0.1}} style={{ maxWidth: 600, margin: '0 auto', position: 'relative' }}>
       <div className={styles.glassCard}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '2rem' }}>Contact & Social Information</h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <InputGroup icon={Phone} label="Primary Phone" placeholder="+1 (555) 000-0000" stateKey="primaryPhone" />
-          <InputGroup icon={Phone} label="WhatsApp Business" placeholder="+1 (555) 000-0000" stateKey="whatsappBusiness" />
-          <InputGroup icon={Mail} label="Support Email" placeholder="hello@domain.com" stateKey="supportEmail" />
+          <InputGroup icon={Phone} label="Primary Phone" placeholder="+1 (555) 000-0000" stateKey="primaryPhone" value={draft.primaryPhone} onChange={handleInputChange} />
+          <InputGroup icon={Phone} label="WhatsApp Business" placeholder="+1 (555) 000-0000" stateKey="whatsappBusiness" value={draft.whatsappBusiness} onChange={handleInputChange} />
+          <InputGroup icon={Mail} label="Support Email" placeholder="hello@domain.com" stateKey="supportEmail" value={draft.supportEmail} onChange={handleInputChange} />
           
           <div style={{ height: 1, background: 'var(--admin-stroke)', margin: '1rem 0' }}></div>
           
-          <InputGroup icon={MapPin} label="Office Address" placeholder="123 Street..." stateKey="officeAddress" />
-          <InputGroup icon={MapPin} label="Google Maps Embed URL" placeholder="https://maps.google.com/..." stateKey="googleMapsEmbed" />
+          <InputGroup icon={MapPin} label="Office Address" placeholder="123 Street..." stateKey="officeAddress" value={draft.officeAddress} onChange={handleInputChange} />
+          <InputGroup icon={MapPin} label="Google Maps Embed URL" placeholder="https://maps.google.com/..." stateKey="googleMapsEmbed" value={draft.googleMapsEmbed} onChange={handleInputChange} />
           
           <div style={{ height: 1, background: 'var(--admin-stroke)', margin: '1rem 0' }}></div>
 
-          <InputGroup icon={Link} label="Instagram Profile URL" placeholder="https://instagram.com/..." stateKey="instagramUrl" />
-          <InputGroup icon={Link} label="Facebook Page URL" placeholder="https://facebook.com/..." stateKey="facebookUrl" />
+          <InputGroup icon={Link} label="Instagram Profile URL" placeholder="https://instagram.com/..." stateKey="instagramUrl" value={draft.instagramUrl} onChange={handleInputChange} />
+          <InputGroup icon={Link} label="Facebook Page URL" placeholder="https://facebook.com/..." stateKey="facebookUrl" value={draft.facebookUrl} onChange={handleInputChange} />
 
           {isDirty && (
             <motion.button 

@@ -70,6 +70,7 @@ export default function Dashboard() {
   });
 
   const [pieData, setPieData] = useState([]);
+  const [barData, setBarData] = useState([]);
   const [recentInquiries, setRecentInquiries] = useState([]);
 
   useEffect(() => {
@@ -97,6 +98,35 @@ export default function Dashboard() {
 
       setPieData(pie.length > 0 ? pie : [{ name: 'No Data', value: 1 }]);
 
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const dynamicBarData = [];
+      
+      for (let i = 5; i >= 0; i--) {
+        let d = new Date(currentYear, currentMonth - i, 1);
+        dynamicBarData.push({ monthIndex: d.getMonth(), year: d.getFullYear(), name: months[d.getMonth()], inquiries: 0, highlight: i === 0 });
+      }
+      
+      inqs.forEach(inq => {
+        let date;
+        if (inq.createdAt?.toDate) {
+          date = inq.createdAt.toDate();
+        } else if (inq.date) {
+          date = new Date(inq.date);
+        }
+        
+        if (date && !isNaN(date)) {
+          const m = date.getMonth();
+          const y = date.getFullYear();
+          const target = dynamicBarData.find(l => l.monthIndex === m && l.year === y);
+          if (target) {
+            target.inquiries += 1;
+          }
+        }
+      });
+      setBarData(dynamicBarData);
+
       setStats({
         totalProperties: properties.length,
         totalInquiries: inqs.length,
@@ -114,15 +144,6 @@ export default function Dashboard() {
   };
 
   const COLORS = ['#18181a', '#555555', '#888888', '#bbbbbb'];
-
-  const barData = [
-    { name: 'Oct', inquiries: 42 },
-    { name: 'Nov', inquiries: 55 },
-    { name: 'Dec', inquiries: 38 },
-    { name: 'Jan', inquiries: 65 },
-    { name: 'Feb', inquiries: 80 },
-    { name: 'Mar', inquiries: 110, highlight: true },
-  ];
 
   const getStatusStyle = (status) => {
     const s = status?.toLowerCase();

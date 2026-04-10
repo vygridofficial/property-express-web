@@ -7,20 +7,22 @@ const AdminContext = createContext();
 
 export function AdminProvider({ children }) {
   // ─── Auth: true=logged in, false=logged out, null=loading ───
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('property_express_admin_auth') === 'true';
+  });
   const [properties, setProperties] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // ── Issue 1: Auth Persistence ──
-  // onAuthStateChanged ensures session survives page refresh.
-  // null initial state prevents a flash-to-login before Firebase responds.
+  // Using pure local storage since authentication uses custom env static hash 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
-    });
-    return () => unsubscribe();
-  }, []);
+    if (isAuthenticated) {
+      localStorage.setItem('property_express_admin_auth', 'true');
+    } else {
+      localStorage.removeItem('property_express_admin_auth');
+    }
+  }, [isAuthenticated]);
 
   // ── Real-time Properties Sync ──
   useEffect(() => {
@@ -111,9 +113,12 @@ export function AdminProvider({ children }) {
   const deleteNotification = (id) => setNotifications(prev => prev.filter(n => n.id !== id));
   const clearAllNotifications = () => setNotifications([]);
 
-  const login = () => setIsAuthenticated(true);
+  const login = () => {
+    localStorage.setItem('property_express_admin_auth', 'true');
+    setIsAuthenticated(true);
+  };
   const logout = () => {
-    auth.signOut();
+    localStorage.removeItem('property_express_admin_auth');
     setIsAuthenticated(false);
   };
 
@@ -177,18 +182,15 @@ export function AdminProvider({ children }) {
     setDeleteModalConfig({ isOpen: false, category: '' });
   };
 
-  const addCustomCategory = async (name, filters = []) => {
+  const addCustomCategory = async (name, filters = [], customImageUrl) => {
     const trimmed = name?.trim();
-    if (!trimmed) return;
+    if (!trimmed || !customImageUrl) return; // customImageUrl is now required
 
     const base = ['Apartment', 'Villa', 'Plot', 'Commercial', 'Uncategorized'];
     const alreadyExists = base.includes(trimmed) || customCategories.some(c => c.name === trimmed);
     if (alreadyExists) return;
 
-    // Auto-generate a relevant background image using Unsplash
-    const autoImage = `https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80`;
-
-    const newCat = { name: trimmed, image: autoImage, filters };
+    const newCat = { name: trimmed, image: customImageUrl, filters };
     const updatedCats = [...customCategories, newCat];
 
     // Enable visibility by default

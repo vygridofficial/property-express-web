@@ -4,6 +4,31 @@ import { useAdmin } from '../context/AdminContext';
 import { Check } from 'lucide-react';
 import styles from '../styles/admin.module.css';
 
+const ToggleRow = ({ label, checked, onToggle }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
+    <span style={{ fontWeight: 500 }}>{label}</span>
+    <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
+      <input 
+        type="checkbox" 
+        checked={checked} 
+        onChange={onToggle} 
+        style={{ opacity: 0, width: 0, height: 0 }} 
+      />
+      <span style={{ 
+        position: 'absolute', cursor: 'pointer', inset: 0, 
+        background: checked ? '#18181a' : 'rgba(0,0,0,0.1)', 
+        borderRadius: 34, transition: '0.4s' 
+      }}>
+        <span style={{ 
+          position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
+          background: 'white', borderRadius: '50%', transition: '0.4s',
+          transform: checked ? 'translateX(22px)' : 'translateX(0)'
+        }}></span>
+      </span>
+    </label>
+  </div>
+);
+
 export default function Settings() {
   const { siteSettings, updateSiteSettings } = useAdmin();
   
@@ -38,31 +63,6 @@ export default function Settings() {
       console.error('Failed to save settings:', error);
     }
   };
-
-  const ToggleRow = ({ label, stateKey }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
-      <span style={{ fontWeight: 500 }}>{label}</span>
-      <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
-        <input 
-          type="checkbox" 
-          checked={draft[stateKey]} 
-          onChange={() => handleToggle(stateKey)} 
-          style={{ opacity: 0, width: 0, height: 0 }} 
-        />
-        <span style={{ 
-          position: 'absolute', cursor: 'pointer', inset: 0, 
-          background: draft[stateKey] ? '#18181a' : 'rgba(0,0,0,0.1)', 
-          borderRadius: 34, transition: '0.4s' 
-        }}>
-          <span style={{ 
-            position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
-            background: 'white', borderRadius: '50%', transition: '0.4s',
-            transform: draft[stateKey] ? 'translateX(22px)' : 'translateX(0)'
-          }}></span>
-        </span>
-      </label>
-    </div>
-  );
 
   return (
     <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay: 0.1}} style={{ maxWidth: 800, position: 'relative' }}>
@@ -165,8 +165,8 @@ export default function Settings() {
           ))}
 
           {/* Fixed Sections */}
-          <ToggleRow label="Show Customer Reviews" stateKey="showReviews" />
-          <ToggleRow label="Show Contact Form" stateKey="showContactForm" />
+          <ToggleRow label="Show Customer Reviews" checked={draft.showReviews !== false} onToggle={() => handleToggle('showReviews')} />
+          <ToggleRow label="Show Contact Form" checked={draft.showContactForm !== false} onToggle={() => handleToggle('showContactForm')} />
         </div>
       </div>
 
@@ -177,7 +177,7 @@ export default function Settings() {
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Properties Sold (K+)</label>
             <input 
               type="text" 
-              value={draft.achievementsPropertiesSold || '1.2'} 
+              value={draft.achievementsPropertiesSold ?? '1.2'} 
               onChange={(e) => handleInputChange('achievementsPropertiesSold', e.target.value)}
               style={{ width: '100%', maxWidth: 400 }} 
             />
@@ -186,7 +186,7 @@ export default function Settings() {
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Client Satisfaction (/5)</label>
             <input 
               type="text" 
-              value={draft.achievementsClientSatisfaction || '4.9'} 
+              value={draft.achievementsClientSatisfaction ?? '4.9'} 
               onChange={(e) => handleInputChange('achievementsClientSatisfaction', e.target.value)}
               style={{ width: '100%', maxWidth: 400 }} 
             />
@@ -195,7 +195,7 @@ export default function Settings() {
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Verified Listings (%)</label>
             <input 
               type="text" 
-              value={draft.achievementsVerifiedListings || '100'} 
+              value={draft.achievementsVerifiedListings ?? '100'} 
               onChange={(e) => handleInputChange('achievementsVerifiedListings', e.target.value)}
               style={{ width: '100%', maxWidth: 400 }} 
             />
@@ -204,7 +204,7 @@ export default function Settings() {
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Expert Consultants (+)</label>
             <input 
               type="text" 
-              value={draft.achievementsExpertConsultants || '50'} 
+              value={draft.achievementsExpertConsultants ?? '50'} 
               onChange={(e) => handleInputChange('achievementsExpertConsultants', e.target.value)}
               style={{ width: '100%', maxWidth: 400 }} 
             />
