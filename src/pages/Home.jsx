@@ -720,7 +720,8 @@ export default function Home() {
 
         <div className={`container ${styles.mapCtaContent}`} style={isLocationDetected ? { 
           position: 'absolute', 
-          top: isMobile ? '20px' : '40px', 
+          bottom: isMobile ? '20px' : 'auto',
+          top: isMobile ? 'auto' : '40px', 
           left: isMobile ? '50%' : '40px', 
           transform: isMobile ? 'translateX(-50%)' : 'none',
           textAlign: isMobile ? 'center' : 'left', 
