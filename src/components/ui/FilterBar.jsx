@@ -58,10 +58,10 @@ export default function FilterBar() {
           <label>Max Price</label>
           <select name="priceMax" value={localFilters.priceMax} onChange={handleChange}>
             <option value="">No Max</option>
-            <option value="500000">Up to $500k</option>
-            <option value="1000000">Up to $1 Million</option>
-            <option value="2000000">Up to $2 Million</option>
-            <option value="5000000">Up to $5 Million</option>
+            <option value="5000000">Up to ₹50 Lakhs</option>
+            <option value="10000000">Up to ₹1 Crore</option>
+            <option value="20000000">Up to ₹2 Crores</option>
+            <option value="50000000">Up to ₹5 Crores</option>
           </select>
         </div>
         <div className={styles.filterGroup}>

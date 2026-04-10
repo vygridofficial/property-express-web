@@ -2,13 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
+import { formatPrice } from '../../utils/formatPrice';
 import styles from './GtaMarker.module.css';
 
 export default function GtaMarker({ property, style, delay, mobileCompact }) {
   if (!property) return null;
 
   const { id, price, images, title, image } = property;
-  const displayPrice = typeof price === 'string' ? price : `₹${price?.toLocaleString() || 0}`;
+  const displayPrice = formatPrice(price);
   const displayImages = images && images.length > 0 ? images : (image ? [image] : ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80']);
 
   if (mobileCompact) {

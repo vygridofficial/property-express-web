@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
 import { getCoordinatesForLocation, getDistanceFromLatLonInKm } from '../utils/geo';
+import { formatPrice } from '../utils/formatPrice';
 import styles from './CategoryHero.module.css';
 
 // Floating positions for 4 images: top-left, top-right, center-left, bottom-right
@@ -58,10 +59,7 @@ function PropertyListingCard({ property, index }) {
     ? property.images[0] 
     : (property.image || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80');
 
-  // Handle price display (Cr/L vs number)
-  const displayPrice = typeof property.price === 'string' 
-    ? property.price 
-    : `₹${property.price.toLocaleString()}`;
+  const displayPrice = formatPrice(property.price);
 
   return (
     <motion.div
@@ -127,16 +125,31 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
   // Always use live properties from Firestore.
   const baseProperties = liveProperties;
 
-  // Ensure we map standard fields for display if coming from live DB
-  const images = baseProperties.map(p => ({
-    ...p,
-    // Add logic to handle different field names if necessary
-    images: p.images || (p.image ? [p.image] : []),
-    location: p.location || p.address || "Location TBD",
-    beds: p.beds || p.bedrooms || 0,
-    baths: p.baths || p.bathrooms || 0,
-    sqft: p.sqft || p.area || 0
-  }));
+  const images = baseProperties.map(p => {
+    // Robust price normalization
+    let nPrice = 0;
+    if (typeof p.price === 'number') {
+      nPrice = p.price;
+    } else if (typeof p.price === 'string') {
+      const clean = p.price.replace(/[^\d.]/g, '');
+      const val = parseFloat(clean);
+      if (!isNaN(val)) {
+        if (p.price.toLowerCase().includes('cr')) nPrice = val * 10000000;
+        else if (p.price.toLowerCase().includes('l')) nPrice = val * 100000;
+        else nPrice = val;
+      }
+    }
+
+    return {
+      ...p,
+      images: p.images || (p.image ? [p.image] : []),
+      location: (p.location || p.address || "Location TBD").trim(),
+      beds: p.beds || p.bedrooms || 0,
+      baths: p.baths || p.bathrooms || 0,
+      sqft: p.sqft || p.area || 0,
+      numericPrice: nPrice
+    };
+  });
 
   const taxonomy = FILTER_TAXONOMY[categoryId];
 

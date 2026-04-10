@@ -7,6 +7,8 @@ import { submitLead } from '../services/leadService';
 import { MOCK_AGENTS } from '../data/mockProperties';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './PropertyDetail.module.css';
+import brandLogo from '../assets/logo.png';
+import { formatPrice } from '../utils/formatPrice';
 
 const DEFAULT_AMENITIES = [
   "Swimming Pool", 
@@ -138,7 +140,7 @@ export default function PropertyDetail() {
             <div className={styles.headerRow}>
               <h1>{property.title}</h1>
               <div className={styles.price}>
-                ${property.price.toLocaleString()} {property.status === 'For Rent' && <span>/mo</span>}
+                {formatPrice(property.price)} {property.status === 'For Rent' && <span>/mo</span>}
               </div>
             </div>
             <div className={styles.location}>
@@ -192,15 +194,15 @@ export default function PropertyDetail() {
         <motion.div className={styles.detailSidebar} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
           <div className={styles.sidebarSticky}>
             <div className={styles.agentCard}>
-              {agent && (
-                <div className={styles.agentInfo}>
-                  <img src={agent.photo} alt={agent.name} className={styles.agentPhoto} />
-                  <div>
-                    <h4 style={{ margin: 0 }}>{agent.name}</h4>
-                    <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>{agent.role}</p>
-                  </div>
+              <div className={styles.agentInfo}>
+                <div className={styles.agentPhotoWrap}>
+                  <img src={brandLogo} alt="Property Express logo" className={styles.brandAgentLogo} />
                 </div>
-              )}
+                <div>
+                  <h4 style={{ margin: 0 }}>Property Express Team</h4>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>Your Personal Consultants</p>
+                </div>
+              </div>
               
               <div className={styles.contactFormWrap}>
                 <h4 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', fontWeight: '400' }}>Interested in this property?</h4>

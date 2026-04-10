@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, BedDouble, Bath, Scaling } from 'lucide-react';
+import { formatPrice } from '../../utils/formatPrice';
 import styles from './PropertyCard.module.css';
 
 export default function PropertyCard({ property }) {
@@ -24,10 +25,7 @@ export default function PropertyCard({ property }) {
     allImages[2] || allImages[0]
   ];
 
-  // Handle price display (Cr/L vs number)
-  const displayPrice = typeof price === 'string' 
-    ? price 
-    : `₹${price.toLocaleString()}`;
+  const displayPrice = formatPrice(price);
 
   return (
     <motion.article 
