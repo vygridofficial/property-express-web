@@ -144,12 +144,13 @@
 @media (max-width: 768px) {
   .statCard {
     padding: 1.25rem 1.75rem;
-    min-height: 160px;
+    min-height: 140px; /* Reduced fixed height */
+    flex: none; /* Prevent stretching */
   }
 
   .bgTeal,
   .bgGreen {
-    min-height: 160px;
+    min-height: 140px; /* Consistently shorter */
   }
 }
 
