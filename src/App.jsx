@@ -96,7 +96,7 @@ function AppContent() {
   return (
     <>
       <SEOManager />
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         <Routes location={location} key={location.pathname.startsWith('/admin') ? 'admin' : location.pathname}>
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
