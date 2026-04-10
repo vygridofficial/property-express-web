@@ -149,6 +149,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
   const markResponded = async (id) => {
     try {
       await updateInquiry(id, { status: 'responded' });
