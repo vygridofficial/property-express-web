@@ -1,0 +1,101 @@
+.gtaMarker {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 8;
+  /* Next z-index handles the hover via Framer Motion, but we can set a base */
+}
+
+.pinCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 5px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  width: 168px;
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.pinCard::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 24px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  transform: rotate(45deg);
+  border-radius: 2px;
+  z-index: -1;
+}
+
+.pinCardPrice {
+  background: #cbf04a;
+  color: #111;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 2px solid #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: -12px;
+  left: -8px;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.pinCardImg {
+  width: 158px;
+  height: 90px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.pinCardImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.pinCard:hover .pinCardImg img {
+  transform: scale(1.08);
+}
+
+/* ── Mobile Compact Pin ── */
+.gtaMarkerCompact {
+  z-index: 6;
+}
+
+.compactPin {
+  background: #cbf04a;
+  color: #111;
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 700;
+  padding: 0.25rem 0.5rem; /* py-1 px-2 */
+  border-radius: 12px;
+  border: 1.5px solid #fff;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.compactPin::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  z-index: -1;
+}

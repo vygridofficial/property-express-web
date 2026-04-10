@@ -1,0 +1,56 @@
+.filterBar {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-top: -40px;
+  position: relative;
+  z-index: 10;
+  border: 1px solid var(--color-border);
+}
+
+.filterForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterGroup label {
+  font-weight: 500;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+}
+
+.filterGroup select {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.filterGroup select:focus {
+  border-color: #333;
+}
+
+.searchBtn {
+  height: 48px;
+  width: 100%;
+}
+
+.subFilterRow {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--color-border);
+}

@@ -1,0 +1,171 @@
+.pageWrap {
+  min-height: 100vh;
+}
+
+/* ── Hero Header Banner ──────────────────────────────────── */
+.pageHeader {
+  height: 40vh;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: url('https://images.unsplash.com/photo-1628624747186-a941c476b7ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+  padding-top: 80px;
+}
+
+.pageHeader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.25) 100%);
+}
+
+.headerContent {
+  position: relative;
+  z-index: 10;
+  color: white;
+}
+
+.headerContent h1 {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+/* ── Category Selection Grid ─────────────────────────────── */
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.catCardWrap {
+  cursor: pointer;
+}
+
+.catCard {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  height: 340px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              box-shadow 0.4s ease;
+}
+
+.catCard:hover {
+  transform: translateY(-10px) scale(1.015);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+}
+
+.catBgImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.catCard:hover .catBgImg {
+  transform: scale(1.08);
+}
+
+.catOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(10, 10, 10, 0.85) 0%,
+    rgba(10, 10, 10, 0.2) 55%,
+    transparent 100%
+  );
+  transition: background 0.4s ease;
+}
+
+.catCard:hover .catOverlay {
+  background: linear-gradient(
+    to top,
+    rgba(10, 10, 10, 0.92) 0%,
+    rgba(10, 10, 10, 0.35) 55%,
+    transparent 100%
+  );
+}
+
+.catContent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.catIconWrap {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  backdrop-filter: blur(10px);
+  margin-bottom: 0.5rem;
+}
+
+.catTitle {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+}
+
+.catDesc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.catCta {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.5rem 1.2rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 30px;
+  width: fit-content;
+  backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+
+.catCard:hover .catCta {
+  background: #fff;
+  color: #1a1a1a;
+  border-color: #fff;
+}
+
+@media (max-width: 768px) {
+  /* On mobile, stack category cards vertically in a single column */
+  .catGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .catCard {
+    height: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .catCard {
+    height: 300px;
+  }
+}

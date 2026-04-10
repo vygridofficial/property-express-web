@@ -1,0 +1,113 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  transition: var(--transition);
+  padding: 1.5rem 0;
+}
+
+.scrolled {
+  padding: 1rem 0;
+  background-color: rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.logoImg {
+  height: 48px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.15));
+  transition: opacity 0.3s ease;
+}
+
+.logo:hover .logoImg {
+  opacity: 0.85;
+}
+
+.navLinks {
+  display: flex;
+  gap: 3rem;
+}
+
+.navLink {
+  font-weight: 400;
+  position: relative;
+  padding: 0.5rem 0;
+  opacity: 0.6;
+  letter-spacing: 0.02em;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 1px;
+  background-color: var(--color-primary);
+  transition: var(--transition);
+}
+
+.navLink:hover,
+.active {
+  opacity: 1;
+}
+
+.navLink:hover::after,
+.active::after {
+  width: 100%;
+}
+
+.mobileToggle {
+  display: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+}
+
+.mobileMenu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navLinks {
+    display: none;
+  }
+  .mobileToggle {
+    display: block;
+  }
+  .mobileMenu {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 2rem;
+    z-index: 999;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  .mobileMenu a {
+    padding: 1rem 0;
+    font-size: 1.25rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+}

@@ -1,0 +1,40 @@
+:root {
+  /* Fluid Glass Colors */
+  --color-primary: #18181a;
+  --color-accent-blue: #333333;
+  --color-accent-gold: #555555;
+  --color-bg: transparent;
+  --color-surface: rgba(255, 255, 255, 0.15);
+  --color-text: #222222;
+  --color-text-light: #555555;
+  --color-border: rgba(0, 0, 0, 0.05);
+
+  --glass-bg: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
+  --glass-blur: blur(20px);
+
+  /* Typography */
+  --font-main: 'Outfit', sans-serif;
+
+  /* Spacing */
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2.5rem;
+  --space-xl: 5rem;
+  --space-xxl: 8rem;
+
+  /* Transitions & Shadows */
+  --transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.1);
+  --radius-md: 12px;
+  --radius-lg: 24px;
+}
+
+@keyframes fluidBodyBg {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.05) translate(2%, 3%); }
+  100% { transform: scale(1) translate(-2%, -1%); }
+}

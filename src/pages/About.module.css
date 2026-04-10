@@ -1,0 +1,76 @@
+.pageWrap {
+  min-height: 100vh;
+}
+
+.pageHeader {
+  height: 40vh;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: url('https://images.unsplash.com/photo-1574362848149-11496d93a7c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+  padding-top: 80px; 
+}
+
+.pageHeader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.3) 100%);
+}
+
+.headerContent {
+  position: relative;
+  z-index: 10;
+  color: white;
+}
+
+.headerContent h1 {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.statCard {
+  background: var(--glass-bg);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  text-align: center;
+}
+
+.statNum {
+  font-size: 2.5rem;
+  color: var(--color-primary);
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+}
+
+.statLabel {
+  color: var(--color-text-light);
+}
+
+.valueCard {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.valueCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.valueIcon {
+  color: var(--color-accent-blue);
+  margin-bottom: 1.5rem;
+}

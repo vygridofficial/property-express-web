@@ -1,0 +1,103 @@
+﻿
+> w1@0.0.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 2174 modules transformed.
+node.exe : [31mx[39m 
+Build failed in 1.90s
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: ([3  
+  1mx[39m Build failed    
+ in 1.90s:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+[31merror during build:
+[31msrc/pages/PropertyDeta
+il.jsx (5:26): 
+"MOCK_AGENTS" is not 
+exported by "src/services/p
+ropertyService.js", 
+imported by "src/pages/Prop
+ertyDetail.jsx".[31m
+file: [36mD:/Vygrid/W1/src
+/pages/PropertyDetail.jsx:5
+:26[31m
+[33m
+3: import { motion } from 
+'framer-motion';
+4: import { MapPin, 
+BedDouble, Bath, Scaling, 
+Calendar, ShieldCheck, 
+User } from 'lucide-react';
+5: import { 
+getPropertyById, 
+MOCK_AGENTS } from '../serv
+ices/propertyService';
+                           
+  ^
+6: import { 
+revealVariants, 
+revealViewport } from 
+'../hooks/useScrollReveal';
+7: import styles from './Pr
+opertyDetail.module.css';
+[31m
+    at getRollupError (file
+:///D:/Vygrid/W1/node_modul
+es/rollup/dist/es/shared/pa
+rseAst.js:406:41)
+    at error (file:///D:/Vy
+grid/W1/node_modules/rollup
+/dist/es/shared/parseAst.js
+:402:42)
+    at Module.error (file:/
+//D:/Vygrid/W1/node_modules
+/rollup/dist/es/shared/node
+-entry.js:17380:16)
+    at 
+Module.traceVariable (file:
+///D:/Vygrid/W1/node_module
+s/rollup/dist/es/shared/nod
+e-entry.js:17813:29)
+    at 
+ModuleScope.findVariable (f
+ile:///D:/Vygrid/W1/node_mo
+dules/rollup/dist/es/shared
+/node-entry.js:15403:39)
+    at 
+FunctionScope.findVariable 
+(file:///D:/Vygrid/W1/node_
+modules/rollup/dist/es/shar
+ed/node-entry.js:5676:38)
+    at FunctionBodyScope.fi
+ndVariable (file:///D:/Vygr
+id/W1/node_modules/rollup/d
+ist/es/shared/node-entry.js
+:5676:38)
+    at ReturnValueScope.fin
+dVariable (file:///D:/Vygri
+d/W1/node_modules/rollup/di
+st/es/shared/node-entry.js:
+5676:38)
+    at FunctionBodyScope.fi
+ndVariable (file:///D:/Vygr
+id/W1/node_modules/rollup/d
+ist/es/shared/node-entry.js
+:5676:38)
+    at ReturnValueScope.fin
+dVariable (file:///D:/Vygri
+d/W1/node_modules/rollup/di
+st/es/shared/node-entry.js:
+5676:38)[39m

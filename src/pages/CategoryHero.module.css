@@ -1,0 +1,388 @@
+.outerWrap {
+  width: 100%;
+}
+
+/* ── Hero Panel ─────────────────────────────────────────── */
+.heroPanel {
+  height: 200vh;
+  /* Extra height gives scroll room */
+  position: relative;
+}
+
+.heroInner {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Back button ─────────────────────────────────────────── */
+.backBtn {
+  position: absolute;
+  top: 6rem;
+  left: 2rem;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 40px;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.backBtn:hover {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+/* ── Floating images ─────────────────────────────────────── */
+.floatingImg {
+  position: absolute;
+  width: clamp(200px, 26vw, 380px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+
+.floatingImgEl {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.floatingImg:hover .floatingImgEl {
+  transform: scale(1.05);
+}
+
+/* ── Big hero title ──────────────────────────────────────── */
+.heroTitle {
+  position: relative;
+  z-index: 10;
+  font-family: var(--font-main);
+  font-size: clamp(5rem, 14vw, 14rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  color: #1a1a1a;
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+  mix-blend-mode: multiply;
+}
+
+
+.listingsSection {
+  background: #f5f5f5;
+  padding: 5rem 2rem 8rem;
+  will-change: opacity;
+}
+
+.listingsHeader {
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+}
+
+.listingsHeader h2 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.listingsHeader p {
+  color: #888;
+  font-size: 1rem;
+}
+
+/* ── Filter Bar ──────────────────────────────────────────── */
+.filterWrap {
+  max-width: 1200px;
+  margin: 0 auto 2.5rem;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  border: 1px solid #ebebeb;
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.filterGroup label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #555;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.filterGroup select {
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1.5px solid #e5e5e5;
+  background: #fafafa;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filterGroup select:focus {
+  border-color: #1a1a1a;
+}
+
+.subFilterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #e5e5e5;
+}
+
+.subFilterToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 10px;
+  border: 1.5px solid #e5e5e5;
+  background: #fafafa;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-end;
+  white-space: nowrap;
+}
+
+.subFilterToggle:hover {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.searchBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.6rem;
+  border-radius: 10px;
+  border: none;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  align-self: flex-end;
+  white-space: nowrap;
+}
+
+.searchBtn:hover {
+  background: #444;
+}
+
+.noResults {
+  color: #888;
+  font-size: 1rem;
+  text-align: center;
+  padding: 3rem 0;
+  grid-column: 1 / -1;
+}
+
+/* ── Listings Grid ───────────────────────────────────────── */
+.listingsGrid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+/* ── Listing card ─────────────────────────────────────────── */
+.listingCard {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.listingCard:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.listingImgWrap {
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+}
+
+.listingImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+  display: block;
+}
+
+.listingCard:hover .listingImg {
+  transform: scale(1.06);
+}
+
+.listingBadge {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  padding: 0.35rem 1rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  z-index: 2;
+}
+
+.listingContent {
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.listingPrice {
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.perMonth {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #999;
+}
+
+.listingTitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.listingLocation {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 1.2rem;
+}
+
+.listingFeatures {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 0.85rem;
+  color: #555;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 1rem;
+  margin-bottom: 1.4rem;
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+
+.viewBtn {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 50px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s ease;
+}
+
+.viewBtn:hover {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .heroPanel {
+    height: 100vh; /* Restores the scroll space needed for parallax */
+  }
+
+  /* Make floating images larger and wider */
+  .floatingImg {
+    width: clamp(200px, 60vw, 360px); 
+    z-index: 2 !important; /* Keep strictly behind title */
+  }
+
+  .heroTitle {
+    font-size: clamp(3rem, 14vw, 5rem);
+    z-index: 50 !important; /* Force title strictly above images */
+    color: #1a1a1a;
+    background: rgba(255, 255, 255, 0.9); /* Pill background */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.5rem 2rem;
+    border-radius: 40px;
+    display: inline-block;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  .listingsSection {
+    padding: 2rem 1.5rem 6rem;
+    margin-top: 0;
+  }
+
+  .listingsHeader h2 {
+    font-size: 2.25rem; /* ~text-4xl equivalent */
+  }
+
+  .listingsGrid {
+    grid-template-columns: 1fr;
+  }
+}
