@@ -143,14 +143,27 @@
 
 @media (max-width: 768px) {
   .statCard {
-    padding: 1.25rem 1.75rem;
-    min-height: 140px; /* Reduced fixed height */
-    flex: none; /* Prevent stretching */
+    padding: 1rem 1.25rem; /* Reduced padding */
+    min-height: 100px !important; /* Extremely compact height */
+    flex: none !important; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content to feel shorter */
+  }
+
+  .statNumber {
+    font-size: 2.25rem !important; /* Smaller text on mobile */
+    margin-bottom: 0.25rem !important;
+  }
+
+  .statFooter {
+    margin-top: 0 !important;
+    padding-top: 0.25rem !important;
   }
 
   .bgTeal,
   .bgGreen {
-    min-height: 140px; /* Consistently shorter */
+    min-height: 100px !important;
   }
 }
 
