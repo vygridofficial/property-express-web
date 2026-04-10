@@ -1,7 +1,7 @@
 export function deg2rad(deg) { return deg * (Math.PI / 180); }
 
 export function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-  var R = 6371; 
+  var R = 6371;
   var dLat = deg2rad(lat2 - lat1);
   var dLon = deg2rad(lon2 - lon1);
   var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
@@ -13,7 +13,7 @@ export function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 
 export const extractCoordsFromUrl = (url) => {
   if (!url || typeof url !== 'string') return null;
-  
+
   let result = null;
 
   // 1. Match @lat,lng format commonly in standard maps URLs
@@ -21,7 +21,7 @@ export const extractCoordsFromUrl = (url) => {
   if (atMatch) {
     result = { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
   }
-  
+
   // 2. Match iframe pb=!2dLONG!3dLAT format
   const pbMatch = url.match(/!2d(-?\d+\.\d+).*?!3d(-?\d+\.\d+)/);
   if (pbMatch && !result) {
@@ -33,7 +33,7 @@ export const extractCoordsFromUrl = (url) => {
   if (qMatch && !result) {
     result = { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
   }
-  
+
   if (result) {
     // Attempt to extract place name from URL path /place/PLACE_NAME/
     const placeMatch = url.match(/\/place\/([^/@]+)/);
@@ -51,11 +51,11 @@ export const getPropertyCoordinates = (property) => {
     const coords = extractCoordsFromUrl(property.mapsUrl);
     if (coords) {
       // Use exact coordinates provided in DB document
-      return { 
-        id: property.id || `exact-${coords.lat}-${coords.lng}`, 
-        lat: coords.lat, 
+      return {
+        id: property.id || `exact-${coords.lat}-${coords.lng}`,
+        lat: coords.lat,
         lng: coords.lng,
-        label: coords.label 
+        label: coords.label
       };
     }
   }

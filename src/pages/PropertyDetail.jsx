@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
 import { submitLead } from '../services/leadService';
@@ -12,13 +12,13 @@ import { formatPrice } from '../utils/formatPrice';
 import { getPropertyCoordinates } from '../utils/geo';
 
 const DEFAULT_AMENITIES = [
-  "Swimming Pool", 
-  "24/7 Security", 
-  "Private Garage (3 Cars)", 
-  "Central AC / Heating", 
-  "Smart Home System", 
-  "Outdoor BBQ Area", 
-  "City Water Supply", 
+  "Swimming Pool",
+  "24/7 Security",
+  "Private Garage (3 Cars)",
+  "Central AC / Heating",
+  "Smart Home System",
+  "Outdoor BBQ Area",
+  "City Water Supply",
   "High-Speed Internet"
 ];
 
@@ -35,6 +35,7 @@ export default function PropertyDetail() {
     email: '',
     message: 'I am interested in Property Express listing...'
   });
+  const [currentMainIndex, setCurrentMainIndex] = useState(0);
 
   useEffect(() => {
     // If we have data from state, we can already initialize agent info
@@ -56,14 +57,14 @@ export default function PropertyDetail() {
       if (data) {
         setProperty(data);
         if (data.agentName) {
-           setAgent({
-              name: data.agentName,
-              photo: data.agentPhoto || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
-              role: 'Property Agent',
-              phone: data.agentPhone || '+91 98765 43210'
-           });
+          setAgent({
+            name: data.agentName,
+            photo: data.agentPhoto || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
+            role: 'Property Agent',
+            phone: data.agentPhone || '+91 98765 43210'
+          });
         } else {
-           setAgent(MOCK_AGENTS.find(a => a.id === data.agentId) || MOCK_AGENTS[0]);
+          setAgent(MOCK_AGENTS.find(a => a.id === data.agentId) || MOCK_AGENTS[0]);
         }
       }
     });
@@ -79,6 +80,25 @@ export default function PropertyDetail() {
     allImages[1] || safeImg,
     allImages[2] || safeImg
   ];
+
+  // Auto-slide logic for main image
+  const cycleIndices = useMemo(() => {
+    if (allImages.length <= 3) return [0];
+    // Main slot cycles through 0 and any images from index 3 onwards
+    return [0, ...allImages.map((_, i) => i).filter(i => i > 2)];
+  }, [allImages]);
+
+  useEffect(() => {
+    if (cycleIndices.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentMainIndex(prev => (prev + 1) % cycleIndices.length);
+    }, 7000);
+
+    return () => clearInterval(interval);
+  }, [cycleIndices]);
+
+  const activeMainImage = allImages[cycleIndices[currentMainIndex]] || safeImg;
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -115,17 +135,34 @@ export default function PropertyDetail() {
       {/* 1. Image Gallery */}
       <div className={styles.galleryHero}>
         <div className={styles.galleryGrid}>
-          <button 
+          <button
             className={styles.backBtnFloating}
-            onClick={() => navigate(-1)} 
+            onClick={() => navigate(-1)}
           >
             &larr; Back
           </button>
-          {displayImages.map((img, idx) => (
-            <div key={idx} className={`${styles.galleryItem} ${idx === 0 ? styles.galleryMain : ''}`}>
-              <img src={img} alt={`${property.title} view ${idx + 1}`} />
-            </div>
-          ))}
+          {/* Main Image Slot with Slider */}
+          <div className={`${styles.galleryItem} ${styles.galleryMain}`}>
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={cycleIndices[currentMainIndex]}
+                src={activeMainImage}
+                alt={`${property.title} main view`}
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -100, opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+              />
+            </AnimatePresence>
+          </div>
+
+          {/* Side Images (Static) */}
+          <div className={styles.galleryItem}>
+            <img src={displayImages[1]} alt={`${property.title} view 2`} />
+          </div>
+          <div className={styles.galleryItem}>
+            <img src={displayImages[2]} alt={`${property.title} view 3`} />
+          </div>
         </div>
       </div>
 
@@ -137,7 +174,7 @@ export default function PropertyDetail() {
               <span className={styles.badge}>{property.status}</span>
               {property.featured && <span className={styles.badge} style={{ background: '#f5ebd9', color: '#9c6b24', border: '1px solid #dcb57e' }}>Featured</span>}
             </div>
-            
+
             <div className={styles.headerRow}>
               <h1>{property.title}</h1>
               <div className={styles.price}>
@@ -181,10 +218,10 @@ export default function PropertyDetail() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <h3 style={{ margin: 0 }}>Location Map</h3>
               {property.mapsUrl && (
-                <a 
-                  href={property.mapsUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={property.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="btn"
                   style={{ background: '#1a1a1a', color: 'white', textDecoration: 'none', padding: '0.6rem 1.25rem', fontSize: '0.9rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
@@ -195,10 +232,10 @@ export default function PropertyDetail() {
             <div className={styles.mapWrapper}>
               {(() => {
                 const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
-                const src = coords 
+                const src = coords
                   ? `https://maps.google.com/maps?q=${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}&z=15&output=embed`
                   : `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
-                
+
                 return (
                   <iframe
                     title="Property Location"
@@ -226,7 +263,7 @@ export default function PropertyDetail() {
                   <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>Your Personal Consultants</p>
                 </div>
               </div>
-              
+
               <div className={styles.contactFormWrap}>
                 <h4 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', fontWeight: '400' }}>Interested in this property?</h4>
                 <form className={styles.contactForm} onSubmit={handleFormSubmit}>
