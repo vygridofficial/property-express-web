@@ -145,20 +145,7 @@ export default function PropertyDetail() {
               </div>
             </div>
             <div className={styles.location}>
-              {property.mapsUrl ? (
-                <a 
-                  href={property.mapsUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}
-                >
-                  <MapPin size={18} /> <span style={{ textDecoration: 'underline' }}>View on Google Maps</span>
-                </a>
-              ) : (
-                <>
-                  <MapPin size={18} /> {property.location}
-                </>
-              )}
+              <MapPin size={18} /> {property.location}
             </div>
           </motion.div>
 

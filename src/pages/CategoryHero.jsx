@@ -97,20 +97,7 @@ function PropertyListingCard({ property, index }) {
         <div className={styles.titleWrap}>
           <h3 className={styles.listingTitle}>{property.title}</h3>
         </div>
-        {property.mapsUrl ? (
-          <a 
-            href={property.mapsUrl} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className={styles.listingLocation}
-            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', color: '#666' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            📍 <span style={{ textDecoration: 'underline' }}>View on Google Maps</span>
-          </a>
-        ) : (
-          <p className={styles.listingLocation}>📍 {property.location}</p>
-        )}
+        <p className={styles.listingLocation}>📍 {property.location}</p>
         <div className={styles.listingFeatures}>
           {(property.beds > 0 || property.bedrooms > 0) && (
             <span>🛏 {property.beds || property.bedrooms} Beds</span>
