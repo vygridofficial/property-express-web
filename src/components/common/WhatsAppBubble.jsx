@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, Phone, MapPin, X } from 'lucide-react';
+import { MessageCircle, Phone, MapPin, X, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './WhatsAppBubble.module.css';
 
@@ -24,11 +24,9 @@ export default function WhatsAppBubble() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const actions = [
-    { id: 'whatsapp', icon: <MessageCircle size={20} />, href: 'https://wa.me/15551234567', color: '#25D366' },
-    { id: 'call', icon: <Phone size={20} />, href: 'tel:+15551234567', color: '#34b7f1' },
     { id: 'instagram', icon: <InstagramIcon size={20} />, href: 'https://instagram.com/propertyexpress', color: '#E1306C' },
-    { id: 'facebook', icon: <FacebookIcon size={20} />, href: 'https://facebook.com/propertyexpress', color: '#4267B2' },
-    { id: 'map', icon: <MapPin size={20} />, href: 'https://goo.gl/maps/example', color: '#EA4335' }
+    { id: 'whatsapp', icon: <MessageCircle size={20} />, href: 'https://wa.me/15551234567', color: '#25D366' },
+    { id: 'facebook', icon: <FacebookIcon size={20} />, href: 'https://facebook.com/propertyexpress', color: '#4267B2' }
   ];
 
   return (
@@ -72,7 +70,7 @@ export default function WhatsAppBubble() {
         animate={{ rotate: isOpen ? 180 : 0 }}
         transition={{ duration: 0.2 }}
       >
-        {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
+        {isOpen ? <X size={28} /> : <Share2 size={28} />}
       </motion.button>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
@@ -22,7 +22,8 @@ const DEFAULT_AMENITIES = [
 export default function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [property, setProperty] = useState(null);
+  const location = useLocation();
+  const [property, setProperty] = useState(location.state?.property || null);
   const [agent, setAgent] = useState(null);
   const [formStatus, setFormStatus] = useState('idle');
   const [inquiryForm, setInquiryForm] = useState({

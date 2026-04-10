@@ -58,7 +58,7 @@ export default function PropertyCard({ property }) {
           <span className={styles.featureItem}><Bath size={16} /> {displayBaths} Baths</span>
           <span className={styles.featureItem}><Scaling size={16} /> {displaySqft.toLocaleString()} sqft</span>
         </div>
-        <Link to={`/properties/${id}`} className="btn btn-outline" style={{ width: '100%' }}>View Details</Link>
+        <Link to={`/properties/${id}`} state={{ property }} className="btn btn-outline" style={{ width: '100%' }}>View Details</Link>
       </div>
     </motion.article>
   );

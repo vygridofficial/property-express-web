@@ -9,6 +9,12 @@ export const getFeaturedProperties = async () => {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+export const getSiteSettings = async () => {
+  const docSnap = await getDoc(doc(db, 'settings', 'global'));
+  if (docSnap.exists()) return docSnap.data();
+  return null;
+};
+
 export const getAllProperties = async (filters = {}) => {
   const snapshot = await getDocs(collection(db, PROPERTIES_COLLECTION));
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

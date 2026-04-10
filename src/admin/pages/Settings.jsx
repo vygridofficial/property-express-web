@@ -113,6 +113,48 @@ export default function Settings() {
         </div>
       </div>
 
+      <div className={styles.glassCard} style={{ marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '1.5rem' }}>Company Achievements</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Properties Sold (K+)</label>
+            <input 
+              type="text" 
+              value={draft.achievementsPropertiesSold || '1.2'} 
+              onChange={(e) => handleInputChange('achievementsPropertiesSold', e.target.value)}
+              style={{ width: '100%', maxWidth: 400 }} 
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Client Satisfaction (/5)</label>
+            <input 
+              type="text" 
+              value={draft.achievementsClientSatisfaction || '4.9'} 
+              onChange={(e) => handleInputChange('achievementsClientSatisfaction', e.target.value)}
+              style={{ width: '100%', maxWidth: 400 }} 
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Verified Listings (%)</label>
+            <input 
+              type="text" 
+              value={draft.achievementsVerifiedListings || '100'} 
+              onChange={(e) => handleInputChange('achievementsVerifiedListings', e.target.value)}
+              style={{ width: '100%', maxWidth: 400 }} 
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Expert Consultants (+)</label>
+            <input 
+              type="text" 
+              value={draft.achievementsExpertConsultants || '50'} 
+              onChange={(e) => handleInputChange('achievementsExpertConsultants', e.target.value)}
+              style={{ width: '100%', maxWidth: 400 }} 
+            />
+          </div>
+        </div>
+      </div>
+
       <AnimatePresence>
         {isDirty && (
           <motion.div 

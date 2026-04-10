@@ -119,6 +119,10 @@ export function AdminProvider({ children }) {
     showVillas: true,
     showReviews: true,
     showContactForm: true,
+    achievementsPropertiesSold: '1.2',
+    achievementsClientSatisfaction: '4.9',
+    achievementsVerifiedListings: '100',
+    achievementsExpertConsultants: '50'
   });
 
   useEffect(() => {
