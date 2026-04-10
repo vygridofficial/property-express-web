@@ -62,22 +62,25 @@ const CATEGORY_SYNONYMS = {
 
 export const getPropertiesByCategory = async (category) => {
   const normalizedCategory = category?.toString().trim() || '';
-  const exactQuery = query(collection(db, PROPERTIES_COLLECTION), where("category", "==", normalizedCategory));
-  const snapshot = await getDocs(exactQuery);
+  const synonyms = CATEGORY_SYNONYMS[normalizedCategory] || [normalizedCategory];
+  
+  // Use 'in' query to fetch all synonym matches in one go
+  const q = query(
+    collection(db, PROPERTIES_COLLECTION), 
+    where("category", "in", synonyms)
+  );
+  
+  const snapshot = await getDocs(q);
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  if (results.length > 0) {
-    return results;
+  // Case-insensitive fallback check (rarely needed if data is normalized)
+  if (results.length === 0) {
+    const allSnapshot = await getDocs(collection(db, PROPERTIES_COLLECTION));
+    const normalizedSyns = synonyms.map(s => s.toLowerCase());
+    results = allSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(p => normalizedSyns.includes((p.category || '').toLowerCase()));
   }
 
-  const allProperties = await getAllProperties();
-  const synonyms = CATEGORY_SYNONYMS[normalizedCategory] || [normalizedCategory];
-  const normalizedSynonyms = synonyms.map(s => s.toLowerCase());
-
-  const filtered = allProperties.filter(p => {
-    const categoryValue = (p.category || '').toString().trim().toLowerCase();
-    return normalizedSynonyms.includes(categoryValue);
-  });
-
-  return filtered;
+  return results;
 };

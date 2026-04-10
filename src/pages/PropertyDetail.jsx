@@ -34,9 +34,24 @@ export default function PropertyDetail() {
   });
 
   useEffect(() => {
+    // If we have data from state, we can already initialize agent info
+    if (property) {
+      if (property.agentName) {
+        setAgent({
+          name: property.agentName,
+          photo: property.agentPhoto || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
+          role: 'Property Agent',
+          phone: property.agentPhone || '+91 98765 43210'
+        });
+      } else {
+        setAgent(MOCK_AGENTS.find(a => a.id === property.agentId) || MOCK_AGENTS[0]);
+      }
+    }
+
+    // Always fetch in background to get latest stats/availability
     getPropertyById(id).then(data => {
-      setProperty(data);
       if (data) {
+        setProperty(data);
         if (data.agentName) {
            setAgent({
               name: data.agentName,

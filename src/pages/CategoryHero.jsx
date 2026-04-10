@@ -104,6 +104,7 @@ function PropertyListingCard({ property, index }) {
         </div>
         <Link 
           to={`/properties/${property.id}`} 
+          state={{ property }}
           className={styles.viewBtn} 
           style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}
         >

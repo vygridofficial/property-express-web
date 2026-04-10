@@ -59,7 +59,7 @@ export default function Contact() {
       icon: <Mail size={22} />,
       label: 'Email',
       value: 'hello@propertyexpress.com',
-      href: 'mailto:hello@propertyexpress.com',
+      href: 'https://mail.google.com/mail/?view=cm&fs=1&to=hello@propertyexpress.com',
     },
     {
       icon: <InstagramIcon size={22} />,
@@ -111,7 +111,12 @@ export default function Contact() {
                     <div className={styles.contactItemText}>
                       <span className={styles.contactLabel}>{item.label}</span>
                       {item.href ? (
-                        <a href={item.href} className={styles.contactValue} target="_blank" rel="noopener noreferrer">
+                        <a 
+                          href={item.href} 
+                          className={styles.contactValue} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
                           {item.value}
                         </a>
                       ) : (

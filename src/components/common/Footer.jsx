@@ -37,9 +37,9 @@ export default function Footer() {
               Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight.
             </p>
             <div className={`flex ${styles.socialLinks}`}>
-              <a href="#" aria-label="Facebook"><FacebookIcon /></a>
-              <a href="#" aria-label="Instagram"><InstagramIcon /></a>
-              <a href="#" aria-label="X (Twitter)"><XIcon /></a>
+              <a href="https://facebook.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FacebookIcon /></a>
+              <a href="https://instagram.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><InstagramIcon /></a>
+              <a href="https://twitter.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><XIcon /></a>
             </div>
           </div>
 
@@ -66,18 +66,28 @@ export default function Footer() {
           <div className={styles.footerCol}>
             <h4>Contact Info</h4>
             <div className={styles.footerLinks}>
-              <div className={styles.contactItem}>
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=123+Business+Avenue+Suite+100+New+York+NY+10001" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={styles.contactItem}
+              >
                 <MapPin size={18} /> 
                 <span>123 Business Avenue, Suite 100, New York, NY 10001</span>
-              </div>
-              <div className={styles.contactItem}>
+              </a>
+              <a href="tel:+15551234567" className={styles.contactItem}>
                 <Phone size={18} /> 
                 <span>+1 (555) 123-4567</span>
-              </div>
-              <div className={styles.contactItem}>
+              </a>
+              <a 
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@propertyexpress.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={styles.contactItem}
+              >
                 <Mail size={18} /> 
                 <span>hello@propertyexpress.com</span>
-              </div>
+              </a>
             </div>
           </div>
         </div>
