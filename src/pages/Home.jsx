@@ -718,7 +718,7 @@ export default function Home() {
           )}
         </div>
 
-        <div className={`container ${styles.mapCtaContent}`} style={isLocationDetected ? { 
+        <div className={isMobile ? styles.mapCtaContent : `container ${styles.mapCtaContent}`} style={isLocationDetected ? { 
           position: 'absolute', 
           bottom: isMobile ? '20px' : 'auto',
           top: isMobile ? 'auto' : '40px', 
