@@ -718,20 +718,20 @@ export default function Home() {
           )}
         </div>
 
-        <div className={isMobile ? styles.mapCtaContent : `container ${styles.mapCtaContent}`} style={isLocationDetected ? { 
-          position: 'absolute', 
+        <div className={isMobile ? styles.mapCtaContent : `container ${styles.mapCtaContent}`} style={isLocationDetected ? {
+          position: 'absolute',
           bottom: isMobile ? '20px' : 'auto',
-          top: isMobile ? 'auto' : '40px', 
-          left: isMobile ? '50%' : '40px', 
+          top: isMobile ? 'auto' : '40px',
+          left: isMobile ? '50%' : '40px',
           transform: isMobile ? 'translateX(-50%)' : 'none',
-          textAlign: isMobile ? 'center' : 'left', 
-          margin: 0, 
-          width: isMobile ? '100%' : 'auto', 
-          pointerEvents: 'none' 
+          textAlign: isMobile ? 'center' : 'left',
+          margin: 0,
+          width: isMobile ? '100%' : 'auto',
+          pointerEvents: 'none'
         } : {}}>
           <div style={{ pointerEvents: 'auto' }}>
             <h2 className={styles.mapCtaTitle} style={isLocationDetected ? { fontSize: isMobile ? '1.5rem' : '2rem', marginBottom: '0.5rem', textShadow: '0 4px 12px rgba(0,0,0,1)' } : {}}>Explore Nearby Homes</h2>
-            <p className={styles.mapCtaSubtitle} style={isLocationDetected ? { fontSize: '0.9rem', maxWidth: isMobile ? '100%': '300px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' } : {}}>Browse available homes near you and explore<br />listings in your favorite areas.</p>
+            <p className={styles.mapCtaSubtitle} style={isLocationDetected ? { fontSize: '0.9rem', maxWidth: isMobile ? '100%' : '300px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' } : {}}>Browse available homes near you and explore<br />listings in your favorite areas.</p>
             <div className={styles.mapCtaBtnWrap}>
               {!isLocationDetected && (
                 <>
@@ -744,12 +744,12 @@ export default function Home() {
             <div style={{ marginTop: isMobile ? '0.75rem' : '1.5rem', display: 'flex', justifyContent: isLocationDetected && !isMobile ? 'flex-start' : 'center', position: 'relative', zIndex: 10 }}>
               <button
                 onClick={handleDetectLocation}
-              disabled={isDetecting}
-              className="btn"
-              style={{ background: 'white', color: '#18181a', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: isMobile ? '0.6rem 1.25rem' : '0.875rem 2rem', fontSize: isMobile ? '0.85rem' : '1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
-              <Map size={isMobile ? 16 : 18} /> {isDetecting ? 'Detecting...' : 'Detect My Location'}
-            </button>
-          </div>
+                disabled={isDetecting}
+                className="btn"
+                style={{ background: 'white', color: '#18181a', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: isMobile ? '0.6rem 1.25rem' : '0.875rem 2rem', fontSize: isMobile ? '0.85rem' : '1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+                <Map size={isMobile ? 16 : 18} /> {isDetecting ? 'Detecting...' : 'Detect My Location'}
+              </button>
+            </div>
           </div>
         </div>
       </section>
