@@ -50,9 +50,22 @@ export default function PropertyCard({ property }) {
         <div className={styles.titleWrap}>
           <h3 className={styles.title}>{title}</h3>
         </div>
-        <div className={styles.location}>
-          <MapPin size={16} /> {displayLocation}
-        </div>
+        {property.mapsUrl ? (
+          <a 
+            href={property.mapsUrl} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className={styles.location}
+            style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MapPin size={16} /> <span style={{ textDecoration: 'underline' }}>View on Maps</span>
+          </a>
+        ) : (
+          <div className={styles.location}>
+            <MapPin size={16} /> {displayLocation}
+          </div>
+        )}
         <div className={styles.features}>
           <span className={styles.featureItem}><BedDouble size={16} /> {displayBeds} Beds</span>
           <span className={styles.featureItem}><Bath size={16} /> {displayBaths} Baths</span>

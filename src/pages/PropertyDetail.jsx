@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
+import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
 import { submitLead } from '../services/leadService';
 import { MOCK_AGENTS } from '../data/mockProperties';
@@ -9,6 +9,7 @@ import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './PropertyDetail.module.css';
 import brandLogo from '../assets/logo.png';
 import { formatPrice } from '../utils/formatPrice';
+import { getPropertyCoordinates } from '../utils/geo';
 
 const DEFAULT_AMENITIES = [
   "Swimming Pool", 
@@ -144,7 +145,20 @@ export default function PropertyDetail() {
               </div>
             </div>
             <div className={styles.location}>
-              <MapPin size={18} /> {property.location}
+              {property.mapsUrl ? (
+                <a 
+                  href={property.mapsUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <MapPin size={18} /> <span style={{ textDecoration: 'underline' }}>View on Google Maps</span>
+                </a>
+              ) : (
+                <>
+                  <MapPin size={18} /> {property.location}
+                </>
+              )}
             </div>
           </motion.div>
 
@@ -177,15 +191,37 @@ export default function PropertyDetail() {
 
           {/* Location Map Section */}
           <motion.div className={styles.mapSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
-            <h3>Location Map</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <h3 style={{ margin: 0 }}>Location Map</h3>
+              {property.mapsUrl && (
+                <a 
+                  href={property.mapsUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="btn"
+                  style={{ background: '#1a1a1a', color: 'white', textDecoration: 'none', padding: '0.6rem 1.25rem', fontSize: '0.9rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <Map size={18} /> Open in Google Maps
+                </a>
+              )}
+            </div>
             <div className={styles.mapWrapper}>
-              <iframe
-                title="Property Location"
-                src={`https://www.google.com/maps?q=${encodeURIComponent(property.location)}&output=embed`}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
+              {(() => {
+                const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
+                const src = coords 
+                  ? `https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=15&output=embed`
+                  : `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
+                
+                return (
+                  <iframe
+                    title="Property Location"
+                    src={src}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                );
+              })()}
             </div>
           </motion.div>
         </div>
