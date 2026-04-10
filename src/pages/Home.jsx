@@ -310,7 +310,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <Link to="/properties" className={`btn ${styles.btnPrimary}`}>Search Properties</Link>
-            <Link to="/contact" className={`btn ${styles.btnSecondary}`}>Sell with Us</Link>
+            <Link to="/contact" className={`btn ${styles.btnSecondary}`}>Contact Us</Link>
           </motion.div>
         </div>
       </section>
