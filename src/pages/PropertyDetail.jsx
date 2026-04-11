@@ -230,16 +230,25 @@ export default function PropertyDetail() {
             <div className={styles.mapWrapper}>
               {(() => {
                 let src = '';
-                if (property.mapsUrl && property.mapsUrl.includes('<iframe')) {
-                  const match = property.mapsUrl.match(/src="([^"]+)"/);
-                  if (match) src = match[1];
-                } else if (property.mapsUrl && property.mapsUrl.includes('google.com/maps/embed')) {
-                  src = property.mapsUrl;
-                } else {
-                  const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
-                  src = coords
-                    ? `https://maps.google.com/maps?q=${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}&z=15&output=embed`
-                    : `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
+                if (property.mapsUrl) {
+                  if (property.mapsUrl.includes('<iframe')) {
+                    // Admin pasted full iframe embed HTML — extract src
+                    const match = property.mapsUrl.match(/src="([^"]+)"/);
+                    src = match ? match[1] : '';
+                  } else if (property.mapsUrl.includes('google.com/maps/embed')) {
+                    // Already a direct embed URL
+                    src = property.mapsUrl;
+                  } else {
+                    // Standard Google Maps link (google.com/maps/place/..., maps.google.com/..., etc.)
+                    // Convert to embed by appending output=embed
+                    const separator = property.mapsUrl.includes('?') ? '&' : '?';
+                    src = `${property.mapsUrl}${separator}output=embed`;
+                  }
+                }
+
+                if (!src) {
+                  // Absolute fallback — search by address
+                  src = `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
                 }
 
                 return (
