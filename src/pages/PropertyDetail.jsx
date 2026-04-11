@@ -230,24 +230,21 @@ export default function PropertyDetail() {
             <div className={styles.mapWrapper}>
               {(() => {
                 let src = '';
-                if (property.mapsUrl) {
+                const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
+                
+                if (property.mapsUrl && (property.mapsUrl.includes('<iframe') || property.mapsUrl.includes('google.com/maps/embed'))) {
+                  // If it's already an embed code or embed link, use extraction or direct link
                   if (property.mapsUrl.includes('<iframe')) {
-                    // Admin pasted full iframe embed HTML — extract src
                     const match = property.mapsUrl.match(/src="([^"]+)"/);
                     src = match ? match[1] : '';
-                  } else if (property.mapsUrl.includes('google.com/maps/embed')) {
-                    // Already a direct embed URL
-                    src = property.mapsUrl;
                   } else {
-                    // Standard Google Maps link (google.com/maps/place/..., maps.google.com/..., etc.)
-                    // Convert to embed by appending output=embed
-                    const separator = property.mapsUrl.includes('?') ? '&' : '?';
-                    src = `${property.mapsUrl}${separator}output=embed`;
+                    src = property.mapsUrl;
                   }
-                }
-
-                if (!src) {
-                  // Absolute fallback — search by address
+                } else if (coords) {
+                  // If we have coordinates (extracted from mapsUrl or district), use the robust embed format
+                  src = `https://www.google.com/maps?q=${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}&z=15&output=embed`;
+                } else {
+                  // Fallback to address search if all else fails
                   src = `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
                 }
 
