@@ -241,8 +241,11 @@ export default function PropertyDetail() {
                     src = property.mapsUrl;
                   }
                 } else if (coords) {
-                  // If we have coordinates (extracted from mapsUrl or district), use the robust embed format
-                  src = `https://www.google.com/maps?q=${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}&z=15&output=embed`;
+                  // If we have coordinates or just a label (extracted from mapsUrl or district)
+                  const query = coords.lat 
+                    ? `${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}`
+                    : encodeURIComponent(coords.label);
+                  src = `https://www.google.com/maps?q=${query}&z=15&output=embed`;
                 } else {
                   // Fallback to address search if all else fails
                   src = `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;

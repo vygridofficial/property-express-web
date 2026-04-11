@@ -36,11 +36,28 @@ export const extractCoordsFromUrl = (url) => {
     result = { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
   }
 
-  if (result) {
-    // Attempt to extract place name from URL path /place/PLACE_NAME/
-    const placeMatch = url.match(/\/place\/([^/@]+)/);
-    if (placeMatch) {
-      result.label = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
+  // 4. Match search/place URLs where location name is in the path /place/NAME/
+  const placeMatch = url.match(/\/place\/([^/@?]+)/);
+  if (placeMatch) {
+    const label = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
+    if (result) {
+      result.label = label;
+    } else {
+      // If no coords, just return the label as a search query
+      result = { label };
+    }
+  }
+
+  // 5. Match search query param q=...
+  if (!result || !result.lat) {
+    const sMatch = url.match(/[?&]q=([^&]+)/);
+    if (sMatch) {
+      const qVal = decodeURIComponent(sMatch[1].replace(/\+/g, ' '));
+      // Only use it if it's not a coordinate pair (which was handled in step 3)
+      if (!qVal.match(/^-?\d+\.\d+,-?\d+\.\d+$/)) {
+        if (!result) result = {};
+        result.label = qVal;
+      }
     }
   }
 
@@ -51,13 +68,13 @@ export const getPropertyCoordinates = (property) => {
   if (!property) return null;
   if (property.mapsUrl) {
     const coords = extractCoordsFromUrl(property.mapsUrl);
-    if (coords) {
-      // Use exact coordinates provided in DB document
+    if (coords && (coords.lat || coords.label)) {
+      // Use exact coordinates or label provided in DB document
       return {
-        id: property.id || `exact-${coords.lat}-${coords.lng}`,
+        id: property.id || `exact-${coords.lat || 'query'}-${coords.lng || 'query'}`,
         lat: coords.lat,
         lng: coords.lng,
-        label: coords.label
+        label: coords.label || property.title
       };
     }
   }
