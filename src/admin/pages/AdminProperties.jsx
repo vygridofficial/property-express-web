@@ -68,6 +68,7 @@ export default function AdminProperties() {
   const [customAmenity, setCustomAmenity] = useState('');
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [showToast, setShowToast] = useState('');
+  const [propertyToDelete, setPropertyToDelete] = useState(null);
   const [previewImages, setPreviewImages] = useState([]); // Added to fix ReferenceError
   const [dynKey, setDynKey] = useState('');
   const [dynVal, setDynVal] = useState('');
@@ -164,17 +165,23 @@ export default function AdminProperties() {
     }
   };
 
-  const handleDeleteProperty = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this property?')) return;
+  const handleDeleteProperty = (id) => {
+    setPropertyToDelete(id);
+  };
+
+  const confirmDeleteProperty = async () => {
+    if (!propertyToDelete) return;
     try {
-      await deleteProperty(id);
-      setProperties(prev => prev.filter(p => p.id !== id));
+      await deleteProperty(propertyToDelete);
+      setProperties(prev => prev.filter(p => p.id !== propertyToDelete));
       setShowToast('Property deleted successfully');
-      setTimeout(() => setShowToast(''), 2500);
+      setTimeout(() => setShowToast(''), 3000);
     } catch (error) {
       console.error('Failed to delete:', error);
       setShowToast('Failed to delete property');
+      setTimeout(() => setShowToast(''), 3000);
     }
+    setPropertyToDelete(null);
   };
 
   const filteredProperties = useMemo(() => {
@@ -183,6 +190,7 @@ export default function AdminProperties() {
 
       const catMap = {
         flats: ['flat', 'apartment'],
+        apartments: ['flat', 'apartment'],
         villas: ['villa'],
         warehouses: ['warehouse', 'commercial'],
         plots: ['plot']
@@ -385,9 +393,11 @@ export default function AdminProperties() {
           if (editingId) {
             await updateProperty(editingId, finalData);
             setShowToast('Property updated successfully!');
+            setTimeout(() => setShowToast(''), 3000);
           } else {
             await addProperty({ ...finalData, createdAt: new Date() });
             setShowToast('Property saved successfully!');
+            setTimeout(() => setShowToast(''), 3000);
           }
           setEditingId(null);
           setFormData({
@@ -1100,6 +1110,31 @@ export default function AdminProperties() {
                     ) : 'Create Type'}
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {propertyToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(4px)' }}
+            onClick={() => setPropertyToDelete(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              onClick={e => e.stopPropagation()}
+              style={{ width: '100%', maxWidth: 400, padding: '2rem', textAlign: 'center', background: '#ffffff', borderRadius: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.1)' }}
+            >
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(237,27,36,0.1)', color: '#ed1b24', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Trash2 size={32} />
+              </div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.75rem', color: '#18181b' }}>Delete Property?</h2>
+              <p style={{ color: '#71717a', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.5 }}>Are you sure you want to delete this property? This action cannot be undone.</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="btn" onClick={() => setPropertyToDelete(null)} style={{ flex: 1, padding: '0.875rem', background: '#f4f4f5', color: '#18181b', border: 'none', fontWeight: 600, borderRadius: 12 }}>Cancel</button>
+                <button className="btn" onClick={confirmDeleteProperty} style={{ flex: 1, padding: '0.875rem', background: '#ed1b24', color: 'white', border: 'none', fontWeight: 700, borderRadius: 12 }}>Confirm Delete</button>
               </div>
             </motion.div>
           </motion.div>
