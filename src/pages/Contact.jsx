@@ -4,6 +4,7 @@ import { MapPin, Phone, Mail, MessageCircle } from 'lucide-react';
 import { submitLead } from '../services/leadService';
 import { getSiteSettings } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
+import SEO from '../components/common/SEO';
 import styles from './Contact.module.css';
 
 const InstagramIcon = ({ size = 24, color = "currentColor" }) => (
@@ -102,6 +103,27 @@ export default function Contact() {
       transition={{ duration: 0.3 }}
       className={styles.pageWrap}
     >
+      <SEO 
+        title="Contact Us"
+        description="Get in touch with Property Express. Whether you're looking to buy, rent, or have questions about luxury real estate, our team is here to help."
+        url="/contact"
+        schemaData={{
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          "mainEntity": {
+            "@type": "RealEstateAgent",
+            "name": "Property Express",
+            "image": "https://propertyexpress-mu.vercel.app/logo.png",
+            "telephone": settings?.primaryPhone || "+919876543210",
+            "email": settings?.supportEmail || "contact@property-express.com",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": settings?.officeAddress || "Trivandrum",
+              "addressCountry": "IN"
+            }
+          }
+        }}
+      />
       <section className={styles.pageHeader}>
         <div className={`container ${styles.headerContent}`}>
           <h1>Contact Us</h1>

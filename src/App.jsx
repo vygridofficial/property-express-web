@@ -32,29 +32,7 @@ function PublicLayout() {
   );
 }
 
-import { useAdmin } from './admin/context/AdminContext';
 
-function SEOManager() {
-  const { siteSettings } = useAdmin();
-  
-  React.useEffect(() => {
-    if (siteSettings) {
-      document.title = `${siteSettings.siteName || 'Property Express'} | ${siteSettings.tagline || 'Premium Real Estate'}`;
-      
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', siteSettings.metaDescription || '');
-      } else {
-        const meta = document.createElement('meta');
-        meta.name = 'description';
-        meta.content = siteSettings.metaDescription || '';
-        document.head.appendChild(meta);
-      }
-    }
-  }, [siteSettings]);
-
-  return null;
-}
 
 function AppContent() {
   const location = useLocation();
@@ -95,7 +73,6 @@ function AppContent() {
 
   return (
     <>
-      <SEOManager />
       <AnimatePresence>
         <Routes location={location} key={location.pathname.startsWith('/admin') ? 'admin' : location.pathname}>
           {/* Public Routes */}

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Target, Lightbulb, Users, CheckCircle } from 'lucide-react';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
+import SEO from '../components/common/SEO';
 import styles from './About.module.css';
 
 export default function About() {
@@ -13,6 +14,20 @@ export default function About() {
       transition={{ duration: 0.3 }}
       className={styles.pageWrap}
     >
+      <SEO 
+        title="About Us"
+        description="Learn about Property Express, the region's leading exclusive real estate agency, and our mission to redefine luxury living."
+        url="/about"
+        schemaData={{
+          "@context": "https://schema.org",
+          "@type": "RealEstateAgent",
+          "name": "Property Express",
+          "image": "https://propertyexpress-mu.vercel.app/logo.png",
+          "description": "Redefining luxury real estate with trust and transparency.",
+          "url": "https://propertyexpress-mu.vercel.app/about",
+          "address": "Trivandrum, Kerala, India"
+        }}
+      />
       <section className={styles.pageHeader}>
         <div className={`container ${styles.headerContent}`}>
           <h1>About Property Express</h1>

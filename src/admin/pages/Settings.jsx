@@ -91,10 +91,51 @@ export default function Settings() {
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>SEO Meta Description</label>
             <textarea 
               rows={3} 
-              value={draft.metaDescription} 
+              value={draft.metaDescription || ''} 
               onChange={(e) => handleInputChange('metaDescription', e.target.value)}
               style={{ width: '100%', maxWidth: 600, resize: 'none' }}
             ></textarea>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>SEO Keywords (comma separated)</label>
+            <input 
+              type="text" 
+              value={draft.metaKeywords || ''} 
+              onChange={(e) => handleInputChange('metaKeywords', e.target.value)}
+              style={{ width: '100%', maxWidth: 600 }} 
+            />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: 600 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Twitter Handle</label>
+              <input 
+                type="text" 
+                value={draft.twitterHandle || ''} 
+                onChange={(e) => handleInputChange('twitterHandle', e.target.value)}
+                style={{ width: '100%' }} 
+                placeholder="@username"
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Vercel URL (Domain)</label>
+              <input 
+                type="text" 
+                value={draft.vercelUrl || 'https://propertyexpress-mu.vercel.app'} 
+                readOnly
+                style={{ width: '100%', opacity: 0.7, cursor: 'not-allowed' }} 
+              />
+            </div>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>OG Sharing Image (URL)</label>
+            <input 
+              type="text" 
+              value={draft.ogImage || ''} 
+              onChange={(e) => handleInputChange('ogImage', e.target.value)}
+              style={{ width: '100%', maxWidth: 600 }} 
+              placeholder="https://example.com/og-image.jpg"
+            />
+            <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.4rem' }}>Recommended size: 1200x630px</p>
           </div>
         </div>
       </div>

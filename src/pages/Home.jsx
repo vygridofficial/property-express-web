@@ -11,6 +11,7 @@ import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './Home.module.css';
 
 import { useInView } from 'framer-motion';
+import SEO from '../components/common/SEO';
 
 import { getPropertyCoordinates, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
 
@@ -279,6 +280,7 @@ export default function Home() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
+      <SEO />
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>

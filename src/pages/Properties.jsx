@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { getPropertiesByCategory, getSiteSettings } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import CategoryHero from './CategoryHero';
+import SEO from '../components/common/SEO';
 import styles from './Properties.module.css';
 
 const CATEGORIES = [
@@ -109,6 +110,11 @@ export default function Properties() {
       transition={{ duration: 0.3 }}
       className={styles.pageWrap}
     >
+      <SEO 
+        title={selectedCategory ? `${selectedCategory.title} Listings` : "All Properties"}
+        description={selectedCategory ? `Explore our premium selection of ${selectedCategory.title.toLowerCase()} in top locations.` : "Discover your dream home from our extensive collection of premium properties."}
+        url={selectedCategory ? `/properties?category=${selectedCategory.id}` : "/properties"}
+      />
       <AnimatePresence mode="wait">
         {!selectedCategory ? (
           /* ── Category Selection Screen ─────────────────────── */

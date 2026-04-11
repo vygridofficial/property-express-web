@@ -10,6 +10,7 @@ import styles from './PropertyDetail.module.css';
 import brandLogo from '../assets/logo.png';
 import { formatPrice } from '../utils/formatPrice';
 import { getPropertyCoordinates } from '../utils/geo';
+import SEO from '../components/common/SEO';
 
 const DEFAULT_AMENITIES = [
   "Swimming Pool",
@@ -132,6 +133,29 @@ export default function PropertyDetail() {
       transition={{ duration: 0.3 }}
       className={styles.pageWrap}
     >
+      {property && (
+        <SEO 
+          title={property.title}
+          description={`${property.category} in ${property.location}. ${property.bedrooms ? `${property.bedrooms} Bed, ` : ''}${property.bathrooms ? `${property.bathrooms} Bath, ` : ''}${property.area ? `${property.area} sqft. ` : ''}${property.description?.substring(0, 100)}...`}
+          image={property.imageUrls?.[0] || property.images?.[0] || property.image}
+          url={`/properties/${property.id}`}
+          type="article"
+          schemaData={{
+            "@context": "https://schema.org/",
+            "@type": "RealEstateListing",
+            "name": property.title,
+            "description": property.description,
+            "url": `https://propertyexpress-mu.vercel.app/properties/${property.id}`,
+            "image": [property.imageUrls?.[0] || property.images?.[0] || property.image],
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": property.location,
+              "addressRegion": property.district || "",
+              "addressCountry": "IN"
+            }
+          }}
+        />
+      )}
       {/* 1. Image Gallery */}
       <div className={styles.galleryHero}>
         <div className={styles.galleryGrid}>
