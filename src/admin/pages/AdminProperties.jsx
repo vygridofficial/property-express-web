@@ -628,6 +628,10 @@ export default function AdminProperties() {
                       >
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>District</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 500, textAlign: 'right' }}>{prop.district || 'Not specified'}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Location</span>
                             <span style={{ fontSize: '0.85rem', fontWeight: 500, textAlign: 'right' }}>{prop.address || prop.location}</span>
                           </div>

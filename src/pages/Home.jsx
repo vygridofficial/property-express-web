@@ -32,7 +32,7 @@ const InteractiveCluster = ({ cluster, isMobile }) => {
 
   return (
     <div
-      style={{ position: 'absolute', ...cluster.position, transform: 'translate(-50%, -50%)', zIndex: isExpanded ? 9999 : 10, padding: '24px', cursor: 'pointer' }}
+      style={{ position: 'absolute', ...cluster.position, transform: 'translate(-50%, -50%)', zIndex: isExpanded ? 45 : 10, padding: '24px', cursor: 'pointer' }}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <motion.div
@@ -693,7 +693,7 @@ export default function Home() {
         <div className={styles.mapTintOverlay}></div>
 
         {/* Map Zoom Controls */}
-        <div style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 1000 }}>
+        <div style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 40 }}>
           <button onClick={() => setZoomIndex(z => Math.min(z + 1, ZOOM_LEVELS.length - 1))} style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)', borderRadius: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 16px rgba(0,0,0,0.15)', fontSize: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#181a18', fontWeight: 600 }}>+</button>
           <button onClick={() => setZoomIndex(z => Math.max(z - 1, 0))} style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(4px)', borderRadius: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 16px rgba(0,0,0,0.15)', fontSize: '28px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#181a18', fontWeight: 600 }}>-</button>
         </div>
