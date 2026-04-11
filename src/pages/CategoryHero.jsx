@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
-import { KERALA_DISTRICTS } from '../data/districts';
+import { KERALA_DISTRICTS, DISTRICT_COORDINATES } from '../data/districts';
 import { getPropertyCoordinates, getDistanceFromLatLonInKm } from '../utils/geo';
 import { formatPrice } from '../utils/formatPrice';
 import styles from './CategoryHero.module.css';
@@ -132,6 +132,8 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const [showSubFilters, setShowSubFilters] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const taxonomy = React.useMemo(() => {
     // 1. Check if DB has custom taxonomy for this category
@@ -184,12 +186,20 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     const handler = (e) => setIsMobile(e.matches);
     mq.addEventListener('change', handler);
     
+    const isAutoGeo = searchParams.get('autoGeo') === 'true';
+
     setLocalFilters({
       district: '',
-      location: '',
+      location: isAutoGeo ? 'My Location' : '',
       priceMax: '',
       ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, '']))
     });
+
+    if (isAutoGeo) {
+      searchParams.delete('autoGeo');
+      setSearchParams(searchParams, { replace: true });
+    }
+    
     setShowSubFilters(false);
     
     return () => mq.removeEventListener('change', handler);
@@ -217,6 +227,36 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     setLocalFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleGeoToggle = () => {
+    if (localFilters.location === 'My Location') {
+      setLocalFilters(prev => ({ ...prev, location: '' }));
+      return;
+    }
+
+    // Turn ON
+    const currentlyDetected = window.sessionStorage.getItem('isLocationDetected') === 'true';
+    if (currentlyDetected) {
+      setLocalFilters(prev => ({ ...prev, location: 'My Location' }));
+    } else {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser");
+        return;
+      }
+      setIsDetectingLocation(true);
+      navigator.geolocation.getCurrentPosition((position) => {
+        const center = { lat: position.coords.latitude, lng: position.coords.longitude };
+        window.sessionStorage.setItem('mapCenter', JSON.stringify(center));
+        window.sessionStorage.setItem('isLocationDetected', 'true');
+        setIsDetectingLocation(false);
+        setLocalFilters(prev => ({ ...prev, location: 'My Location' }));
+      }, (error) => {
+        console.error("Error getting location", error);
+        alert("Unable to retrieve your location. Please check browser permissions.");
+        setIsDetectingLocation(false);
+      });
+    }
+  };
+
   // Apply filters to images & sort by haversine distance
   const filteredImages = React.useMemo(() => {
     let result = [...images];
@@ -233,11 +273,17 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
         try {
           const center = JSON.parse(centerCache);
           result.forEach(img => {
-            const coords = getPropertyCoordinates(img);
+            const distKey = KERALA_DISTRICTS.find(d => d.toLowerCase() === (img.district || '').toLowerCase()) || img.district;
+            const coords = DISTRICT_COORDINATES[distKey];
             if (coords) {
               img._distance = getDistanceFromLatLonInKm(center.lat, center.lng, coords.lat, coords.lng);
             } else {
-              img._distance = 999999;
+              const exactCoords = getPropertyCoordinates(img);
+              if (exactCoords) {
+                img._distance = getDistanceFromLatLonInKm(center.lat, center.lng, exactCoords.lat, exactCoords.lng);
+              } else {
+                img._distance = 999999;
+              }
             }
           });
           
@@ -368,12 +414,21 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
         {/* ── Filter Bar ──────────────────────────────── */}
         <div className={styles.filterWrap}>
           <div className={styles.filterRow}>
-            <div className={styles.filterGroup}>
-              <label>Geo Filtering</label>
-              <select name="location" value={localFilters.location} onChange={handleFilterChange}>
-                <option value="">Off (Show All)</option>
-                {window.sessionStorage.getItem('isLocationDetected') === 'true' && <option value="My Location">On (Within 50km)</option>}
-              </select>
+            <div className={styles.geoToggleWrap}>
+              <div className={styles.geoToggleLabel}>
+                <span>Location Filter</span>
+                <span>{isDetectingLocation ? 'Detecting...' : (localFilters.location === 'My Location' ? 'Within 50km' : 'All Areas')}</span>
+              </div>
+              <button 
+                type="button"
+                className={styles.toggleSwitch} 
+                data-active={localFilters.location === 'My Location'}
+                onClick={handleGeoToggle}
+                disabled={isDetectingLocation}
+                aria-label="Toggle Geo Filter"
+              >
+                <div className={styles.toggleKnob} />
+              </button>
             </div>
             <div className={styles.filterGroup}>
               <label>Max Price</label>

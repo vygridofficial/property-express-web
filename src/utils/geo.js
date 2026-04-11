@@ -1,3 +1,5 @@
+import { DISTRICT_COORDINATES, KERALA_DISTRICTS } from '../data/districts';
+
 export function deg2rad(deg) { return deg * (Math.PI / 180); }
 
 export function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -59,5 +61,20 @@ export const getPropertyCoordinates = (property) => {
       };
     }
   }
+  
+  if (property.district) {
+    const distKey = KERALA_DISTRICTS.find(d => d.toLowerCase() === (property.district || '').toLowerCase()) || property.district;
+    const districtCoords = DISTRICT_COORDINATES[distKey];
+    if (districtCoords) {
+      // Fallback to district center
+      return {
+        id: property.id || `dist-${districtCoords.lat}-${districtCoords.lng}`,
+        lat: districtCoords.lat,
+        lng: districtCoords.lng,
+        label: property.district
+      };
+    }
+  }
+  
   return null;
 }

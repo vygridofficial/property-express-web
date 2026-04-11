@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home as HomeIcon, Building, Store, Map, Award, Handshake, Headphones, Star } from 'lucide-react';
-import { getFeaturedProperties, getSiteSettings } from '../services/propertyService';
+import { getFeaturedProperties, getSiteSettings, getAllProperties } from '../services/propertyService';
 import { getAllReviews, addReview } from '../services/reviewService';
 import PropertyCard from '../components/ui/PropertyCard';
 import GtaMarker from '../components/ui/GtaMarker';
@@ -138,6 +138,7 @@ export default function Home() {
   const [isLocationDetected, setIsLocationDetected] = useState(() => {
     return sessionStorage.getItem('isLocationDetected') === 'true';
   });
+  const [allProps, setAllProps] = useState([]);
   const [siteSettings, setSiteSettings] = useState(null);
 
   const handleDetectLocation = () => {
@@ -206,6 +207,7 @@ export default function Home() {
 
   useEffect(() => {
     getFeaturedProperties().then(setFeatured);
+    getAllProperties({}, false).then(setAllProps);
     getAllReviews().then(data => {
       setReviews(data.filter(r => r.status?.toLowerCase() === 'approved'));
     });
@@ -214,16 +216,16 @@ export default function Home() {
 
   // Group properties by matching location string (case-insensitive approximation)
   const clusters = useMemo(() => {
-    if (!featured) return [];
+    if (!allProps || allProps.length === 0) return [];
 
-    // First, filter by 50km radius if coords are known
-    const radiusFiltered = featured.filter(prop => {
-      if (!isLocationDetected) return true; // Show all if location isn't detected or before detecting
-      const coords = getPropertyCoordinates(prop);
-      if (!coords) return false; // If location is totally unknown, hide it to maintain strict radius rules
-      const dist = getDistanceFromLatLonInKm(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
-      return dist <= 50;
-    });
+      // First, filter by 100km radius if coords are known
+      const radiusFiltered = allProps.filter(prop => {
+        if (!isLocationDetected) return true; // Show all if location isn't detected or before detecting
+        const coords = getPropertyCoordinates(prop);
+        if (!coords) return false; // If location is totally unknown, hide it to maintain strict radius rules
+        const dist = getDistanceFromLatLonInKm(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
+        return dist <= 100;
+      });
 
     const grouped = radiusFiltered.reduce((acc, prop) => {
       const coords = getPropertyCoordinates(prop);
@@ -261,7 +263,7 @@ export default function Home() {
         position: { top: clampedTop, left: clampedLeft }
       };
     });
-  }, [featured, isLocationDetected, mapCenter, zoomIndex, ZOOM_LEVELS]);
+  }, [allProps, isLocationDetected, mapCenter, zoomIndex, ZOOM_LEVELS]);
 
   const displayTestimonials = reviews.length > 0 ? reviews : [
     {
@@ -737,7 +739,18 @@ export default function Home() {
                   <div className={styles.ctaRadar2}></div>
                 </>
               )}
-              <Link to="/properties" className={styles.btnMapCta} style={isLocationDetected ? { padding: '0.6rem 1.5rem', fontSize: '0.9rem', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' } : {}}>Get started</Link>
+              <Link 
+                to="/properties" 
+                className={styles.btnMapCta} 
+                style={isLocationDetected ? { padding: '0.6rem 1.5rem', fontSize: '0.9rem', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' } : {}}
+                onClick={() => {
+                  if (isLocationDetected) {
+                    window.sessionStorage.setItem('autoGeo', 'true');
+                  }
+                }}
+              >
+                Get started
+              </Link>
             </div>
             <div style={{ marginTop: isMobile ? '0.75rem' : '1.5rem', display: 'flex', justifyContent: isLocationDetected && !isMobile ? 'flex-start' : 'center', position: 'relative', zIndex: 10 }}>
               <button
