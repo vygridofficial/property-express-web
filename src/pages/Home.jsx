@@ -270,17 +270,7 @@ export default function Home() {
     });
   }, [allProps, isLocationDetected, mapCenter, zoomIndex, ZOOM_LEVELS]);
 
-  const displayTestimonials = reviews.length > 0 ? reviews : [
-    {
-      id: 1,
-      name: "Sandeep Singh",
-      role: "Property Owner",
-      text: "Property Express made finding my dream apartment incredibly simple. Their team was professional, and the property exceeded my expectations.",
-      rating: 5
-    }
-  ];
-
-  const duplicatedTestimonials = [...displayTestimonials, ...displayTestimonials];
+  const duplicatedTestimonials = reviews.length > 0 ? [...reviews, ...reviews] : [];
 
   return (
     <motion.div
@@ -467,33 +457,40 @@ export default function Home() {
             <p className="subtitle" style={{ margin: '0 auto' }}>Read stories from clients who found their perfect match with us.</p>
           </motion.div>
 
-          <div className={styles.marqueeContainer}>
-            <div className={styles.marqueeTrack}>
-              {duplicatedTestimonials.map((t, idx) => (
-                <div key={idx} className={styles.testimonialCard}>
-                  <div className={styles.stars}>
-                    {[1, 2, 3, 4, 5].map(v => (
-                      <Star key={v} size={16} fill={v <= (t.rating || 5) ? 'currentColor' : 'none'} style={{ opacity: v <= (t.rating || 5) ? 1 : 0.25 }} />
-                    ))}
-                  </div>
-                  <p style={{ marginBottom: '1.5rem', fontStyle: 'italic' }}>"{t.text}"</p>
-                  <div className={styles.testimonialHeader}>
-                    {t.img ? (
-                      <img src={t.img} alt={t.name} className={styles.testimonialImg} />
-                    ) : (
-                      <div className={styles.testimonialImg} style={{ background: 'var(--color-ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>
-                        {t.name?.charAt(0) || '?'}
+          {reviews.length > 0 ? (
+            <div className={styles.marqueeContainer}>
+              <div className={styles.marqueeTrack}>
+                {duplicatedTestimonials.map((t, idx) => (
+                  <div key={idx} className={styles.testimonialCard}>
+                    <div className={styles.stars}>
+                      {[1, 2, 3, 4, 5].map(v => (
+                        <Star key={v} size={16} fill={v <= (t.rating || 5) ? 'currentColor' : 'none'} style={{ opacity: v <= (t.rating || 5) ? 1 : 0.25 }} />
+                      ))}
+                    </div>
+                    <p style={{ marginBottom: '1.5rem', fontStyle: 'italic' }}>"{t.text}"</p>
+                    <div className={styles.testimonialHeader}>
+                      {t.img ? (
+                        <img src={t.img} alt={t.name} className={styles.testimonialImg} />
+                      ) : (
+                        <div className={styles.testimonialImg} style={{ background: 'var(--color-ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>
+                          {t.name?.charAt(0) || '?'}
+                        </div>
+                      )}
+                      <div>
+                        <h4 style={{ margin: 0 }}>{t.name}</h4>
+                        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>{t.role}</p>
                       </div>
-                    )}
-                    <div>
-                      <h4 style={{ margin: 0 }}>{t.name}</h4>
-                      <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>{t.role}</p>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--color-text-light)' }}>
+              <p style={{ fontSize: '1.15rem', fontWeight: 500, color: 'var(--color-text-main)' }}>No reviews found</p>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.25rem' }}>Be the first to share your experience with us!</p>
+            </div>
+          )}
 
           {/* CTA to share review */}
           <motion.div
