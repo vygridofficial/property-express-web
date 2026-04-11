@@ -324,7 +324,7 @@ export default function AdminProperties() {
     };
 
     const handleSaveProperty = async () => {
-      const required = ['title', 'category', 'status', 'price', 'area', 'address', 'district', 'mapsUrl'];
+      const required = ['title', 'category', 'status', 'price', 'area', 'address', 'district', 'mapsUrl', 'description'];
       const newErrors = [];
       required.forEach(req => { if (!formData[req]) newErrors.push(req); });
       
@@ -902,7 +902,7 @@ export default function AdminProperties() {
                 {/* Section 5 */}
                 <SectionHeading>Section 5 — Description</SectionHeading>
                 <div>
-                  <Label>Property Description</Label>
+                  <Label required>Property Description</Label>
                   <textarea placeholder="Write a detailed description..." rows={4} value={formData.description} onChange={e => handleFormChange('description', e.target.value)} style={{ ...getInputStyle('description'), minHeight: 120, resize: 'vertical' }} />
                 </div>
 

@@ -195,9 +195,7 @@ export default function PropertyDetail() {
           {/* Description Section */}
           <motion.div className={styles.descriptionSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
             <h3>Property Description</h3>
-            <p>{property.description}</p>
-            {/* Adding extra paragraphs to match "2-3 paragraphs" requirement */}
-            <p>The state-of-the-art kitchen comes fully equipped with premium appliances, custom cabinetry, and a large marble island perfect for entertaining. The master suite is a true sanctuary, boasting a spa-like bathroom and a private terrace. Outside, you will find a beautifully landscaped backyard complete with an infinity pool, outdoor kitchen, and fire pit.</p>
+            <p style={{ whiteSpace: 'pre-line' }}>{property.description}</p>
           </motion.div>
 
           {/* Amenities Section */}
@@ -231,10 +229,18 @@ export default function PropertyDetail() {
             </div>
             <div className={styles.mapWrapper}>
               {(() => {
-                const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
-                const src = coords
-                  ? `https://maps.google.com/maps?q=${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}&z=15&output=embed`
-                  : `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
+                let src = '';
+                if (property.mapsUrl && property.mapsUrl.includes('<iframe')) {
+                  const match = property.mapsUrl.match(/src="([^"]+)"/);
+                  if (match) src = match[1];
+                } else if (property.mapsUrl && property.mapsUrl.includes('google.com/maps/embed')) {
+                  src = property.mapsUrl;
+                } else {
+                  const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
+                  src = coords
+                    ? `https://maps.google.com/maps?q=${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}&z=15&output=embed`
+                    : `https://www.google.com/maps?q=${encodeURIComponent(property.location || property.address || '')}&output=embed`;
+                }
 
                 return (
                   <iframe
