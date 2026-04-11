@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home as HomeIcon, Building, Store, Map, Award, Handshake, Headphones, Star } from 'lucide-react';
 import { getFeaturedProperties, getSiteSettings, getAllProperties } from '../services/propertyService';
@@ -14,7 +14,7 @@ import { useInView } from 'framer-motion';
 
 import { getPropertyCoordinates, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
 
-const InteractiveCluster = ({ cluster, isMobile }) => {
+const InteractiveCluster = ({ cluster, isMobile, navigate }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (cluster.properties.length <= 1) {
@@ -23,7 +23,10 @@ const InteractiveCluster = ({ cluster, isMobile }) => {
         <div style={{ position: 'absolute', top: '-24px', left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.8)', color: '#18181a', padding: '2px 8px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 'bold', whiteSpace: 'nowrap', backdropFilter: 'blur(4px)', pointerEvents: 'none' }}>
           {cluster.location}
         </div>
-        <div style={{ position: 'relative', width: isMobile ? '60px' : '150px', height: isMobile ? '30px' : '90px' }}>
+        <div 
+          onClick={(e) => { e.stopPropagation(); navigate(`/properties/${cluster.properties[0].id}`, { state: { property: cluster.properties[0] } }); }}
+          style={{ position: 'relative', width: isMobile ? '60px' : '150px', height: isMobile ? '30px' : '90px', cursor: 'pointer' }}
+        >
           <GtaMarker property={cluster.properties[0]} style={{ position: 'relative', top: 'auto', left: 'auto', width: '100%', height: '100%', pointerEvents: 'auto' }} mobileCompact={isMobile} delay={0.15} />
         </div>
       </div>
@@ -76,9 +79,10 @@ const InteractiveCluster = ({ cluster, isMobile }) => {
                 position: 'relative',
                 width: isMobile ? '60px' : '150px',
                 height: isMobile ? '30px' : '90px',
-                flexShrink: 0
+                flexShrink: 0,
+                cursor: 'pointer'
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); navigate(`/properties/${prop.id}`, { state: { property: prop } }); }}
             >
               <GtaMarker property={prop} style={{ position: 'relative', top: 'auto', left: 'auto', width: '100%', height: '100%', pointerEvents: 'auto' }} mobileCompact={isMobile} delay={0} />
             </motion.div>
@@ -117,6 +121,7 @@ const CountUp = ({ end, decimals = 0, suffix = "" }) => {
 };
 
 export default function Home() {
+  const navigate = useNavigate();
   const [featured, setFeatured] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -712,7 +717,7 @@ export default function Home() {
           {isLocationDetected && clusters.length > 0 && (
             <>
               {clusters.map((cluster, idx) => (
-                <InteractiveCluster key={idx} cluster={cluster} isMobile={isMobile} />
+                <InteractiveCluster key={idx} cluster={cluster} isMobile={isMobile} navigate={navigate} />
               ))}
             </>
           )}

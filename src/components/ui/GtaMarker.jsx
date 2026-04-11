@@ -22,7 +22,7 @@ export default function GtaMarker({ property, style, delay, mobileCompact }) {
         viewport={{ once: true, amount: 0 }}
         transition={{ delay: delay, duration: 0.4 }}
       >
-        <Link to={`/properties/${id}`} className={styles.compactPin}>
+        <Link to={`/properties/${id}`} state={{ property }} className={styles.compactPin}>
           {displayPrice}
         </Link>
       </motion.div>
@@ -39,7 +39,7 @@ export default function GtaMarker({ property, style, delay, mobileCompact }) {
       transition={{ delay: delay, duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
       whileHover={{ y: -5, scale: 1.06, zIndex: 20 }}
     >
-      <Link to={`/properties/${id}`} className={styles.pinCard}>
+      <Link to={`/properties/${id}`} state={{ property }} className={styles.pinCard}>
         <div className={styles.pinCardPrice}>
           <Home size={14} /> {displayPrice}
         </div>
