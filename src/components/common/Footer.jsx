@@ -27,19 +27,14 @@ const XIcon = () => (
 );
 
 export default function Footer() {
-  const [settings, setSettings] = useState(null);
-
-  useEffect(() => {
-    getSiteSettings().then(data => {
-      if (data) setSettings(data);
-    });
-  }, []);
+  const { siteSettings: settings } = useAdmin();
 
   const phone = settings?.primaryPhone || '';
   const email = settings?.supportEmail || '';
   const address = settings?.officeAddress || '';
   const facebookUrl = settings?.facebookUrl || '';
   const instagramUrl = settings?.instagramUrl || '';
+  const twitterHandle = settings?.twitterHandle || '';
 
   return (
     <footer className={styles.footer}>
@@ -47,7 +42,7 @@ export default function Footer() {
         <div className={styles.footerGrid}>
           <div className={styles.footerCol}>
             <Link to="/" className={styles.logo}>
-              <img src={logo} alt={settings?.siteName || "Property Express"} className={styles.logoImg} />
+              <img src={logo} alt={settings?.siteName || "Logo"} className={styles.logoImg} />
             </Link>
             <p className={styles.footerDesc}>
               {settings?.metaDescription || "Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight."}
@@ -63,10 +58,11 @@ export default function Footer() {
                   <InstagramIcon />
                 </a>
               )}
-              {/* Keeping a default X icon as a placeholder unless there's a field for it */}
-              <a href="https://twitter.com/propertyexpress" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-                <XIcon />
-              </a>
+              {twitterHandle && (
+                <a href={`https://twitter.com/${twitterHandle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                  <XIcon />
+                </a>
+              )}
             </div>
           </div>
 

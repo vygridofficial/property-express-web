@@ -107,14 +107,14 @@ export default function Contact() {
     >
       <SEO 
         title="Contact Us"
-        description="Get in touch with Property Express. Whether you're looking to buy, rent, or have questions about luxury real estate, our team is here to help."
+        description="Get in touch with us. Whether you're looking to buy, rent, or have questions about luxury real estate, our team is here to help."
         url="/contact"
         schemaData={{
           "@context": "https://schema.org",
           "@type": "ContactPage",
           "mainEntity": {
             "@type": "RealEstateAgent",
-            "name": "Property Express",
+            "name": "our team",
             "image": "https://propertyexpress-mu.vercel.app/logo.png",
             "telephone": settings?.primaryPhone || "+919876543210",
             "email": settings?.supportEmail || "contact@property-express.com",

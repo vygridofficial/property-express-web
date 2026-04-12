@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home as HomeIcon, Building, Store, Map, Award, Handshake, Headphones, Star } from 'lucide-react';
-import { getFeaturedProperties, getSiteSettings, getAllProperties } from '../services/propertyService';
+import { getFeaturedProperties, getAllProperties } from '../services/propertyService';
 import { getAllReviews, addReview } from '../services/reviewService';
 import PropertyCard from '../components/ui/PropertyCard';
 import GtaMarker from '../components/ui/GtaMarker';
@@ -14,7 +14,7 @@ import styles from './Home.module.css';
 import { useInView } from 'framer-motion';
 import SEO from '../components/common/SEO';
 
-import { getPropertyCoordinates, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
+import { getPropertyCoordinates, getDistanceFromLatLonInKm } from '../utils/geo';
 
 const InteractiveCluster = ({ cluster, isMobile, navigate }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -290,16 +290,8 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            {siteSettings?.siteName || 'Find Your Perfect Property'}
+            {siteSettings?.tagline || 'Find Your Perfect Property'}
           </motion.h1>
-          <motion.p
-            className={styles.heroSubtitle}
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            {siteSettings?.tagline || 'Discover premium real estate, curated exclusively by our expert team. Experience seamless living in the home of your dreams.'}
-          </motion.p>
           <motion.div
             className={styles.heroCtas}
             initial={{ y: 30, opacity: 0 }}
@@ -423,7 +415,7 @@ export default function Home() {
             className="section-header" style={{ textAlign: 'center' }}
             variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
           >
-            <h2>Why Choose Property Express?</h2>
+            <h2>Why Choose Us?</h2>
             <p className="subtitle" style={{ margin: '0 auto' }}>We stand out through our commitment to transparency, quality, and support.</p>
           </motion.div>
 
@@ -555,7 +547,7 @@ export default function Home() {
                   <Star size={28} fill="white" color="white" />
                 </div>
                 <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: '0.5rem' }}>Thank You!</h3>
-                <p style={{ color: '#555', fontWeight: 300, lineHeight: 1.6 }}>Your testimonial has been added. We truly appreciate you sharing your experience with Property Express.</p>
+                <p style={{ color: '#555', fontWeight: 300, lineHeight: 1.6 }}>Your testimonial has been added. We truly appreciate you sharing your experience with us.</p>
                 <button
                   onClick={() => { setShowReviewModal(false); setReviewSubmitted(false); }}
                   style={{ marginTop: '1.5rem', background: '#18181a', color: 'white', border: 'none', borderRadius: 12, padding: '0.875rem 2rem', fontWeight: 700, fontFamily: 'Outfit', cursor: 'pointer', fontSize: '0.95rem' }}
@@ -582,7 +574,7 @@ export default function Home() {
                   ← Back
                 </button>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: '0.25rem' }}>Share Your Experience</h3>
-                <p style={{ color: '#555', fontWeight: 300, marginBottom: '2rem', fontSize: '0.9rem' }}>Tell others about your journey with Property Express.</p>
+                <p style={{ color: '#555', fontWeight: 300, marginBottom: '2rem', fontSize: '0.9rem' }}>Tell others about your journey with us.</p>
 
                 {/* Star Rating */}
                 <div style={{ marginBottom: '1.5rem' }}>
@@ -653,7 +645,7 @@ export default function Home() {
                     Your Testimonial <span style={{ color: '#ed1b24' }}>*</span>
                   </label>
                   <textarea
-                    placeholder="Tell us about your experience with Property Express..."
+                    placeholder="Tell us about your experience with our team..."
                     rows={4}
                     value={reviewForm.text}
                     onChange={e => { setReviewForm(f => ({ ...f, text: e.target.value })); setReviewErrors(ev => ({ ...ev, text: false })); }}

@@ -30,7 +30,7 @@ export default function About() {
       />
       <section className={styles.pageHeader}>
         <div className={`container ${styles.headerContent}`}>
-          <h1>About Property Express</h1>
+          <h1>About Us</h1>
           <p className="subtitle">Redefining luxury real estate with trust and transparency.</p>
         </div>
       </section>
@@ -43,7 +43,7 @@ export default function About() {
           >
             <h2>Our Story</h2>
             <p className={styles.storyText}>
-              Founded in 2020, Property Express started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region's leading exclusive real estate agency.
+              Founded in 2020, our agency started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region's leading exclusive real estate agency.
             </p>
             <p className={styles.storyText}>
               We believe that finding a home should be an inspiring journey, not a stressful task. That's why we don't rely on external agents—every property listed is verified and managed by our in-house experts.

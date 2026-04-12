@@ -35,7 +35,7 @@ export default function PropertyDetail() {
     name: '',
     phone: '',
     email: '',
-    message: 'I am interested in Property Express listing...'
+    message: 'I am interested in this listing...'
   });
   const [currentMainIndex, setCurrentMainIndex] = useState(0);
 
@@ -117,7 +117,7 @@ export default function PropertyDetail() {
         status: 'new'
       });
       setFormStatus('success');
-      setInquiryForm({ name: '', phone: '', email: '', message: 'I am interested in Property Express listing...' });
+      setInquiryForm({ name: '', phone: '', email: '', message: 'I am interested in this listing...' });
       setTimeout(() => setFormStatus('idle'), 5000);
     } catch (error) {
       console.error('Inquiry submission failed:', error);
@@ -299,7 +299,7 @@ export default function PropertyDetail() {
                   <img src={brandLogo} alt="Property Express logo" className={styles.brandAgentLogo} />
                 </div>
                 <div>
-                  <h4 style={{ margin: 0 }}>Property Express Team</h4>
+                  <h4 style={{ margin: 0 }}>Our Expert Team</h4>
                   <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>Your Personal Consultants</p>
                 </div>
               </div>
