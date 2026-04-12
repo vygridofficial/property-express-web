@@ -8,6 +8,7 @@ import { getAllReviews, addReview } from '../services/reviewService';
 import PropertyCard from '../components/ui/PropertyCard';
 import GtaMarker from '../components/ui/GtaMarker';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
+import { useAdmin } from '../admin/context/AdminContext';
 import styles from './Home.module.css';
 
 import { useInView } from 'framer-motion';
@@ -145,7 +146,7 @@ export default function Home() {
     return sessionStorage.getItem('isLocationDetected') === 'true';
   });
   const [allProps, setAllProps] = useState([]);
-  const [siteSettings, setSiteSettings] = useState(null);
+  const { siteSettings } = useAdmin();
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -217,7 +218,6 @@ export default function Home() {
     getAllReviews().then(data => {
       setReviews(data.filter(r => r.status?.toLowerCase() === 'approved'));
     });
-    getSiteSettings().then(setSiteSettings);
   }, []);
 
   // Group properties by matching location string (case-insensitive approximation)
@@ -290,7 +290,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            {siteSettings?.siteName || 'Find Your Perfect Property'}
+            {siteSettings?.siteName}
           </motion.h1>
           <motion.p
             className={styles.heroSubtitle}
@@ -298,7 +298,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {siteSettings?.metaDescription || 'Discover premium real estate, curated exclusively by our expert team. Experience seamless living in the home of your dreams.'}
+            {siteSettings?.tagline}
           </motion.p>
           <motion.div
             className={styles.heroCtas}
