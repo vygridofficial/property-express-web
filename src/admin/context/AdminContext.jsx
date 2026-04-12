@@ -125,7 +125,7 @@ export function AdminProvider({ children }) {
   // ── Issues 2, 3, 4, 5: Global Site Settings ──
   // All settings stored in Firestore at settings/global
   const [siteSettings, setSiteSettings] = useState({
-    siteName: 'Property Express',
+    siteName: '',
     tagline: '',
     metaDescription: '',
     metaKeywords: '',
