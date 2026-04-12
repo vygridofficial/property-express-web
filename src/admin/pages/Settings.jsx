@@ -8,19 +8,19 @@ const ToggleRow = ({ label, checked, onToggle }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
     <span style={{ fontWeight: 500 }}>{label}</span>
     <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
-      <input 
-        type="checkbox" 
-        checked={checked} 
-        onChange={onToggle} 
-        style={{ opacity: 0, width: 0, height: 0 }} 
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onToggle}
+        style={{ opacity: 0, width: 0, height: 0 }}
       />
-      <span style={{ 
-        position: 'absolute', cursor: 'pointer', inset: 0, 
-        background: checked ? '#18181a' : 'rgba(0,0,0,0.1)', 
-        borderRadius: 34, transition: '0.4s' 
+      <span style={{
+        position: 'absolute', cursor: 'pointer', inset: 0,
+        background: checked ? '#18181a' : 'rgba(0,0,0,0.1)',
+        borderRadius: 34, transition: '0.4s'
       }}>
-        <span style={{ 
-          position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
+        <span style={{
+          position: 'absolute', height: 20, width: 20, left: 4, bottom: 4,
           background: 'white', borderRadius: '50%', transition: '0.4s',
           transform: checked ? 'translateX(22px)' : 'translateX(0)'
         }}></span>
@@ -31,7 +31,7 @@ const ToggleRow = ({ label, checked, onToggle }) => (
 
 export default function Settings() {
   const { siteSettings, updateSiteSettings } = useAdmin();
-  
+
   // Local drafted state for dirty checking
   const [draft, setDraft] = useState(siteSettings);
   const [isDirty, setIsDirty] = useState(false);
@@ -65,74 +65,74 @@ export default function Settings() {
   };
 
   return (
-    <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay: 0.1}} style={{ maxWidth: 800, position: 'relative' }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} style={{ maxWidth: 800, position: 'relative' }}>
       <div className={styles.glassCard} style={{ marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '1.5rem' }}>General Settings</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Site Name (Browser Tab & Header)</label>
-            <input 
-              type="text" 
-              value={draft.siteName} 
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Site Name</label>
+            <input
+              type="text"
+              value={draft.siteName}
               onChange={(e) => handleInputChange('siteName', e.target.value)}
-              style={{ width: '100%', maxWidth: 400 }} 
+              style={{ width: '100%', maxWidth: 400 }}
             />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Hero Section Heading</label>
-            <input 
-              type="text" 
-              value={draft.tagline} 
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Tagline</label>
+            <input
+              type="text"
+              value={draft.tagline}
               onChange={(e) => handleInputChange('tagline', e.target.value)}
-              style={{ width: '100%', maxWidth: 400 }} 
+              style={{ width: '100%', maxWidth: 400 }}
             />
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>SEO Meta Description</label>
-            <textarea 
-              rows={3} 
-              value={draft.metaDescription || ''} 
+            <textarea
+              rows={3}
+              value={draft.metaDescription || ''}
               onChange={(e) => handleInputChange('metaDescription', e.target.value)}
               style={{ width: '100%', maxWidth: 600, resize: 'none' }}
             ></textarea>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>SEO Keywords (comma separated)</label>
-            <input 
-              type="text" 
-              value={draft.metaKeywords || ''} 
+            <input
+              type="text"
+              value={draft.metaKeywords || ''}
               onChange={(e) => handleInputChange('metaKeywords', e.target.value)}
-              style={{ width: '100%', maxWidth: 600 }} 
+              style={{ width: '100%', maxWidth: 600 }}
             />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: 600 }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Twitter Handle</label>
-              <input 
-                type="text" 
-                value={draft.twitterHandle || ''} 
+              <input
+                type="text"
+                value={draft.twitterHandle || ''}
                 onChange={(e) => handleInputChange('twitterHandle', e.target.value)}
-                style={{ width: '100%' }} 
+                style={{ width: '100%' }}
                 placeholder="@username"
               />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Vercel URL (Domain)</label>
-              <input 
-                type="text" 
-                value={draft.vercelUrl || 'https://propertyexpress-mu.vercel.app'} 
+              <input
+                type="text"
+                value={draft.vercelUrl || 'https://propertyexpress-mu.vercel.app'}
                 readOnly
-                style={{ width: '100%', opacity: 0.7, cursor: 'not-allowed' }} 
+                style={{ width: '100%', opacity: 0.7, cursor: 'not-allowed' }}
               />
             </div>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>OG Sharing Image (URL)</label>
-            <input 
-              type="text" 
-              value={draft.ogImage || ''} 
+            <input
+              type="text"
+              value={draft.ogImage || ''}
               onChange={(e) => handleInputChange('ogImage', e.target.value)}
-              style={{ width: '100%', maxWidth: 600 }} 
+              style={{ width: '100%', maxWidth: 600 }}
               placeholder="https://example.com/og-image.jpg"
             />
             <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.4rem' }}>Recommended size: 1200x630px</p>
@@ -143,30 +143,30 @@ export default function Settings() {
       <div className={styles.glassCard} style={{ marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>Section Visibility</h3>
         <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Toggle which property categories and sections appear on the public website and admin sidebar.</p>
-        
+
         <div>
           {/* Base Categories */}
           {['Apartment', 'Villa', 'Plot', 'Commercial'].map(cat => (
             <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
               <span style={{ fontWeight: 500 }}>Show {cat}s</span>
               <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
-                <input 
-                  type="checkbox" 
-                  checked={draft.visibility?.[cat] !== false} 
+                <input
+                  type="checkbox"
+                  checked={draft.visibility?.[cat] !== false}
                   onChange={() => {
                     const newVis = { ...(draft.visibility || {}) };
                     newVis[cat] = draft.visibility?.[cat] === false;
                     setDraft(prev => ({ ...prev, visibility: newVis }));
-                  }} 
-                  style={{ opacity: 0, width: 0, height: 0 }} 
+                  }}
+                  style={{ opacity: 0, width: 0, height: 0 }}
                 />
-                <span style={{ 
-                  position: 'absolute', cursor: 'pointer', inset: 0, 
-                  background: draft.visibility?.[cat] !== false ? '#18181a' : 'rgba(0,0,0,0.1)', 
-                  borderRadius: 34, transition: '0.4s' 
+                <span style={{
+                  position: 'absolute', cursor: 'pointer', inset: 0,
+                  background: draft.visibility?.[cat] !== false ? '#18181a' : 'rgba(0,0,0,0.1)',
+                  borderRadius: 34, transition: '0.4s'
                 }}>
-                  <span style={{ 
-                    position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
+                  <span style={{
+                    position: 'absolute', height: 20, width: 20, left: 4, bottom: 4,
                     background: 'white', borderRadius: '50%', transition: '0.4s',
                     transform: draft.visibility?.[cat] !== false ? 'translateX(22px)' : 'translateX(0)'
                   }}></span>
@@ -180,23 +180,23 @@ export default function Settings() {
             <div key={cat.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
               <span style={{ fontWeight: 500 }}>Show {cat.name}</span>
               <label style={{ position: 'relative', display: 'inline-block', width: 50, height: 28 }}>
-                <input 
-                  type="checkbox" 
-                  checked={draft.visibility?.[cat.name] !== false} 
+                <input
+                  type="checkbox"
+                  checked={draft.visibility?.[cat.name] !== false}
                   onChange={() => {
                     const newVis = { ...(draft.visibility || {}) };
                     newVis[cat.name] = draft.visibility?.[cat.name] === false;
                     setDraft(prev => ({ ...prev, visibility: newVis }));
-                  }} 
-                  style={{ opacity: 0, width: 0, height: 0 }} 
+                  }}
+                  style={{ opacity: 0, width: 0, height: 0 }}
                 />
-                <span style={{ 
-                  position: 'absolute', cursor: 'pointer', inset: 0, 
-                  background: draft.visibility?.[cat.name] !== false ? '#18181a' : 'rgba(0,0,0,0.1)', 
-                  borderRadius: 34, transition: '0.4s' 
+                <span style={{
+                  position: 'absolute', cursor: 'pointer', inset: 0,
+                  background: draft.visibility?.[cat.name] !== false ? '#18181a' : 'rgba(0,0,0,0.1)',
+                  borderRadius: 34, transition: '0.4s'
                 }}>
-                  <span style={{ 
-                    position: 'absolute', height: 20, width: 20, left: 4, bottom: 4, 
+                  <span style={{
+                    position: 'absolute', height: 20, width: 20, left: 4, bottom: 4,
                     background: 'white', borderRadius: '50%', transition: '0.4s',
                     transform: draft.visibility?.[cat.name] !== false ? 'translateX(22px)' : 'translateX(0)'
                   }}></span>
@@ -216,38 +216,38 @@ export default function Settings() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Properties Sold (K+)</label>
-            <input 
-              type="text" 
-              value={draft.achievementsPropertiesSold ?? '1.2'} 
+            <input
+              type="text"
+              value={draft.achievementsPropertiesSold ?? '1.2'}
               onChange={(e) => handleInputChange('achievementsPropertiesSold', e.target.value)}
-              style={{ width: '100%', maxWidth: 400 }} 
+              style={{ width: '100%', maxWidth: 400 }}
             />
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Client Satisfaction (/5)</label>
-            <input 
-              type="text" 
-              value={draft.achievementsClientSatisfaction ?? '4.9'} 
+            <input
+              type="text"
+              value={draft.achievementsClientSatisfaction ?? '4.9'}
               onChange={(e) => handleInputChange('achievementsClientSatisfaction', e.target.value)}
-              style={{ width: '100%', maxWidth: 400 }} 
+              style={{ width: '100%', maxWidth: 400 }}
             />
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Verified Listings (%)</label>
-            <input 
-              type="text" 
-              value={draft.achievementsVerifiedListings ?? '100'} 
+            <input
+              type="text"
+              value={draft.achievementsVerifiedListings ?? '100'}
               onChange={(e) => handleInputChange('achievementsVerifiedListings', e.target.value)}
-              style={{ width: '100%', maxWidth: 400 }} 
+              style={{ width: '100%', maxWidth: 400 }}
             />
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Expert Consultants (+)</label>
-            <input 
-              type="text" 
-              value={draft.achievementsExpertConsultants ?? '50'} 
+            <input
+              type="text"
+              value={draft.achievementsExpertConsultants ?? '50'}
               onChange={(e) => handleInputChange('achievementsExpertConsultants', e.target.value)}
-              style={{ width: '100%', maxWidth: 400 }} 
+              style={{ width: '100%', maxWidth: 400 }}
             />
           </div>
         </div>
@@ -255,9 +255,9 @@ export default function Settings() {
 
       <AnimatePresence>
         {isDirty && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', position: 'sticky', bottom: '2rem' }}
           >

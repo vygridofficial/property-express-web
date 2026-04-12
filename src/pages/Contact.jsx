@@ -92,7 +92,7 @@ export default function Contact() {
     facebookUrl && {
       icon: <FacebookIcon size={22} />,
       label: 'Facebook',
-      value: formatSocialDisplay(facebookUrl, 'facebook', 'Property Express'),
+      value: formatSocialDisplay(facebookUrl, 'facebook', settings?.siteName || 'Property Express'),
       href: formatSocialUrl(facebookUrl, 'facebook'),
     },
   ].filter(Boolean); // Remove items with no data
@@ -105,16 +105,16 @@ export default function Contact() {
       transition={{ duration: 0.3 }}
       className={styles.pageWrap}
     >
-      <SEO 
+      <SEO
         title="Contact Us"
-        description="Get in touch with us. Whether you're looking to buy, rent, or have questions about luxury real estate, our team is here to help."
+        description="Get in touch with Property Express. Whether you're looking to buy, rent, or have questions about luxury real estate, our team is here to help."
         url="/contact"
         schemaData={{
           "@context": "https://schema.org",
           "@type": "ContactPage",
           "mainEntity": {
             "@type": "RealEstateAgent",
-            "name": "our team",
+            "name": "Property Express",
             "image": "https://propertyexpress-mu.vercel.app/logo.png",
             "telephone": settings?.primaryPhone || "+919876543210",
             "email": settings?.supportEmail || "contact@property-express.com",
@@ -163,8 +163,8 @@ export default function Contact() {
                   contactItems.map((item, i) => (
                     <div key={i} className={styles.contactItem}>
                       {item.href ? (
-                        <a 
-                          href={item.href} 
+                        <a
+                          href={item.href}
                           className={styles.iconWrap}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -222,7 +222,7 @@ export default function Contact() {
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={status === 'submitting'}>
                   {status === 'submitting' ? 'Sending…' : 'Submit Enquiry'}
                 </button>
-                {status === 'error'   && <p style={{ color: 'red',   marginTop: '1rem', textAlign: 'center' }}>Something went wrong. Please try again.</p>}
+                {status === 'error' && <p style={{ color: 'red', marginTop: '1rem', textAlign: 'center' }}>Something went wrong. Please try again.</p>}
               </form>
             </motion.div>
 
@@ -230,8 +230,8 @@ export default function Contact() {
         </div>
       </section>
 
-      <EnquirySuccessPopup 
-        isOpen={status === 'success'} 
+      <EnquirySuccessPopup
+        isOpen={status === 'success'}
         onClose={() => setStatus('idle')}
       />
     </motion.div>

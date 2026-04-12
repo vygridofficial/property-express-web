@@ -35,7 +35,7 @@ export default function PropertyDetail() {
     name: '',
     phone: '',
     email: '',
-    message: 'I am interested in this listing...'
+    message: 'I am interested in Property Express listing...'
   });
   const [currentMainIndex, setCurrentMainIndex] = useState(0);
 
@@ -117,7 +117,7 @@ export default function PropertyDetail() {
         status: 'new'
       });
       setFormStatus('success');
-      setInquiryForm({ name: '', phone: '', email: '', message: 'I am interested in this listing...' });
+      setInquiryForm({ name: '', phone: '', email: '', message: 'I am interested in Property Express listing...' });
       setTimeout(() => setFormStatus('idle'), 5000);
     } catch (error) {
       console.error('Inquiry submission failed:', error);
@@ -135,7 +135,7 @@ export default function PropertyDetail() {
       className={styles.pageWrap}
     >
       {property && (
-        <SEO 
+        <SEO
           title={property.title}
           description={`${property.category} in ${property.location}. ${property.bedrooms ? `${property.bedrooms} Bed, ` : ''}${property.bathrooms ? `${property.bathrooms} Bath, ` : ''}${property.area ? `${property.area} sqft. ` : ''}${property.description?.substring(0, 100)}...`}
           image={property.imageUrls?.[0] || property.images?.[0] || property.image}
@@ -256,7 +256,7 @@ export default function PropertyDetail() {
               {(() => {
                 let src = '';
                 const coords = typeof getPropertyCoordinates === 'function' ? getPropertyCoordinates(property) : null;
-                
+
                 if (property.mapsUrl && (property.mapsUrl.includes('<iframe') || property.mapsUrl.includes('google.com/maps/embed'))) {
                   // If it's already an embed code or embed link, use extraction or direct link
                   if (property.mapsUrl.includes('<iframe')) {
@@ -267,7 +267,7 @@ export default function PropertyDetail() {
                   }
                 } else if (coords) {
                   // If we have coordinates or just a label (extracted from mapsUrl or district)
-                  const query = coords.lat 
+                  const query = coords.lat
                     ? `${coords.lat},${coords.lng}${coords.label ? ` (${encodeURIComponent(coords.label)})` : ''}`
                     : encodeURIComponent(coords.label);
                   src = `https://www.google.com/maps?q=${query}&z=15&output=embed`;
@@ -299,7 +299,7 @@ export default function PropertyDetail() {
                   <img src={brandLogo} alt="Property Express logo" className={styles.brandAgentLogo} />
                 </div>
                 <div>
-                  <h4 style={{ margin: 0 }}>Our Expert Team</h4>
+                  <h4 style={{ margin: 0 }}>Property Express Team</h4>
                   <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>Your Personal Consultants</p>
                 </div>
               </div>
@@ -373,8 +373,8 @@ export default function PropertyDetail() {
         </motion.div>
       </div>
 
-      <EnquirySuccessPopup 
-        isOpen={formStatus === 'success'} 
+      <EnquirySuccessPopup
+        isOpen={formStatus === 'success'}
         onClose={() => setFormStatus('idle')}
       />
     </motion.div>

@@ -14,7 +14,7 @@ export default function About() {
       transition={{ duration: 0.3 }}
       className={styles.pageWrap}
     >
-      <SEO 
+      <SEO
         title="About Us"
         description="Learn about Property Express, the region's leading exclusive real estate agency, and our mission to redefine luxury living."
         url="/about"
@@ -30,20 +30,20 @@ export default function About() {
       />
       <section className={styles.pageHeader}>
         <div className={`container ${styles.headerContent}`}>
-          <h1>About Us</h1>
+          <h1>About Property Express</h1>
           <p className="subtitle">Redefining luxury real estate with trust and transparency.</p>
         </div>
       </section>
 
       <section className="section">
         <div className="container">
-          <motion.div 
+          <motion.div
             className={styles.storySection}
             variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
           >
             <h2>Our Story</h2>
             <p className={styles.storyText}>
-              Founded in 2020, our agency started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region's leading exclusive real estate agency.
+              Founded in 2020, Property Express started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region's leading exclusive real estate agency.
             </p>
             <p className={styles.storyText}>
               We believe that finding a home should be an inspiring journey, not a stressful task. That's why we don't rely on external agents—every property listed is verified and managed by our in-house experts.
@@ -59,14 +59,14 @@ export default function About() {
             <h2>Our Core Values</h2>
             <p className="subtitle" style={{ margin: '0 auto' }}>The principles that guide everything we do.</p>
           </div>
-          
+
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', marginTop: '3rem' }}>
             {[
               { icon: Target, title: 'Mission-Driven' },
               { icon: Users, title: 'Client-First' },
               { icon: CheckCircle, title: 'Transparent' }
             ].map((val, i) => (
-              <motion.div 
+              <motion.div
                 key={i} className={styles.valueCard}
                 variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
                 transition={{ delay: i * 0.1 }}

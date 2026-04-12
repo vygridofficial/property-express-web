@@ -126,11 +126,11 @@ export function AdminProvider({ children }) {
   // All settings stored in Firestore at settings/global
   const [siteSettings, setSiteSettings] = useState({
     siteName: 'Property Express',
-    tagline: 'Find Your Perfect Property',
-    metaDescription: '',
-    metaKeywords: '',
+    tagline: 'Premium Real Estate Properties',
+    metaDescription: 'Discover the most premium luxury villas, apartments, and plots available.',
+    metaKeywords: 'real estate, luxury villas, apartments, plots, property express',
     ogImage: '',
-    twitterHandle: '',
+    twitterHandle: '@PropertyExpress',
     visibility: {},
     achievementsPropertiesSold: '1.2',
     achievementsClientSatisfaction: '4.9',

@@ -3,12 +3,10 @@ import { NavLink, Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScrolled } from '../../hooks/useScrolled';
-import { useAdmin } from '../../admin/context/AdminContext';
 import styles from './Navbar.module.css';
 import logo from '../../assets/logo.png';
 
 export default function Navbar() {
-  const { siteSettings } = useAdmin();
   const isScrolled = useScrolled();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -17,11 +15,11 @@ export default function Navbar() {
       <header className={`${styles.header} ${isScrolled ? styles.scrolled : ''}`}>
         <div className={`container flex-between ${styles.navContainer}`}>
           <Link to="/" className={styles.logo} onClick={() => setIsMobileMenuOpen(false)}>
-            <img src={logo} alt={siteSettings?.siteName || "Property Express"} className={styles.logoImg} />
+            <img src={logo} alt="Property Express" className={styles.logoImg} />
           </Link>
 
-          <button 
-            className={styles.mobileToggle} 
+          <button
+            className={styles.mobileToggle}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X /> : <Menu />}
@@ -42,7 +40,7 @@ export default function Navbar() {
 
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
+          <motion.div
             className={styles.mobileMenu}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
