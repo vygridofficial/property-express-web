@@ -290,7 +290,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            {siteSettings?.siteName || 'Find Your Perfect Property'}
+            {siteSettings?.heroTitle || 'Find Your Perfect Property'}
           </motion.h1>
           <motion.p
             className={styles.heroSubtitle}
@@ -298,7 +298,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {siteSettings?.tagline || 'Experience seamless living in the home of your dreams.'}
+            {siteSettings?.heroDescription || 'Discover the most premium luxury villas, apartments, and plots available.'}
           </motion.p>
           <motion.div
             className={styles.heroCtas}

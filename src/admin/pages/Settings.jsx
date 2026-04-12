@@ -70,7 +70,7 @@ export default function Settings() {
         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '1.5rem' }}>General Settings</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Site Name</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Site Name (Browser Tab)</label>
             <input 
               type="text" 
               value={draft.siteName} 
@@ -79,13 +79,37 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Tagline</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Tagline (Meta Description)</label>
             <input 
               type="text" 
               value={draft.tagline} 
               onChange={(e) => handleInputChange('tagline', e.target.value)}
               style={{ width: '100%', maxWidth: 400 }} 
             />
+          </div>
+
+          <div style={{ marginTop: '0.5rem', padding: '1.5rem 0', borderTop: '1px solid var(--admin-stroke)' }}>
+            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Hero Section</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Hero Title</label>
+                <input 
+                  type="text" 
+                  value={draft.heroTitle || ''} 
+                  onChange={(e) => handleInputChange('heroTitle', e.target.value)}
+                  style={{ width: '100%', maxWidth: 600 }} 
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Hero Description</label>
+                <textarea 
+                  rows={2} 
+                  value={draft.heroDescription || ''} 
+                  onChange={(e) => handleInputChange('heroDescription', e.target.value)}
+                  style={{ width: '100%', maxWidth: 600, resize: 'none' }}
+                ></textarea>
+              </div>
+            </div>
           </div>
           <hr style={{ border: 'none', borderTop: '1px solid var(--admin-stroke)', margin: '0.5rem 0' }} />
           <div>

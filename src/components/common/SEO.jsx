@@ -26,6 +26,7 @@ const SEO = ({
     <Helmet>
       {/* Basic Meta Tags */}
       <title>{fullTitle}</title>
+      <meta name="description" content={tagline} />
       <link rel="canonical" href={canonicalUrl} />
 
       {/* Structured Data */}

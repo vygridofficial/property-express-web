@@ -131,6 +131,8 @@ export function AdminProvider({ children }) {
     visibility: {},
     maintenanceMode: false,
     maintenanceMessage: "We'll be back soon. Our site is currently undergoing scheduled maintenance.",
+    heroTitle: 'Find Your Perfect Property',
+    heroDescription: 'Discover the most premium luxury villas, apartments, and plots available.',
     achievementsPropertiesSold: '1.2',
     achievementsClientSatisfaction: '4.9',
     achievementsVerifiedListings: '100',

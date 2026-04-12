@@ -42,10 +42,10 @@ export default function Footer() {
         <div className={styles.footerGrid}>
           <div className={styles.footerCol}>
             <Link to="/" className={styles.logo}>
-              <img src={logo} alt={settings?.siteName || "Property Express"} className={styles.logoImg} />
+              <img src={logo} alt="Property Express" className={styles.logoImg} />
             </Link>
             <p className={styles.footerDesc}>
-              {settings?.tagline || "Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight."}
+              {settings?.heroDescription || "Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight."}
             </p>
             <div className={`flex ${styles.socialLinks}`}>
               {facebookUrl && (
