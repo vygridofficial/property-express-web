@@ -199,8 +199,7 @@ export default function Settings() {
             </div>
           ))}
 
-          {/* Fixed Sections */}
-          <ToggleRow label="Show Contact Form" checked={draft.showContactForm !== false} onToggle={() => handleToggle('showContactForm')} />
+          {/* Fixed Sections removed as requested */}
         </div>
       </div>
 
