@@ -205,19 +205,19 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className={styles.contactForm}>
                 <div className={styles.formGroup}>
                   <label>Full Name</label>
-                  <input type="text" placeholder="Your full name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
+                  <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                 </div>
                 <div className={styles.formGroup}>
                   <label>Phone Number</label>
-                  <input type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                  <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                 </div>
                 <div className={styles.formGroup}>
                   <label>Email Address</label>
-                  <input type="email" placeholder="you@example.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
+                  <input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
                 </div>
                 <div className={styles.formGroup}>
                   <label>Message</label>
-                  <textarea rows={5} placeholder="Tell us how we can help..." value={formData.message} onChange={e => setFormData({ ...formData, message: e.target.value })} required></textarea>
+                  <textarea rows={5} value={formData.message} onChange={e => setFormData({ ...formData, message: e.target.value })} required></textarea>
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={status === 'submitting'}>
                   {status === 'submitting' ? 'Sending…' : 'Submit Enquiry'}

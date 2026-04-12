@@ -307,34 +307,30 @@ export default function PropertyDetail() {
               <div className={styles.contactFormWrap}>
                 <h4 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', fontWeight: '400' }}>Interested in this property?</h4>
                 <form className={styles.contactForm} onSubmit={handleFormSubmit}>
-                  <input
-                    type="text"
-                    placeholder="Your Name"
-                    required
-                    value={inquiryForm.name}
-                    onChange={e => setInquiryForm(f => ({ ...f, name: e.target.value }))}
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Phone Number"
-                    required
-                    value={inquiryForm.phone}
-                    onChange={e => setInquiryForm(f => ({ ...f, phone: e.target.value }))}
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    required
-                    value={inquiryForm.email}
-                    onChange={e => setInquiryForm(f => ({ ...f, email: e.target.value }))}
-                  />
-                  <textarea
-                    rows="2"
-                    placeholder="Message"
-                    required
-                    value={inquiryForm.message}
-                    onChange={e => setInquiryForm(f => ({ ...f, message: e.target.value }))}
-                  ></textarea>
+                    <input
+                      type="text"
+                      required
+                      value={inquiryForm.name}
+                      onChange={e => setInquiryForm(f => ({ ...f, name: e.target.value }))}
+                    />
+                    <input
+                      type="tel"
+                      required
+                      value={inquiryForm.phone}
+                      onChange={e => setInquiryForm(f => ({ ...f, phone: e.target.value }))}
+                    />
+                    <input
+                      type="email"
+                      required
+                      value={inquiryForm.email}
+                      onChange={e => setInquiryForm(f => ({ ...f, email: e.target.value }))}
+                    />
+                    <textarea
+                      rows="2"
+                      required
+                      value={inquiryForm.message}
+                      onChange={e => setInquiryForm(f => ({ ...f, message: e.target.value }))}
+                    ></textarea>
 
                   <div className={styles.actionButtons}>
                     <button

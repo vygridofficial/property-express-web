@@ -637,7 +637,7 @@ export default function Home() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. First-time Buyer, Investor..."
+                    placeholder=""
                     value={reviewForm.role}
                     onChange={e => setReviewForm(f => ({ ...f, role: e.target.value }))}
                     style={{
@@ -653,7 +653,7 @@ export default function Home() {
                     Your Testimonial <span style={{ color: '#ed1b24' }}>*</span>
                   </label>
                   <textarea
-                    placeholder="Tell us about your experience with Property Express..."
+                    placeholder=""
                     rows={4}
                     value={reviewForm.text}
                     onChange={e => { setReviewForm(f => ({ ...f, text: e.target.value })); setReviewErrors(ev => ({ ...ev, text: false })); }}
