@@ -188,11 +188,59 @@ a.contactValue:hover {
 }
 
 @media (max-width: 768px) {
+  .contactLayout {
+    padding: 3rem 0;
+    gap: 3rem;
+  }
+
+  .detailsPanel {
+    padding: 0 1rem;
+  }
+
+  .sectionHeading {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .detailsIntro {
+    text-align: center;
+    margin: 0 auto 2.5rem auto;
+    font-size: 1rem;
+  }
+
+  .contactItem {
+    gap: 1.25rem;
+    padding: 0 0.5rem;
+  }
+
+  .iconWrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .contactValue {
+    font-size: 1.05rem;
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+
   .formContainer {
     padding: 2.5rem 1.5rem;
+    border-radius: 20px;
   }
   
   .headerContent h1 {
     font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .contactItem {
+    gap: 1rem;
+  }
+  
+  .contactValue {
+    font-size: 0.95rem;
   }
 }
