@@ -298,7 +298,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {siteSettings?.tagline}
+            {siteSettings?.tagline || 'Discover premium real estate, curated exclusively by our expert team. Experience seamless living in the home of your dreams.'}
           </motion.p>
           <motion.div
             className={styles.heroCtas}
