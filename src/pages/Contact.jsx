@@ -92,7 +92,7 @@ export default function Contact() {
     facebookUrl && {
       icon: <FacebookIcon size={22} />,
       label: 'Facebook',
-      value: formatSocialDisplay(facebookUrl, 'facebook', settings?.siteName || 'Property Express'),
+      value: formatSocialDisplay(facebookUrl, 'facebook', 'Property Express'),
       href: formatSocialUrl(facebookUrl, 'facebook'),
     },
   ].filter(Boolean); // Remove items with no data

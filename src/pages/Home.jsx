@@ -290,7 +290,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            {siteSettings?.siteName || 'Find Your Perfect Property'}
+            {siteSettings?.siteName || 'Property Express'}
           </motion.h1>
           <motion.p
             className={styles.heroSubtitle}
