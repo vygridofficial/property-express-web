@@ -14,7 +14,7 @@ export default function About() {
       transition={{ duration: 0.3 }}
       className={styles.pageWrap}
     >
-      <SEO
+      <SEO 
         title="About Us"
         description="Learn about Property Express, the region's leading exclusive real estate agency, and our mission to redefine luxury living."
         url="/about"
@@ -37,7 +37,7 @@ export default function About() {
 
       <section className="section">
         <div className="container">
-          <motion.div
+          <motion.div 
             className={styles.storySection}
             variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
           >
@@ -59,14 +59,14 @@ export default function About() {
             <h2>Our Core Values</h2>
             <p className="subtitle" style={{ margin: '0 auto' }}>The principles that guide everything we do.</p>
           </div>
-
+          
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', marginTop: '3rem' }}>
             {[
               { icon: Target, title: 'Mission-Driven' },
               { icon: Users, title: 'Client-First' },
               { icon: CheckCircle, title: 'Transparent' }
             ].map((val, i) => (
-              <motion.div
+              <motion.div 
                 key={i} className={styles.valueCard}
                 variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
                 transition={{ delay: i * 0.1 }}

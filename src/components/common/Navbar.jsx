@@ -18,8 +18,8 @@ export default function Navbar() {
             <img src={logo} alt="Property Express" className={styles.logoImg} />
           </Link>
 
-          <button
-            className={styles.mobileToggle}
+          <button 
+            className={styles.mobileToggle} 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X /> : <Menu />}
@@ -40,7 +40,7 @@ export default function Navbar() {
 
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
+          <motion.div 
             className={styles.mobileMenu}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

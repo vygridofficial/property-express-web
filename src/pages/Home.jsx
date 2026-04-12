@@ -24,7 +24,7 @@ const InteractiveCluster = ({ cluster, isMobile, navigate }) => {
         <div style={{ position: 'absolute', top: '-24px', left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.8)', color: '#18181a', padding: '2px 8px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 'bold', whiteSpace: 'nowrap', backdropFilter: 'blur(4px)', pointerEvents: 'none' }}>
           {cluster.location}
         </div>
-        <div
+        <div 
           onClick={(e) => { e.stopPropagation(); navigate(`/properties/${cluster.properties[0].id}`, { state: { property: cluster.properties[0] } }); }}
           style={{ position: 'relative', width: isMobile ? '60px' : '150px', height: isMobile ? '30px' : '90px', cursor: 'pointer' }}
         >
@@ -224,14 +224,14 @@ export default function Home() {
   const clusters = useMemo(() => {
     if (!allProps || allProps.length === 0) return [];
 
-    // First, filter by 100km radius if coords are known
-    const radiusFiltered = allProps.filter(prop => {
-      if (!isLocationDetected) return true; // Show all if location isn't detected or before detecting
-      const coords = getPropertyCoordinates(prop);
-      if (!coords) return false; // If location is totally unknown, hide it to maintain strict radius rules
-      const dist = getDistanceFromLatLonInKm(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
-      return dist <= 100;
-    });
+      // First, filter by 100km radius if coords are known
+      const radiusFiltered = allProps.filter(prop => {
+        if (!isLocationDetected) return true; // Show all if location isn't detected or before detecting
+        const coords = getPropertyCoordinates(prop);
+        if (!coords) return false; // If location is totally unknown, hide it to maintain strict radius rules
+        const dist = getDistanceFromLatLonInKm(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
+        return dist <= 100;
+      });
 
     const grouped = radiusFiltered.reduce((acc, prop) => {
       const coords = getPropertyCoordinates(prop);
@@ -743,9 +743,9 @@ export default function Home() {
                   <div className={styles.ctaRadar2}></div>
                 </>
               )}
-              <Link
-                to="/properties"
-                className={styles.btnMapCta}
+              <Link 
+                to="/properties" 
+                className={styles.btnMapCta} 
                 style={isLocationDetected ? { padding: '0.6rem 1.5rem', fontSize: '0.9rem', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' } : {}}
                 onClick={() => {
                   if (isLocationDetected) {

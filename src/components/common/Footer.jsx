@@ -8,21 +8,21 @@ import logo from '../../assets/logo.png';
 
 const FacebookIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
   </svg>
 );
 
 const InstagramIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <path d="M17.5 6.5h.01" />
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <path d="M17.5 6.5h.01"/>
   </svg>
 );
 
 const XIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
   </svg>
 );
 
@@ -96,30 +96,30 @@ export default function Footer() {
             <h4>Contact Info</h4>
             <div className={styles.footerLinks}>
               {address && (
-                <a
-                  href={settings?.googleMapsEmbed || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a 
+                  href={settings?.googleMapsEmbed || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
                   className={styles.contactItem}
                 >
-                  <MapPin size={18} />
+                  <MapPin size={18} /> 
                   <span>{address}</span>
                 </a>
               )}
               {phone && (
                 <a href={`tel:${phone.replace(/\s/g, '')}`} className={styles.contactItem}>
-                  <Phone size={18} />
+                  <Phone size={18} /> 
                   <span>{phone}</span>
                 </a>
               )}
               {email && (
-                <a
-                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a 
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
                   className={styles.contactItem}
                 >
-                  <Mail size={18} />
+                  <Mail size={18} /> 
                   <span>{email}</span>
                 </a>
               )}
