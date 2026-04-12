@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { getSiteSettings } from '../../services/propertyService';
+import { formatSocialUrl } from '../../utils/social';
 import styles from './Footer.module.css';
 import logo from '../../assets/logo.png';
 
@@ -53,12 +54,12 @@ export default function Footer() {
             </p>
             <div className={`flex ${styles.socialLinks}`}>
               {facebookUrl && (
-                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <a href={formatSocialUrl(facebookUrl, 'facebook')} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                   <FacebookIcon />
                 </a>
               )}
               {instagramUrl && (
-                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <a href={formatSocialUrl(instagramUrl, 'instagram')} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                   <InstagramIcon />
                 </a>
               )}

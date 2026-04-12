@@ -106,3 +106,15 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
 
   return results;
 };
+
+export const backfillPropertiesAgentDetails = async (agentName, agentPhone) => {
+  const snapshot = await getDocs(collection(db, PROPERTIES_COLLECTION));
+  const updates = snapshot.docs.map(d => 
+    updateDoc(doc(db, PROPERTIES_COLLECTION, d.id), { 
+      agentName, 
+      agentPhone 
+    })
+  );
+  await Promise.all(updates);
+  return snapshot.docs.length;
+};

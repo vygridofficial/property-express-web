@@ -5,6 +5,8 @@ import { submitLead } from '../services/leadService';
 import { getSiteSettings } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import SEO from '../components/common/SEO';
+import { formatSocialUrl, formatSocialDisplay } from '../utils/social';
+import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
 import styles from './Contact.module.css';
 
 const InstagramIcon = ({ size = 24, color = "currentColor" }) => (
@@ -84,14 +86,14 @@ export default function Contact() {
     instagramUrl && {
       icon: <InstagramIcon size={22} />,
       label: 'Instagram',
-      value: instagramUrl.replace(/^https?:\/\/(www\.)?instagram\.com\/?/, '@').replace(/\/$/, ''),
-      href: instagramUrl,
+      value: formatSocialDisplay(instagramUrl, 'instagram'),
+      href: formatSocialUrl(instagramUrl, 'instagram'),
     },
     facebookUrl && {
       icon: <FacebookIcon size={22} />,
       label: 'Facebook',
-      value: facebookUrl.replace(/^https?:\/\/(www\.)?facebook\.com\/?/, '').replace(/\/$/, '') || 'Facebook',
-      href: facebookUrl,
+      value: formatSocialDisplay(facebookUrl, 'facebook', settings?.siteName || 'Property Express'),
+      href: formatSocialUrl(facebookUrl, 'facebook'),
     },
   ].filter(Boolean); // Remove items with no data
 
@@ -160,7 +162,19 @@ export default function Contact() {
                 ) : (
                   contactItems.map((item, i) => (
                     <div key={i} className={styles.contactItem}>
-                      <div className={styles.iconWrap}>{item.icon}</div>
+                      {item.href ? (
+                        <a 
+                          href={item.href} 
+                          className={styles.iconWrap}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={item.label}
+                        >
+                          {item.icon}
+                        </a>
+                      ) : (
+                        <div className={styles.iconWrap}>{item.icon}</div>
+                      )}
                       <div className={styles.contactItemText}>
                         <span className={styles.contactLabel}>{item.label}</span>
                         {item.href ? (
@@ -208,7 +222,6 @@ export default function Contact() {
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={status === 'submitting'}>
                   {status === 'submitting' ? 'Sending…' : 'Submit Enquiry'}
                 </button>
-                {status === 'success' && <p style={{ color: 'green', marginTop: '1rem', textAlign: 'center', fontWeight: 'bold' }}>Enquiry submitted! Our team will contact you shortly.</p>}
                 {status === 'error'   && <p style={{ color: 'red',   marginTop: '1rem', textAlign: 'center' }}>Something went wrong. Please try again.</p>}
               </form>
             </motion.div>
@@ -216,6 +229,11 @@ export default function Contact() {
           </div>
         </div>
       </section>
+
+      <EnquirySuccessPopup 
+        isOpen={status === 'success'} 
+        onClose={() => setStatus('idle')}
+      />
     </motion.div>
   );
 }

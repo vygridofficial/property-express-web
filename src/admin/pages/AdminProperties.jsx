@@ -60,7 +60,10 @@ export default function AdminProperties() {
   const initialForm = {
     title: '', category: '', status: 'Active', isFeatured: false,
     price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
-    address: '', district: '', mapsUrl: '', agentName: '', agentPhone: '', agentPhoto: null,
+    address: '', district: '', mapsUrl: '', 
+    agentName: 'Property Express', 
+    agentPhone: '+91 97787 45146', 
+    agentPhoto: null,
     description: '', amenities: [], dynamicFilters: {}
   };
   const [formData, setFormData] = useState(initialForm);
@@ -400,10 +403,10 @@ export default function AdminProperties() {
             setTimeout(() => setShowToast(''), 3000);
           }
           setEditingId(null);
-          setFormData({
+        setFormData({
             title: '',
             category: '',
-            status: 'For Sale',
+            status: 'Active',
             isFeatured: false,
             price: '',
             area: '',
@@ -412,8 +415,8 @@ export default function AdminProperties() {
             address: '',
             district: '',
             mapsUrl: '',
-            agentName: 'Vikram Singh',
-            agentPhone: '+91 98765 43210',
+            agentName: 'Property Express',
+            agentPhone: '+91 97787 45146',
             agentPhoto: '',
             description: '',
             amenities: ['Parking', 'Security', 'Gated Community'],
@@ -429,6 +432,24 @@ export default function AdminProperties() {
           setLoading(false);
           setIsDrawerOpen(false); // Close drawer in finally or success
         }
+    };
+
+    // Temporary Backfill Function
+    const handleBackfillAgents = async () => {
+      if (!window.confirm('Are you sure you want to update agent details for ALL existing properties? This cannot be undone.')) return;
+      setLoading(true);
+      setShowToast('Updating all properties...');
+      try {
+        const count = await backfillPropertiesAgentDetails('Property Express', '+91 97787 45146');
+        setShowToast(`Success! Updated ${count} properties.`);
+        // Refresh properties in context
+        window.location.reload(); 
+      } catch (error) {
+        console.error('Backfill failed:', error);
+        setShowToast('Backfill failed: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
     };
   const SectionHeading = ({ children }) => (
     <h3 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--admin-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', borderBottom: '1px solid var(--admin-stroke)', paddingBottom: '0.5rem', marginBottom: '1.25rem', marginTop: '2rem' }}>

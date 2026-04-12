@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageCircle, X, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSiteSettings } from '../../services/propertyService';
+import { formatSocialUrl } from '../../utils/social';
 import styles from './WhatsAppBubble.module.css';
 
 const InstagramIcon = ({ size = 20 }) => (
@@ -40,7 +41,7 @@ export default function WhatsAppBubble() {
     instagramUrl && {
       id: 'instagram',
       icon: <InstagramIcon size={20} />,
-      href: instagramUrl,
+      href: formatSocialUrl(instagramUrl, 'instagram'),
       color: '#E1306C',
       label: 'Instagram',
     },
@@ -54,7 +55,7 @@ export default function WhatsAppBubble() {
     facebookUrl && {
       id: 'facebook',
       icon: <FacebookIcon size={20} />,
-      href: facebookUrl,
+      href: formatSocialUrl(facebookUrl, 'facebook'),
       color: '#4267B2',
       label: 'Facebook',
     },

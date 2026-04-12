@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
 import { submitLead } from '../services/leadService';
+import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
 import { MOCK_AGENTS } from '../data/mockProperties';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './PropertyDetail.module.css';
@@ -360,11 +361,6 @@ export default function PropertyDetail() {
                       </a>
                     )}
                   </div>
-                  {formStatus === 'success' && (
-                    <div style={{ color: 'green', marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
-                      ✓ Enquiry submitted! Our team will contact you shortly.
-                    </div>
-                  )}
                   {formStatus === 'error' && (
                     <div style={{ color: '#ed1b24', marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
                       Something went wrong. Please try again.
@@ -376,6 +372,11 @@ export default function PropertyDetail() {
           </div>
         </motion.div>
       </div>
+
+      <EnquirySuccessPopup 
+        isOpen={formStatus === 'success'} 
+        onClose={() => setFormStatus('idle')}
+      />
     </motion.div>
   );
 }
