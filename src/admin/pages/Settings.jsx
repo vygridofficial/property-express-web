@@ -87,55 +87,25 @@ export default function Settings() {
               style={{ width: '100%', maxWidth: 400 }} 
             />
           </div>
+          <hr style={{ border: 'none', borderTop: '1px solid var(--admin-stroke)', margin: '0.5rem 0' }} />
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>SEO Meta Description</label>
-            <textarea 
-              rows={3} 
-              value={draft.metaDescription || ''} 
-              onChange={(e) => handleInputChange('metaDescription', e.target.value)}
-              style={{ width: '100%', maxWidth: 600, resize: 'none' }}
-            ></textarea>
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>SEO Keywords (comma separated)</label>
-            <input 
-              type="text" 
-              value={draft.metaKeywords || ''} 
-              onChange={(e) => handleInputChange('metaKeywords', e.target.value)}
-              style={{ width: '100%', maxWidth: 600 }} 
+            <ToggleRow 
+              label="Maintenance Mode" 
+              checked={draft.maintenanceMode === true} 
+              onToggle={() => handleToggle('maintenanceMode')} 
             />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: 600 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Twitter Handle</label>
-              <input 
-                type="text" 
-                value={draft.twitterHandle || ''} 
-                onChange={(e) => handleInputChange('twitterHandle', e.target.value)}
-                style={{ width: '100%' }} 
-                placeholder="@username"
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Vercel URL (Domain)</label>
-              <input 
-                type="text" 
-                value={draft.vercelUrl || 'https://propertyexpress-mu.vercel.app'} 
-                readOnly
-                style={{ width: '100%', opacity: 0.7, cursor: 'not-allowed' }} 
-              />
-            </div>
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>OG Sharing Image (URL)</label>
-            <input 
-              type="text" 
-              value={draft.ogImage || ''} 
-              onChange={(e) => handleInputChange('ogImage', e.target.value)}
-              style={{ width: '100%', maxWidth: 600 }} 
-              placeholder="https://example.com/og-image.jpg"
-            />
-            <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.4rem' }}>Recommended size: 1200x630px</p>
+            {draft.maintenanceMode && (
+              <div style={{ marginTop: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Maintenance Message</label>
+                <textarea 
+                  rows={3} 
+                  value={draft.maintenanceMessage || ''} 
+                  onChange={(e) => handleInputChange('maintenanceMessage', e.target.value)}
+                  placeholder="Enter custom maintenance message..."
+                  style={{ width: '100%', maxWidth: 600, resize: 'none' }}
+                ></textarea>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -206,7 +176,6 @@ export default function Settings() {
           ))}
 
           {/* Fixed Sections */}
-          <ToggleRow label="Show Customer Reviews" checked={draft.showReviews !== false} onToggle={() => handleToggle('showReviews')} />
           <ToggleRow label="Show Contact Form" checked={draft.showContactForm !== false} onToggle={() => handleToggle('showContactForm')} />
         </div>
       </div>

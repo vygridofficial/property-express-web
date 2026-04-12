@@ -13,6 +13,8 @@ import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Maintenance from './pages/Maintenance';
+import { useAdmin } from './admin/context/AdminContext';
 
 import Dashboard from './admin/pages/Dashboard';
 import AdminProperties from './admin/pages/AdminProperties';
@@ -37,6 +39,17 @@ function PublicLayout() {
 function AppContent() {
   const location = useLocation();
   const navType = useNavigationType();
+  const { siteSettings, settingsLoading } = useAdmin();
+
+  const isMaintenanceMode = siteSettings?.maintenanceMode;
+  const isAdminPath = location.pathname.startsWith('/admin');
+
+  // If settings are still loading from Firestore, do not render public routes yet
+  // to prevent flickering of the home page if maintenance mode is enabled.
+  if (settingsLoading && !isAdminPath) {
+    return null; // Or a minimal branded loader if preferred
+  }
+
 
   // 1. Disable native scroll restoration to stop jumps during animations
   React.useEffect(() => {
@@ -70,6 +83,10 @@ function AppContent() {
       }
     }
   }, [location.pathname, location.key, navType]);
+
+  if (isMaintenanceMode && !isAdminPath) {
+    return <Maintenance message={siteSettings.maintenanceMessage} />;
+  }
 
   return (
     <>

@@ -45,7 +45,7 @@ export default function Footer() {
               <img src={logo} alt={settings?.siteName || "Property Express"} className={styles.logoImg} />
             </Link>
             <p className={styles.footerDesc}>
-              {settings?.metaDescription || "Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight."}
+              {settings?.tagline || "Premium real estate agency providing verified, high-quality properties with exceptional customer service and expert market insight."}
             </p>
             <div className={`flex ${styles.socialLinks}`}>
               {facebookUrl && (

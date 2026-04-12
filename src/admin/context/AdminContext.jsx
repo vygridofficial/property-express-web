@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { db, auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDocs, query, where, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDocs, query, where, setDoc, deleteField } from 'firebase/firestore';
 
 const AdminContext = createContext();
 
@@ -13,6 +13,7 @@ export function AdminProvider({ children }) {
   const [properties, setProperties] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   // ── Issue 1: Auth Persistence ──
   // Using pure local storage since authentication uses custom env static hash 
@@ -127,11 +128,9 @@ export function AdminProvider({ children }) {
   const [siteSettings, setSiteSettings] = useState({
     siteName: 'Property Express',
     tagline: 'Premium Real Estate Properties',
-    metaDescription: 'Discover the most premium luxury villas, apartments, and plots available.',
-    metaKeywords: 'real estate, luxury villas, apartments, plots, property express',
-    ogImage: '',
-    twitterHandle: '@PropertyExpress',
     visibility: {},
+    maintenanceMode: false,
+    maintenanceMessage: "We'll be back soon. Our site is currently undergoing scheduled maintenance.",
     achievementsPropertiesSold: '1.2',
     achievementsClientSatisfaction: '4.9',
     achievementsVerifiedListings: '100',
@@ -162,9 +161,27 @@ export function AdminProvider({ children }) {
         if (Array.isArray(data.customCategories)) {
           setCustomCategories(data.customCategories);
         }
+        setSettingsLoading(false);
+      } else {
+        setSettingsLoading(false);
       }
     });
     return () => unsubscribe();
+  }, []);
+
+  // One-time cleanup for removed fields
+  useEffect(() => {
+    const cleanupUnusedFields = async () => {
+      const ref = doc(db, 'settings', 'global');
+      await updateDoc(ref, {
+        metaDescription: deleteField(),
+        metaKeywords: deleteField(),
+        ogImage: deleteField(),
+        twitterHandle: deleteField(),
+        vercelUrl: deleteField(),
+      }).catch(err => console.log('Cleanup already done or not needed:', err));
+    };
+    cleanupUnusedFields();
   }, []);
 
   // updateCategoryTaxonomy merges new filters for a specific category
@@ -239,7 +256,7 @@ export function AdminProvider({ children }) {
         isDark, toggleTheme,
         properties, setProperties, loading, updatePropertyStatus, deletePropertyItem,
         reviews,
-        siteSettings, updateSiteSettings,
+        siteSettings, updateSiteSettings, settingsLoading,
         customCategories, addCustomCategory, deleteCustomCategory,
         deleteModalConfig, requestDeleteCustomCategory, closeDeleteModal,
         updateCategoryTaxonomy,
