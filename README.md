@@ -11,15 +11,18 @@
 - **GTA-Style Interactive Map**: Custom-designed Google Maps integration with price-tagged markers and radar animations.
 - **Dynamic Property Grids**: Category-based filtering (Villa, Apartment, Plot, Commercial) with real-time data from Firestore.
 - **Deep-Dive Property Details**: Multi-image galleries, automated sliders, comprehensive amenities lists, and in-depth descriptions.
-- **Lead Generation**: Built-in inquiry forms on every property page and a floating WhatsApp contact bubble.
-- **Advanced SEO**: Dynamic meta tags, Open Graph (OG) support, Twitter cards, and automated sitemaps/robots.txt.
+- **Lead Generation**: Built-in inquiry forms on every property page and a floating WhatsApp contact bubble. Now feature-cleaned with no placeholder distractions.
+- **Advanced SEO**: Dynamic meta tags, Open Graph (OG) support, Twitter cards, and automated sitemaps/robots.txt. Strictly separated from visible website content (Hero titles/descriptions).
+- **Maintenance Mode**: A branded, premium-designed maintenance screen that can be activated instantly from the Admin Portal to handle site downtime gracefully.
 
 ### Admin Portal
 - **Dashboard Overview**: Track property inventory, pending reviews, and recent customer leads at a glance.
 - **Full Property Management**: A powerful interface to Add, Edit, and Delete property listings with multi-image support.
 - **Inquiry Management**: View and manage all customer leads generated from the site.
 - **Review System**: A dedicated section to moderate customer testimonials before they go live.
-- **Global Settings**: Control site-wide metadata, SEO keywords, social media links, contact information, and business achievements.
+- **Global Settings**: Control site-wide metadata (Tab Title, Meta-tagline), dedicated Hero Section content (Main Heading & Descriptions), social media links, contact information, and business achievements.
+- **Maintenance Toggle**: Instantly enable a global maintenance page across the public site with a custom status message.
+- **Section Visibility**: Fine-tune the visibility of property categories (Apartments, Villas, etc.) on the public portal.
 - **Theme Control**: Built-in Dark/Light mode for the administrative interface.
 
 ---
