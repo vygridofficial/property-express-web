@@ -49,6 +49,10 @@
   color: #999;
 }
 
+.marqueePlaceholder {
+  display: none;
+}
+
 .searchBtn {
   background: #1a1a1a;
   color: white;
@@ -134,6 +138,40 @@
   .searchBtn {
     padding: 0.75rem;
   }
+  
+  .searchWrapper {
+    position: relative;
+  }
+  
+  .input::placeholder {
+    color: transparent !important;
+  }
+  
+  .marqueePlaceholder {
+    display: flex;
+    position: absolute;
+    left: 48px;
+    right: 50px;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .marqueeContent {
+    white-space: nowrap;
+    color: #999;
+    font-size: 0.95rem;
+    animation: placeholder-scroll 10s ease-in-out infinite;
+  }
+}
+
+@keyframes placeholder-scroll {
+  0%, 15% { transform: translateX(0); }
+  45%, 55% { transform: translateX(calc(-100% + 200px)); }
+  85%, 100% { transform: translateX(0); }
 }
 
 /* Spotlight Search Panel Styles */

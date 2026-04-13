@@ -171,6 +171,15 @@ export default function SearchBar({ properties = [] }) {
         <div className={styles.searchIcon}>
           <Search size={22} />
         </div>
+        
+        {!query && (
+          <div className={styles.marqueePlaceholder}>
+            <div className={styles.marqueeContent}>
+              Search by location, property type, or name...
+            </div>
+          </div>
+        )}
+
         <input
           id="main-search-input"
           type="text"

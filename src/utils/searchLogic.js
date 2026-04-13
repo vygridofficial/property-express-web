@@ -178,7 +178,11 @@ export const filterProperties = (properties, query, filters, knownLocations = []
       const tokens = parsed.freeText.toLowerCase().split(/\s+/).filter(Boolean);
       results = results.filter(p => {
         const targetString = normalizeLocationsInText(`${p.title || ''} ${p.location || ''} ${p.address || ''} ${p.district || ''} ${p.category || ''} ${p.description || ''}`);
-        return tokens.every(token => targetString.includes(token));
+        return tokens.every(token => {
+           const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+           const regex = new RegExp(`\\b${escapedToken}`, 'i');
+           return regex.test(targetString);
+        });
       });
     }
   }
