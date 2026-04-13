@@ -12,6 +12,7 @@ import styles from './Home.module.css';
 
 import { useInView } from 'framer-motion';
 import SEO from '../components/common/SEO';
+import SearchBar from '../components/ui/SearchBar';
 
 import { getPropertyCoordinates, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
 
@@ -281,8 +282,14 @@ export default function Home() {
       transition={{ duration: 0.3 }}
     >
       <SEO />
+      
       {/* Hero Section */}
       <section className={styles.hero}>
+        {/* Master Search Bar - now inside hero for better visibility/layering */}
+        <div className={styles.heroSearchWrap}>
+          <SearchBar properties={allProps} />
+        </div>
+
         <div className={styles.heroContent}>
           <motion.h1
             className={styles.heroTitle}

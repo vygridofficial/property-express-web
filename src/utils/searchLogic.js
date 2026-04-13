@@ -1,0 +1,247 @@
+export const normalizeSearchQuery = (query) => {
+  if (!query) return '';
+  let q = query.toLowerCase().trim();
+  // Handling Plural and Singular Type Names
+  const pluralToSingular = {
+    'apartments': 'apartment',
+    'villas': 'villa',
+    'commercials': 'commercial',
+    'plots': 'plot',
+    'penthouses': 'penthouse'
+  };
+  
+  if (pluralToSingular[q]) {
+    q = pluralToSingular[q];
+  } else if (q.endsWith('es') && q.length > 3) {
+    if (q === 'penthouses') q = 'penthouse';
+    else q = q.slice(0, -2);
+  } else if (q.endsWith('s') && q.length > 2) {
+    q = q.slice(0, -1);
+  }
+  return q;
+};
+
+export const getTypeEmojiMap = () => ({
+  'Apartment': { color: '#E3F2FD', emoji: '🏢' },
+  'Villa': { color: '#E8F5E9', emoji: '🏡' },
+  'Commercial': { color: '#FFF3E0', emoji: '🏬' },
+  'Plot': { color: '#F3E5F5', emoji: '🗺️' },
+  'Penthouse': { color: '#FCE4EC', emoji: '🌆' }
+});
+
+export const isPropertyTypeKeyword = (query) => {
+  const norm = normalizeSearchQuery(query);
+  return ['apartment', 'villa', 'commercial', 'plot', 'penthouse'].includes(norm);
+};
+
+export const getCategoryFromKeyword = (query) => {
+  const norm = normalizeSearchQuery(query);
+  const map = {
+    'apartment': 'Apartment',
+    'villa': 'Villa',
+    'commercial': 'Commercial',
+    'plot': 'Plot',
+    'penthouse': 'Penthouse'
+  };
+  return map[norm] || null;
+}
+
+export const LOCATION_ALIASES = {
+  'ernakulam': 'kochi',
+  'cochin': 'kochi',
+  'trivandrum': 'thiruvananthapuram',
+  'calicut': 'kozhikode',
+  'quilon': 'kollam',
+  'trichur': 'thrissur',
+  'palghat': 'palakkad',
+  'cannanore': 'kannur',
+  'bombay': 'mumbai',
+  'madras': 'chennai',
+  'bengaluru': 'bangalore',
+  'calcutta': 'kolkata',
+  'delhi': 'new delhi'
+};
+
+export const normalizeLocationsInText = (text) => {
+  if (!text) return '';
+  let normalized = text.toLowerCase().trim();
+  Object.entries(LOCATION_ALIASES).forEach(([alias, target]) => {
+    const regex = new RegExp(`\\b${alias}\\b`, 'gi');
+    normalized = normalized.replace(regex, target);
+  });
+  return normalized;
+};
+
+export const parsePhraseQuery = (query, knownLocations = []) => {
+  let result = { type: null, locationSearch: null, freeText: query };
+  if (!query) return result;
+  
+  // Pre-process aliases
+  const qLower = normalizeLocationsInText(query);
+  result.freeText = qLower;
+
+  // Extract type from last word if applicable
+  const words = qLower.split(/\s+/);
+  if (words.length >= 1) {
+    const lastWord = words[words.length - 1];
+    const typeCat = getCategoryFromKeyword(lastWord);
+    if (typeCat) {
+      result.type = typeCat;
+      result.freeText = words.slice(0, -1).join(' ');
+    }
+  }
+
+  // Explicit location preposition matcher "in/at/near/around"
+  const inMatch = qLower.match(/^(.*?)\s*((?:in|at|near|around)\s+(.+))$/i);
+  if (inMatch) {
+     const locPart = inMatch[2]; 
+     const actualLoc = locPart.replace(/^(in|at|near|around)\s+/i, '').trim();
+
+     result.locationSearch = actualLoc;
+     result.freeText = result.freeText.replace(locPart, '').trim();
+     
+     // Extract type before "in" if not already captured
+     if (!result.type) {
+        const beforeLoc = inMatch[1].trim(); 
+        const parts = beforeLoc.split(/\s+/);
+        if (parts.length > 0) {
+          const typeCatBefore = getCategoryFromKeyword(parts[parts.length - 1]);
+          if (typeCatBefore) {
+            result.type = typeCatBefore;
+            result.freeText = result.freeText.replace(parts[parts.length - 1], '').trim();
+          }
+        }
+     }
+  }
+
+  // Scan against known Dictionary Locations if no preposition was used
+  if (!result.locationSearch && knownLocations && knownLocations.length > 0) {
+      const normalizedLocs = knownLocations
+          .filter(l => l && l !== 'All Locations')
+          .map(l => ({ original: l, normalized: normalizeLocationsInText(l) }));
+          
+      // Sort to match longest location first (e.g. "Navi Mumbai" before "Mumbai")
+      normalizedLocs.sort((a,b) => b.normalized.length - a.normalized.length);
+
+      for (const locObj of normalizedLocs) {
+          // Splitting by comma allows extracting primary city from "Kochi, Kerala"
+          const dbParts = locObj.normalized.split(',').map(p => p.trim()).filter(p => p.length >= 3);
+          
+          let matchedPart = null;
+          for (const part of dbParts) {
+             const regex = new RegExp(`\\b${part}\\b`, 'i');
+             if (regex.test(qLower)) {
+                 matchedPart = part;
+                 break;
+             }
+          }
+
+          if (matchedPart) {
+              result.locationSearch = locObj.original;
+              result.freeText = result.freeText.replace(new RegExp(`\\b${matchedPart}\\b`, 'gi'), '').trim();
+              break;
+          }
+      }
+  }
+
+  // Cleanup extra spaces
+  result.freeText = result.freeText.replace(/\s+/g, ' ').trim();
+  
+  return result;
+};
+
+export const filterProperties = (properties, query, filters, knownLocations = []) => {
+  let results = [...properties];
+  
+  // 1. Text Search (Phrase & Tokenized match)
+  if (query && query.length >= 3) {
+    const parsed = parsePhraseQuery(query, knownLocations);
+    
+    // Implicit Type from phrase
+    if (parsed.type) {
+      results = results.filter(p => p.category === parsed.type);
+    }
+    
+    // Implicit Location from phrase 
+    if (parsed.locationSearch) {
+      const locSearch = normalizeLocationsInText(parsed.locationSearch);
+      results = results.filter(p => {
+         const pLoc = normalizeLocationsInText(p.location);
+         const pAddress = normalizeLocationsInText(p.address || '');
+         const pDist = normalizeLocationsInText(p.district || '');
+         return pLoc.includes(locSearch) || pAddress.includes(locSearch) || pDist.includes(locSearch);
+      });
+    }
+    
+    // Remaining free text (tokenized AND match over all searchable fields)
+    if (parsed.freeText) {
+      const tokens = parsed.freeText.toLowerCase().split(/\s+/).filter(Boolean);
+      results = results.filter(p => {
+        const targetString = normalizeLocationsInText(`${p.title || ''} ${p.location || ''} ${p.address || ''} ${p.district || ''} ${p.category || ''} ${p.description || ''}`);
+        return tokens.every(token => targetString.includes(token));
+      });
+    }
+  }
+
+  // 2. Type Filter
+  if (filters.type && filters.type !== 'All Types') {
+    results = results.filter(p => p.category === filters.type);
+  }
+
+  // 3. Location Filter
+  if (filters.location && filters.location !== 'All Locations') {
+    results = results.filter(p => p.location === filters.location);
+  }
+
+  // 4. Price Filter
+  if (filters.price && filters.price !== 'Any Price') {
+    results = results.filter(p => {
+      const priceStr = (p.price || 0).toString().replace(/,/g, '');
+      const price = parseFloat(priceStr);
+      switch(filters.price) {
+        case 'Under ₹50L':
+          return price < 5000000;
+        case '₹50L to ₹1Cr':
+          return price >= 5000000 && price <= 10000000;
+        case '₹1Cr to ₹3Cr':
+          return price >= 10000000 && price <= 30000000;
+        case 'Above ₹3Cr':
+          return price > 30000000;
+        default:
+          return true;
+      }
+    });
+  }
+
+  // 5. Sort
+  if (filters.sort) {
+    switch (filters.sort) {
+      case 'Newest First':
+        // Assuming we sort by created date if it exists, otherwise leave as is. 
+        // We'll rely on the array order as a fallback, which is usually insertion order.
+        results.sort((a, b) => {
+           const timeA = a.createdAt?.seconds || Date.now();
+           const timeB = b.createdAt?.seconds || Date.now();
+           return timeB - timeA;
+        });
+        break;
+      case 'Oldest First':
+        results.sort((a, b) => {
+           const timeA = a.createdAt?.seconds || Date.now();
+           const timeB = b.createdAt?.seconds || Date.now();
+           return timeA - timeB;
+        });
+        break;
+      case 'Price Low to High':
+        results.sort((a, b) => parseFloat((a.price || 0).toString().replace(/,/g, '')) - parseFloat((b.price || 0).toString().replace(/,/g, '')));
+        break;
+      case 'Price High to Low':
+        results.sort((a, b) => parseFloat((b.price || 0).toString().replace(/,/g, '')) - parseFloat((a.price || 0).toString().replace(/,/g, '')));
+        break;
+      default:
+        break;
+    }
+  }
+
+  return results;
+};

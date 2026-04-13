@@ -11,6 +11,7 @@ import { AdminProvider } from './admin/context/AdminContext';
 import Home from './pages/Home';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
+import Search from './pages/Search';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Maintenance from './pages/Maintenance';
@@ -46,9 +47,6 @@ function AppContent() {
 
   // If settings are still loading from Firestore, do not render public routes yet
   // to prevent flickering of the home page if maintenance mode is enabled.
-  if (settingsLoading && !isAdminPath) {
-    return null; // Or a minimal branded loader if preferred
-  }
 
 
   // 1. Disable native scroll restoration to stop jumps during animations
@@ -83,6 +81,10 @@ function AppContent() {
       }
     }
   }, [location.pathname, location.key, navType]);
+  
+  if (settingsLoading && !isAdminPath) {
+    return null; // Or a minimal branded loader if preferred
+  }
 
   if (isMaintenanceMode && !isAdminPath) {
     return <Maintenance message={siteSettings.maintenanceMessage} />;
@@ -95,6 +97,7 @@ function AppContent() {
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/properties" element={<Properties />} />
             <Route path="/properties/:id" element={<PropertyDetail />} />
             <Route path="/about" element={<About />} />

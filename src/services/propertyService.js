@@ -118,3 +118,17 @@ export const backfillPropertiesAgentDetails = async (agentName, agentPhone) => {
   await Promise.all(updates);
   return snapshot.docs.length;
 };
+export const searchProperties = (properties, query) => {
+  if (!query) return properties;
+  const q = query.toLowerCase().trim();
+  return properties.filter(p => {
+    return (
+      (p.title || '').toLowerCase().includes(q) ||
+      (p.location || '').toLowerCase().includes(q) ||
+      (p.address || '').toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q) ||
+      (p.district || '').toLowerCase().includes(q)
+    );
+  });
+};

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Building, Store, Map, LayoutGrid } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { getPropertiesByCategory, getSiteSettings } from '../services/propertyService';
+import { getPropertiesByCategory, getSiteSettings, getAllProperties, searchProperties } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import CategoryHero from './CategoryHero';
 import SEO from '../components/common/SEO';
@@ -47,6 +47,10 @@ export default function Properties() {
   const [categoryProperties, setCategoryProperties] = useState([]);
   const [loading, setLoading] = useState(false);
   const [siteSettings, setSiteSettings] = useState(null);
+  
+  const queryParam = searchParams.get('q');
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [searchTitle, setSearchTitle] = useState('');
 
   useEffect(() => {
     getSiteSettings().then(data => {
@@ -68,7 +72,22 @@ export default function Properties() {
   }, []);
 
   useEffect(() => {
-    if (catId) {
+    if (queryParam) {
+      setIsSearchMode(true);
+      setSearchTitle(`Search: ${queryParam}`);
+      setLoading(true);
+      getAllProperties({}, false)
+        .then(data => {
+          const filtered = searchProperties(data, queryParam);
+          setCategoryProperties(filtered);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Error searching properties:", err);
+          setLoading(false);
+        });
+    } else if (catId) {
+      setIsSearchMode(false);
       setLoading(true);
       // Fetch both exact and potentially lowercased category matches
       getPropertiesByCategory(catId)
@@ -89,8 +108,10 @@ export default function Properties() {
           console.error("Error fetching properties:", err);
           setLoading(false);
         });
+    } else {
+      setIsSearchMode(false);
     }
-  }, [catId]);
+  }, [catId, queryParam]);
 
   const handleSelectCategory = (cat) => {
     setSearchParams({ category: cat.id });
@@ -111,12 +132,12 @@ export default function Properties() {
       className={styles.pageWrap}
     >
       <SEO 
-        title={selectedCategory ? `${selectedCategory.title} Listings` : "All Properties"}
-        description={selectedCategory ? `Explore our premium selection of ${selectedCategory.title.toLowerCase()} in top locations.` : "Discover your dream home from our extensive collection of premium properties."}
-        url={selectedCategory ? `/properties?category=${selectedCategory.id}` : "/properties"}
+        title={isSearchMode ? searchTitle : (selectedCategory ? `${selectedCategory.title} Listings` : "All Properties")}
+        description={isSearchMode ? `Search results for ${queryParam} on Property Express.` : (selectedCategory ? `Explore our premium selection of ${selectedCategory.title.toLowerCase()} in top locations.` : "Discover your dream home from our extensive collection of premium properties.")}
+        url={isSearchMode ? `/properties?q=${queryParam}` : (selectedCategory ? `/properties?category=${selectedCategory.id}` : "/properties")}
       />
       <AnimatePresence mode="wait">
-        {!selectedCategory ? (
+        {!selectedCategory && !isSearchMode ? (
           /* ── Category Selection Screen ─────────────────────── */
           <motion.div
             key="categories"
@@ -183,8 +204,8 @@ export default function Properties() {
               </div>
             ) : (
               <CategoryHero
-                categoryId={selectedCategory.id}
-                categoryTitle={selectedCategory.title}
+                categoryId={isSearchMode ? 'search' : selectedCategory.id}
+                categoryTitle={isSearchMode ? searchTitle : selectedCategory.title}
                 onBack={handleBack}
                 liveProperties={categoryProperties}
                 siteSettings={siteSettings}
