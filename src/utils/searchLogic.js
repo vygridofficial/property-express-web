@@ -177,7 +177,7 @@ export const filterProperties = (properties, query, filters, knownLocations = []
     if (parsed.freeText) {
       const tokens = parsed.freeText.toLowerCase().split(/\s+/).filter(Boolean);
       results = results.filter(p => {
-        const targetString = normalizeLocationsInText(`${p.title || ''} ${p.location || ''} ${p.address || ''} ${p.district || ''} ${p.category || ''} ${p.description || ''}`);
+        const targetString = normalizeLocationsInText(`${p.title || ''} ${p.location || ''} ${p.address || ''} ${p.district || ''} ${p.category || ''}`);
         return tokens.every(token => {
            const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
            const regex = new RegExp(`\\b${escapedToken}`, 'i');
