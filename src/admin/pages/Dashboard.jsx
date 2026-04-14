@@ -57,7 +57,7 @@ const StatCard = ({ title, value, icon, to }) => {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { isDark, properties, reviews, customCategories, siteSettings } = useAdmin();
+  const { isDark, properties, reviews, propertyTypes, siteSettings } = useAdmin();
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
@@ -91,14 +91,10 @@ export default function Dashboard() {
       const inqs = await getAllInquiries();
 
       // Issue 8: Count all unique property types (base 4 + custom)
-      const BASE_CATEGORIES = ['Apartment', 'Villa', 'Plot', 'Commercial'];
-      const totalPropertyTypes = BASE_CATEGORIES.length + (customCategories?.length || 0);
+      const totalPropertyTypes = propertyTypes?.length || 0;
 
       // Category breakdown for Pie Chart — include custom categories
-      const allCategoryNames = [
-        ...BASE_CATEGORIES,
-        ...(customCategories || []).map(c => c.name)
-      ];
+      const allCategoryNames = propertyTypes?.map(c => c.name) || [];
       const pie = allCategoryNames.map(cat => ({
         name: cat,
         value: properties.filter(p => p.category?.toLowerCase() === cat.toLowerCase()).length

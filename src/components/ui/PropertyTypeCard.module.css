@@ -1,0 +1,134 @@
+.card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+.imgWrap {
+  position: absolute;
+  inset: 0;
+}
+
+.bgImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.card:hover .bgImg {
+  transform: scale(1.07);
+}
+
+.imgOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(8, 8, 20, 0.88) 0%,
+    rgba(8, 8, 20, 0.35) 55%,
+    transparent 100%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 5;
+  margin-top: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* When there is NO background image, use a light card style */
+.card:not(:has(.imgWrap)) .content {
+  margin-top: 0;
+  padding: 2rem 1.5rem;
+}
+
+.iconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  backdrop-filter: blur(8px);
+  margin-bottom: 0.5rem;
+}
+
+/* Light variant when no image */
+.card:not(:has(.imgWrap)) .iconWrap {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  color: #1565C0;
+}
+
+.name {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+.card:not(:has(.imgWrap)) .name {
+  color: #0f172a !important;
+}
+
+.sub {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.card:not(:has(.imgWrap)) .sub {
+  color: #64748b;
+}
+
+.cta {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.03em;
+  transition: color 0.2s ease;
+}
+
+.card:hover .cta {
+  color: #fff;
+}
+
+.card:not(:has(.imgWrap)) .cta {
+  color: #1565C0;
+}
+
+/* Skeleton loader */
+.skeleton {
+  border-radius: 20px;
+  min-height: 220px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

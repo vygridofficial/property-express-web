@@ -9,6 +9,8 @@ import AdminLayout from './admin/layouts/AdminLayout';
 import { AdminProvider } from './admin/context/AdminContext';
 
 import Home from './pages/Home';
+import PropertiesPage from './pages/PropertiesPage';
+import PropertyTypesPage from './pages/PropertyTypesPage';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
 import Search from './pages/Search';
@@ -98,7 +100,11 @@ function AppContent() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/properties" element={<Properties />} />
+            {/* New category-first properties navigation */}
+            <Route path="/properties" element={<PropertiesPage />} />
+            <Route path="/properties/category/:category" element={<PropertyTypesPage />} />
+            {/* Legacy: query-param based listings still work */}
+            <Route path="/properties/listings" element={<Properties />} />
             <Route path="/properties/:id" element={<PropertyDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />

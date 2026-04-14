@@ -169,3 +169,29 @@
     height: 300px;
   }
 }
+
+/* ── Property Type Grid (second screen) ──────────────────── */
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .typeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .typeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Category cards — 3 col on desktop, 1 on mobile */
+@media (max-width: 768px) {
+  .catRow {
+    grid-template-columns: 1fr !important;
+  }
+}

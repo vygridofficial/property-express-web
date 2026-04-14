@@ -9,7 +9,7 @@ import logo from '../../assets/logo.png';
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const { sections, logout, customCategories, requestDeleteCustomCategory, properties } = useAdmin();
+  const { sections, logout, propertyTypes, properties } = useAdmin();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -17,7 +17,7 @@ export default function Sidebar() {
     navigate('/admin'); // Assuming /admin redirects to login naturally when unauthenticated
   };
 
-  const NavItem = ({ to, icon: Icon, label, isCustom }) => (
+  const NavItem = ({ to, icon: Icon, label }) => (
     <div style={{ position: 'relative' }}>
       <NavLink 
         to={to} 
@@ -35,15 +35,6 @@ export default function Sidebar() {
           )}
         </AnimatePresence>
       </NavLink>
-      {isCustom && !collapsed && (
-        <button 
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); requestDeleteCustomCategory(label); }}
-          style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--admin-text-muted)' }}
-          title={`Delete ${label}`}
-        >
-          <Trash2 size={14} />
-        </button>
-      )}
     </div>
   );
 
@@ -63,24 +54,25 @@ export default function Sidebar() {
           {!collapsed && <div className={styles.navLabel}>Properties</div>}
           <NavItem to="/admin/properties" icon={WarehouseIcon} label="All Properties" />
           <AnimatePresence mode="popLayout">
-            {/* Base Categories */}
-            {[
-              { id: 'Apartment', label: 'Apartments', icon: FlatIcon, to: '/admin/properties/apartments' },
-              { id: 'Villa', label: 'Villas', icon: VillaIcon, to: '/admin/properties/villas' },
-              { id: 'Plot', label: 'Plots', icon: PlotIcon, to: '/admin/properties/plots' },
-              { id: 'Commercial', label: 'Commercial', icon: Building2, to: '/admin/properties/commercial' }
-            ].map(cat => (sections[cat.id] !== false) && (
-              <motion.div key={cat.id} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                <NavItem to={cat.to} icon={cat.icon} label={cat.label} />
-              </motion.div>
-            ))}
+            {propertyTypes.map((cat) => {
+              if (sections[cat.name] === false) return null;
+              if (cat.name === 'Uncategorized') return null; // We handle it explicitly if properties exist
 
-            {/* Custom Categories */}
-            {customCategories.map((cat, idx) => (sections[cat.name] !== false) && (
-                <motion.div key={`side-cat-${cat.name || 'custom'}-${idx}`} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                   <NavItem to={`/admin/properties/${(cat.name || 'unknown').toLowerCase()}`} icon={Building2} label={cat.name || 'Custom'} isCustom />
-              </motion.div>
-            ))}
+              const low = cat.name.toLowerCase();
+              let Icon = Building2;
+              let path = `/admin/properties/${low}`;
+              
+              if (low === 'apartment' || low === 'apartments' || low === 'flat') { Icon = FlatIcon; path = '/admin/properties/apartments'; }
+              else if (low === 'villa') { Icon = VillaIcon; path = '/admin/properties/villas'; }
+              else if (low === 'plot') { Icon = PlotIcon; path = '/admin/properties/plots'; }
+              else if (low === 'commercial') { Icon = WarehouseIcon; path = '/admin/properties/commercial'; }
+
+              return (
+                <motion.div key={cat.id} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                  <NavItem to={path} icon={Icon} label={cat.name} />
+                </motion.div>
+              );
+            })}
 
             {/* Uncategorized (Fix for Point 11) */}
             {properties.some(p => p.category === 'Uncategorized') && (

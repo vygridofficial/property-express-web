@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { db, auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDocs, query, where, setDoc, deleteField } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDocs, query, where, setDoc, deleteField, writeBatch } from 'firebase/firestore';
 
 const AdminContext = createContext();
 
@@ -14,6 +14,7 @@ export function AdminProvider({ children }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(true);
+  const [propertyTypes, setPropertyTypes] = useState([]);
 
   // ── Issue 1: Auth Persistence ──
   // Using pure local storage since authentication uses custom env static hash 
@@ -55,6 +56,61 @@ export function AdminProvider({ children }) {
     const unsubscribe = onSnapshot(collection(db, 'reviews'), (snapshot) => {
       const revs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setReviews(revs);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // ── Property Types Collection Sync & Seeding ──
+  useEffect(() => {
+    const DEFAULT_CATEGORY_MAP = {
+      Apartment: 'residential',
+      Villa: 'residential',
+      Plot: 'residential',
+      Commercial: 'commercial',
+      Uncategorized: 'residential',
+    };
+
+    const unsubscribe = onSnapshot(collection(db, 'propertyTypes'), async (snapshot) => {
+      if (snapshot.empty) {
+        console.log('Seeding initial property types...');
+        const initialTypes = [
+          { name: 'Apartment', category: 'residential' },
+          { name: 'Villa',     category: 'residential' },
+          { name: 'Plot',      category: 'residential' },
+          { name: 'Commercial', category: 'commercial' },
+          { name: 'Uncategorized', category: 'residential' },
+        ];
+        try {
+          const promises = initialTypes.map((t, index) =>
+            setDoc(doc(db, 'propertyTypes', t.name), {
+              name: t.name, category: t.category, isDefault: true,
+              isActive: true, createdAt: new Date(), order: index,
+              slug: t.name.toLowerCase(), subTypes: [], icon: 'Building2'
+            })
+          );
+          await Promise.all(promises);
+        } catch (error) {
+          console.error('Failed to seed property types', error);
+        }
+        return;
+      }
+
+      // One-time migration: patch docs that are missing the category field
+      const needsMigration = snapshot.docs.filter(d => !d.data().category);
+      if (needsMigration.length > 0) {
+        const batch = writeBatch(db);
+        needsMigration.forEach(d => {
+          const fallback = DEFAULT_CATEGORY_MAP[d.data().name] || 'residential';
+          batch.update(doc(db, 'propertyTypes', d.id), { category: fallback, isActive: true, slug: d.id.toLowerCase(), subTypes: [], icon: 'Building2' });
+        });
+        await batch.commit();
+        console.log(`Migrated ${needsMigration.length} property type(s) with missing category.`);
+        return; // snapshot will re-fire after batch
+      }
+
+      const types = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      types.sort((a, b) => (a.order || 0) - (b.order || 0));
+      setPropertyTypes(types);
     });
     return () => unsubscribe();
   }, []);
@@ -249,6 +305,96 @@ export function AdminProvider({ children }) {
     await updateSiteSettings({ customCategories: updatedCats, visibility: updatedVis });
   };
 
+  // Property Type specific methods (new approach)
+  const addPropertyType = async (name, customImageUrl = null, filters = [], extendedData = {}) => {
+    const trimmed = name?.trim();
+    if (!trimmed) return;
+    const slug = extendedData.slug || trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    
+    // Check if ID or name exists
+    const exists = propertyTypes.some(pt => pt.id.toLowerCase() === slug || pt.name.toLowerCase() === trimmed.toLowerCase());
+    if (exists) return;
+
+    await setDoc(doc(db, 'propertyTypes', slug), { 
+      name: trimmed, 
+      slug,
+      isDefault: false, 
+      image: customImageUrl, 
+      filters, 
+      category: extendedData.category || 'residential',
+      subTypes: extendedData.subTypes || [],
+      icon: extendedData.icon || 'Building2',
+      isActive: extendedData.isActive !== false,
+      order: propertyTypes.length,
+      createdAt: new Date() 
+    });
+    
+    // Auto-enable visibility for back-compatibility
+    if (extendedData.isActive !== false) {
+      const updatedVis = { ...(siteSettings.visibility || {}), [trimmed]: true };
+      await updateSiteSettings({ visibility: updatedVis });
+    }
+  };
+
+  const updatePropertyType = async (id, data) => {
+    const targetType = propertyTypes.find(p => p.id === id);
+
+    // If name changed, batch-migrate all properties using old name to new name
+    if (targetType && data.name && data.name !== targetType.name) {
+      const oldName = targetType.name;
+      const newName = data.name;
+      const q = query(collection(db, 'properties'), where('category', '==', oldName));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const batch = writeBatch(db);
+        snap.docs.forEach(d => batch.update(doc(db, 'properties', d.id), { category: newName }));
+        await batch.commit();
+      }
+      // Also migrate siteSettings visibility key
+      if (siteSettings.visibility && siteSettings.visibility.hasOwnProperty(oldName)) {
+        const updatedVis = { ...(siteSettings.visibility) };
+        updatedVis[newName] = updatedVis[oldName];
+        delete updatedVis[oldName];
+        await updateSiteSettings({ visibility: updatedVis });
+      }
+    }
+
+    // If isActive changed, sync visibility
+    if (data.hasOwnProperty('isActive') && targetType) {
+      const nameKey = data.name || targetType.name;
+      const updatedVis = { ...(siteSettings.visibility || {}) };
+      updatedVis[nameKey] = data.isActive;
+      await updateSiteSettings({ visibility: updatedVis });
+    }
+
+    await updateDoc(doc(db, 'propertyTypes', id), data);
+  };
+
+  
+  const removePropertyType = async (id) => {
+    await deleteDoc(doc(db, 'propertyTypes', id));
+  };
+
+  const reorderPropertyTypes = async (currentIndex, direction) => {
+    if (direction === 'up' && currentIndex > 0) {
+      const currentId = propertyTypes[currentIndex].id;
+      const prevId = propertyTypes[currentIndex - 1].id;
+      
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'propertyTypes', currentId), { order: currentIndex - 1 });
+      batch.update(doc(db, 'propertyTypes', prevId), { order: currentIndex });
+      await batch.commit();
+    } else if (direction === 'down' && currentIndex < propertyTypes.length - 1) {
+      const currentId = propertyTypes[currentIndex].id;
+      const nextId = propertyTypes[currentIndex + 1].id;
+      
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'propertyTypes', currentId), { order: currentIndex + 1 });
+      batch.update(doc(db, 'propertyTypes', nextId), { order: currentIndex });
+      await batch.commit();
+    }
+  };
+
   return (
     <AdminContext.Provider
       value={{
@@ -260,6 +406,7 @@ export function AdminProvider({ children }) {
         reviews,
         siteSettings, updateSiteSettings, settingsLoading,
         customCategories, addCustomCategory, deleteCustomCategory,
+        propertyTypes, addPropertyType, updatePropertyType, removePropertyType, reorderPropertyTypes,
         deleteModalConfig, requestDeleteCustomCategory, closeDeleteModal,
         updateCategoryTaxonomy,
       }}

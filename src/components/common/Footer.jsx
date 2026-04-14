@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail } from 'lucide-react';
-import { getSiteSettings } from '../../services/propertyService';
+import { getSiteSettings, getPropertyTypes } from '../../services/propertyService';
 import { formatSocialUrl } from '../../utils/social';
 import styles from './Footer.module.css';
 import logo from '../../assets/logo.png';
@@ -23,10 +23,12 @@ const InstagramIcon = () => (
 
 export default function Footer() {
   const [settings, setSettings] = useState(null);
+  const [types, setTypes] = useState([]);
 
   useEffect(() => {
-    getSiteSettings().then(data => {
+    Promise.all([getSiteSettings(), getPropertyTypes()]).then(([data, propTypes]) => {
       if (data) setSettings(data);
+      if (propTypes) setTypes(propTypes);
     });
   }, []);
 
@@ -76,15 +78,24 @@ export default function Footer() {
           <div className={styles.footerCol}>
             <h4>Categories</h4>
             <div className={`${styles.footerLinks} ${styles.catLinks}`}>
-              {[
-                { name: 'Villa', label: 'Luxury Villas' },
-                { name: 'Apartment', label: 'City Apartments' },
-                { name: 'Commercial', label: 'Commercial Space' },
-                { name: 'Plot', label: 'Lands & Plots' },
-                ...(settings?.customCategories || []).map(c => ({ name: c.name, label: c.name }))
-              ].map(cat => (
-                <Link key={cat.name} to={`/properties?category=${cat.name}`}>{cat.label}</Link>
-              ))}
+              {types.length > 0 ? types.map(cat => {
+                if (settings?.visibility?.[cat.name] === false) return null;
+                // Prettier labels for base ones
+                let label = cat.name;
+                const low = cat.name.toLowerCase();
+                if (low === 'villa') label = 'Luxury Villas';
+                if (low === 'apartment') label = 'City Apartments';
+                if (low === 'commercial') label = 'Commercial Space';
+                if (low === 'plot') label = 'Lands & Plots';
+                return <Link key={cat.id} to={`/properties?category=${cat.name}`}>{label}</Link>
+              }) : (
+                <>
+                  <Link to={`/properties?category=Villa`}>Luxury Villas</Link>
+                  <Link to={`/properties?category=Apartment`}>City Apartments</Link>
+                  <Link to={`/properties?category=Commercial`}>Commercial Space</Link>
+                  <Link to={`/properties?category=Plot`}>Lands & Plots</Link>
+                </>
+              )}
             </div>
           </div>
 

@@ -18,6 +18,12 @@ export const getSiteSettings = async () => {
   return null;
 };
 
+export const getPropertyTypes = async () => {
+  const snapshot = await getDocs(collection(db, 'propertyTypes'));
+  const types = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return types.sort((a, b) => (a.order || 0) - (b.order || 0));
+};
+
 export const getAllProperties = async (filters = {}, includeInactive = false) => {
   const snapshot = await getDocs(collection(db, PROPERTIES_COLLECTION));
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

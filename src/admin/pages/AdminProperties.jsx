@@ -21,7 +21,7 @@ export default function AdminProperties() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const { properties, setProperties, customCategories, addCustomCategory, loading: contextLoading } = useAdmin();
+  const { properties, setProperties, propertyTypes, addPropertyType, loading: contextLoading } = useAdmin();
 
   // Filters State
   const [searchTerm, setSearchTerm] = useState('');
@@ -94,6 +94,7 @@ export default function AdminProperties() {
   // Additional states for Custom Category Modal
   const [isCatModalOpen, setIsCatModalOpen] = useState(false);
   const [newCatName, setNewCatName] = useState('');
+  const [newCatCategory, setNewCatCategory] = useState('');
   const [newCatFilters, setNewCatFilters] = useState('');
   const [newCatImage, setNewCatImage] = useState(null);
   const [isCreatingType, setIsCreatingType] = useState(false);
@@ -521,8 +522,8 @@ export default function AdminProperties() {
                 else if (low === 'uncategorized') prefilledCat = 'Uncategorized';
                 else {
                   // Check if it's a custom category
-                  const custom = customCategories.find(c => c.name.toLowerCase() === low);
-                  if (custom) prefilledCat = custom.name;
+                const custom = propertyTypes.find(c => c.name.toLowerCase() === low);
+                if (custom && custom.filters?.length) return custom.filters;
                   else prefilledCat = activeCategory; // Fallback to raw string
                 }
               }
@@ -553,13 +554,8 @@ export default function AdminProperties() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
           {activeCategory === 'properties' && (
             <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
-               <option value="All">Category: All</option>
-                <option value="Apartment">Apartment</option>
-                <option value="Villa">Villa</option>
-                <option value="Commercial">Commercial</option>
-                <option value="Plot">Plot</option>
-                <option value="Uncategorized">Uncategorized</option>
-                {customCategories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+               <option value="All">All Categories</option>
+                {propertyTypes.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
           )}
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
@@ -827,12 +823,7 @@ export default function AdminProperties() {
                         disabled={editingId === null && activeCategory !== 'properties'}
                       >
                         <option value="">Select Category</option>
-                        <option value="Apartment">Apartment</option>
-                        <option value="Plot">Plot</option>
-                        <option value="Commercial">Commercial</option>
-                        <option value="Villa">Villa</option>
-                        <option value="Uncategorized">Uncategorized</option>
-                        {customCategories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                        {propertyTypes.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
                     <div>
@@ -1065,6 +1056,18 @@ export default function AdminProperties() {
                   />
                 </div>
                 <div>
+                  <Label required>Category</Label>
+                  <select 
+                    value={newCatCategory} onChange={e => setNewCatCategory(e.target.value)} 
+                    style={getInputStyle()}
+                  >
+                    <option value="" disabled>— Select a Category —</option>
+                    <option value="residential">Residential Properties</option>
+                    <option value="commercial">Commercial Properties</option>
+                    <option value="industrial">Industrial Properties</option>
+                  </select>
+                </div>
+                <div>
                   <Label>Additional Filters (Optional)</Label>
                   <input 
                     type="text" placeholder="e.g. Furnishing, Floor No (comma separated)" 
@@ -1098,16 +1101,16 @@ export default function AdminProperties() {
                   <button className="btn" onClick={() => { setIsCatModalOpen(false); setNewCatImage(null); }} style={{ flex: 1, background: 'rgba(0,0,0,0.05)', border: 'none', padding: '1rem', fontWeight: 600 }} disabled={isCreatingType}>Cancel</button>
                   <button 
                     className="btn" 
-                    style={{ flex: 1, background: '#ed1b24', color: 'white', border: 'none', padding: '1rem', fontWeight: 700, opacity: (!newCatName.trim() || !newCatImage || isCreatingType) ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: (!newCatName.trim() || !newCatImage || isCreatingType) ? 'not-allowed' : 'pointer' }}
-                    disabled={!newCatName.trim() || !newCatImage || isCreatingType}
+                    style={{ flex: 1, background: '#ed1b24', color: 'white', border: 'none', padding: '1rem', fontWeight: 700, opacity: (!newCatName.trim() || !newCatCategory || !newCatImage || isCreatingType) ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: (!newCatName.trim() || !newCatCategory || !newCatImage || isCreatingType) ? 'not-allowed' : 'pointer' }}
+                    disabled={!newCatName.trim() || !newCatCategory || !newCatImage || isCreatingType}
                     onClick={async () => {
-                      if (!newCatName.trim() || !newCatImage) return;
+                      if (!newCatName.trim() || !newCatCategory || !newCatImage) return;
                       setIsCreatingType(true);
                       try {
                         const finalImageUrl = await uploadToCloudinary(newCatImage);
                         const filtersArray = newCatFilters.split(',').map(f => f.trim()).filter(Boolean);
                         
-                        await addCustomCategory(newCatName, filtersArray, finalImageUrl);
+                        await addPropertyType(newCatName, finalImageUrl, filtersArray, { category: newCatCategory });
                         
                         setIsCatModalOpen(false);
                         setNewCatName('');
@@ -1164,22 +1167,28 @@ export default function AdminProperties() {
       <FilterManagementModal 
         isOpen={isFiltersModalOpen}
         onClose={() => setIsFiltersModalOpen(false)}
-        categoryName={resolveCategoryFromSlug(activeCategory, customCategories)}
+        categoryName={resolveCategoryFromSlug(activeCategory, propertyTypes)}
       />
     </>
   );
 }
 
 // Helper to resolve internal category ID from URL slug
-function resolveCategoryFromSlug(slug, customCategories) {
-  if (!slug || slug === 'properties') return null;
+function resolveCategoryFromSlug(slug, propertyTypes) {
   const low = slug.toLowerCase();
-  if (['apartments', 'flats'].includes(low)) return 'Apartment';
-  if (low === 'villas') return 'Villa';
-  if (['commercial', 'warehouses'].includes(low)) return 'Commercial';
-  if (low === 'plots') return 'Plot';
-  if (low === 'uncategorized') return 'Uncategorized';
   
-  const custom = customCategories.find(c => c.name.toLowerCase() === low);
-  return custom ? custom.name : slug;
+  // Base categories resolution
+  if (low === 'apartments' || low === 'flats') return 'Apartment';
+  if (low === 'villas') return 'Villa';
+  if (low === 'plots') return 'Plot';
+  if (low === 'commercial' || low === 'warehouses') return 'Commercial';
+  
+  // Try dynamic resolution
+  if (propertyTypes) {
+    const custom = propertyTypes.find(c => c.name.toLowerCase() === low);
+    if (custom) return custom.name;
+  }
+
+  // Fallback to literal slug capitalization
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
 }

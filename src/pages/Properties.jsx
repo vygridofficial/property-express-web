@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Building, Store, Map, LayoutGrid } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
-import { getPropertiesByCategory, getSiteSettings, getAllProperties, searchProperties } from '../services/propertyService';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { getSiteSettings, getAllProperties, searchProperties, getPropertyTypes, getPropertiesByCategory } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import CategoryHero from './CategoryHero';
 import SEO from '../components/common/SEO';
@@ -41,7 +41,9 @@ const CATEGORIES = [
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const catId = searchParams.get('category');
+  const fromCategory = searchParams.get('from'); // parent category slug (e.g. 'residential')
   const [dynamicCategories, setDynamicCategories] = useState(CATEGORIES);
   const selectedCategory = dynamicCategories.find(c => c.id === catId) || null;
   const [categoryProperties, setCategoryProperties] = useState([]);
@@ -53,20 +55,28 @@ export default function Properties() {
   const [searchTitle, setSearchTitle] = useState('');
 
   useEffect(() => {
-    getSiteSettings().then(data => {
-      if (data) {
-        setSiteSettings(data);
-        const visibleBase = CATEGORIES.filter(cat => data.visibility?.[cat.id] !== false);
-        const customObjects = (data.customCategories || []).map(cat => ({
-          id: cat.name,
-          title: cat.name,
-          icon: LayoutGrid,
-          desc: `Explore ${cat.name} listings`,
-          img: cat.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
-          isVisible: data.visibility?.[cat.name] !== false
-        })).filter(cat => cat.isVisible);
-        
-        setDynamicCategories([...visibleBase, ...customObjects]);
+    Promise.all([getSiteSettings(), getPropertyTypes()]).then(([data, types]) => {
+      if (data) setSiteSettings(data);
+      if (types) {
+        const visibleTypes = types.filter(t => data?.visibility?.[t.name] !== false);
+        const mappedCats = visibleTypes.map(t => {
+          let icon = LayoutGrid;
+          let desc = `Explore ${t.name} listings`;
+          const cDef = CATEGORIES.find(c => c.id === t.id || c.id === t.name);
+          if (cDef) {
+            icon = cDef.icon;
+            desc = cDef.desc;
+          }
+          return {
+            id: t.name,         // URL param uses current name
+            originalId: t.id,   // Firestore doc ID (slug) kept for fallback query
+            title: t.name,
+            icon,
+            desc,
+            img: t.image || cDef?.img || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
+          };
+        });
+        setDynamicCategories(mappedCats);
       }
     });
   }, []);
@@ -89,29 +99,29 @@ export default function Properties() {
     } else if (catId) {
       setIsSearchMode(false);
       setLoading(true);
-      // Fetch both exact and potentially lowercased category matches
-      getPropertiesByCategory(catId)
-        .then(async (data) => {
-          let results = [...data];
-          
-          // Fallback check: if no results, try lowercase version in case of data inconsistency
-          if (results.length === 0) {
-            const lowerData = await getPropertiesByCategory(catId.toLowerCase());
-            results = lowerData;
-          }
-
-          console.log("DEBUG: Fetched live properties for category", catId, ":", results);
-          setCategoryProperties(results);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Error fetching properties:", err);
-          setLoading(false);
-        });
+      // Find the matched category — may include an originalId/slug for fallback
+      const matchedCat = dynamicCategories.find(c => c.id === catId);
+      const fetchCategory = async () => {
+        let results = await getPropertiesByCategory(catId);
+        // If no results and we have an originalId (slug), try that too
+        if (results.length === 0 && matchedCat?.originalId && matchedCat.originalId !== catId) {
+          results = await getPropertiesByCategory(matchedCat.originalId);
+        }
+        // Last resort: case-insensitive scan
+        if (results.length === 0) {
+          results = await getPropertiesByCategory(catId.toLowerCase());
+        }
+        setCategoryProperties(results);
+        setLoading(false);
+      };
+      fetchCategory().catch(err => {
+        console.error('Error fetching properties:', err);
+        setLoading(false);
+      });
     } else {
       setIsSearchMode(false);
     }
-  }, [catId, queryParam]);
+  }, [catId, queryParam, dynamicCategories]);
 
   const handleSelectCategory = (cat) => {
     setSearchParams({ category: cat.id });
@@ -119,7 +129,8 @@ export default function Properties() {
   };
 
   const handleBack = () => {
-    setSearchParams({});
+    // Navigate explicitly back to PropertiesPage, re-opening the correct category accordion
+    navigate(`/properties${fromCategory ? `?open=${fromCategory}` : ''}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
