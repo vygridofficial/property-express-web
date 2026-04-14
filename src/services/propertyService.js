@@ -3,6 +3,9 @@ import { collection, getDocs, getDoc, query, where, doc, updateDoc, deleteDoc, a
 
 const PROPERTIES_COLLECTION = 'properties';
 
+// Simple session-level cache to enable instant back-navigation and reliable scroll restoration
+const categoryCache = new Map();
+
 export const getFeaturedProperties = async (includeInactive = false) => {
   let q = query(collection(db, PROPERTIES_COLLECTION), where("isFeatured", "==", true));
   if (!includeInactive) {
@@ -82,6 +85,12 @@ const CATEGORY_SYNONYMS = {
 
 export const getPropertiesByCategory = async (category, includeInactive = false) => {
   const normalizedCategory = category?.toString().trim() || '';
+  
+  // Return from cache immediately if available (instant render for back-navigation)
+  if (categoryCache.has(normalizedCategory) && !includeInactive) {
+    return categoryCache.get(normalizedCategory);
+  }
+
   const synonyms = CATEGORY_SYNONYMS[normalizedCategory] || [normalizedCategory];
   
   // Use 'in' query to fetch all synonym matches in one go
@@ -108,6 +117,9 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
         const matchesStatus = includeInactive || p.status === "Active";
         return matchesCat && matchesStatus;
       });
+  // Cache the results for this session
+  if (!includeInactive) {
+    categoryCache.set(normalizedCategory, results);
   }
 
   return results;

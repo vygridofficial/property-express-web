@@ -102,15 +102,17 @@ export default function Properties() {
       // Find the matched category — may include an originalId/slug for fallback
       const matchedCat = dynamicCategories.find(c => c.id === catId);
       const fetchCategory = async () => {
-        let results = await getPropertiesByCategory(catId);
-        // If no results and we have an originalId (slug), try that too
-        if (results.length === 0 && matchedCat?.originalId && matchedCat.originalId !== catId) {
-          results = await getPropertiesByCategory(matchedCat.originalId);
+        const results = await getPropertiesByCategory(catId);
+        
+        // If results arrived but loading hasn't been set yet (sync cache hit), 
+        // we can skip the loading state entirely
+        if (results.length > 0) {
+          setCategoryProperties(results);
+          setLoading(false);
+          return;
         }
-        // Last resort: case-insensitive scan
-        if (results.length === 0) {
-          results = await getPropertiesByCategory(catId.toLowerCase());
-        }
+
+        // Standard handles for new/empty results
         setCategoryProperties(results);
         setLoading(false);
       };

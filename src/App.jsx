@@ -76,9 +76,27 @@ function AppContent() {
       // Re-entering page from 'back': wait for exit animation then restore
       const savedScroll = sessionStorage.getItem(`scroll_${location.key}`);
       if (savedScroll) {
+        const targetScroll = parseInt(savedScroll, 10);
+        
+        // Use multiple attempts to overcome async content loading / height clamping
         const timer = setTimeout(() => {
-          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+          window.scrollTo({ top: targetScroll, behavior: 'instant' });
+          
+          // Retry #1 after a short delay if we didn't reach the target (clamped)
+          setTimeout(() => {
+            if (Math.abs(window.scrollY - targetScroll) > 10) {
+              window.scrollTo({ top: targetScroll, behavior: 'instant' });
+            }
+          }, 150);
+
+          // Final Retry #2 for slower mobile connections
+          setTimeout(() => {
+            if (Math.abs(window.scrollY - targetScroll) > 10) {
+              window.scrollTo({ top: targetScroll, behavior: 'instant' });
+            }
+          }, 600);
         }, 400);
+
         return () => clearTimeout(timer);
       }
     }
