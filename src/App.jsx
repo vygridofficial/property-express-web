@@ -69,16 +69,17 @@ function AppContent() {
 
   // 3. Global scroll restoration
   React.useEffect(() => {
+    // Skip global restoration for Properties page (handled internally)
+    if (location.pathname.startsWith('/properties')) return;
+
     if (navType !== 'POP') {
-      // New page: instant scroll to top
       window.scrollTo(0, 0);
     } else {
-      // Re-entering page from 'back': wait for exit animation then restore
       const savedScroll = sessionStorage.getItem(`scroll_${location.key}`);
       if (savedScroll) {
         const timer = setTimeout(() => {
           window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
-        }, 400);
+        }, 700);
         return () => clearTimeout(timer);
       }
     }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Building, Store, Map, LayoutGrid } from 'lucide-react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation, useNavigationType } from 'react-router-dom';
 import { getSiteSettings, getAllProperties, searchProperties, getPropertyTypes, getPropertiesByCategory } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import CategoryHero from './CategoryHero';
@@ -50,9 +50,44 @@ export default function Properties() {
   const [loading, setLoading] = useState(false);
   const [siteSettings, setSiteSettings] = useState(null);
   
+  const location = useLocation();
+  const navType = useNavigationType();
+  const [hasRestored, setHasRestored] = useState(false);
+  
   const queryParam = searchParams.get('q');
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [searchTitle, setSearchTitle] = useState('');
+
+  // 1. Track scroll specifically for the listings
+  useEffect(() => {
+    const handleScroll = () => {
+      // Use the unique location key for storage
+      sessionStorage.setItem(`scroll_${location.key}`, window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.key]);
+
+  // 2. Restore scroll position after data loading is complete
+  useEffect(() => {
+    // Only restore if we are navigating back/forward (POP)
+    if (navType === 'POP' && !loading && categoryProperties.length > 0 && !hasRestored) {
+      const savedScroll = sessionStorage.getItem(`scroll_${location.key}`);
+      if (savedScroll) {
+        // Small delay to ensure CategoryHero and Framer Motion have settled
+        const timer = setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+          setHasRestored(true);
+        }, 150);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [loading, categoryProperties.length, hasRestored, location.key, navType]);
+
+  // Reset restoration flag when category or query changes
+  useEffect(() => {
+     setHasRestored(false);
+  }, [catId, queryParam]);
 
   useEffect(() => {
     Promise.all([getSiteSettings(), getPropertyTypes()]).then(([data, types]) => {
