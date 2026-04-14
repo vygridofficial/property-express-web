@@ -117,6 +117,8 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
         const matchesStatus = includeInactive || p.status === "Active";
         return matchesCat && matchesStatus;
       });
+  }
+
   // Cache the results for this session
   if (!includeInactive) {
     categoryCache.set(normalizedCategory, results);
