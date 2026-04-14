@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, X, ChevronRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { getPropertyTypes } from '../services/propertyService';
@@ -82,8 +82,10 @@ function TypeCard({ type, categorySlug, index }) {
 
 /* ══════════════════════════════════════════════════════════ */
 export default function PropertiesPage() {
-  const [searchParams] = useSearchParams();
-  const openParam = searchParams.get('open');
+  const navigate = useNavigate();
+  const location = useLocation();
+  // Read the category to auto-open (passed via navigate state — gone on hard refresh)
+  const openCategory = location.state?.openCategory || null;
   const [selected, setSelected] = useState(null);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -98,13 +100,12 @@ export default function PropertiesPage() {
       .catch(console.error);
   }, []);
 
-  // Sync openParam to selected state only once on mount OR when param changes
-  // But Bug 2 fix: if user landed on /properties (fresh), it stays null.
+  // Auto-open category from back navigation (state is gone after hard refresh)
   useEffect(() => {
-    if (openParam && openParam !== selected) {
-      setTimeout(() => setSelected(openParam), 100);
+    if (openCategory && openCategory !== selected) {
+      setTimeout(() => handleSelect(openCategory), 250);
     }
-  }, [openParam]);
+  }, [openCategory]);
 
   // Filter when category selected
   useEffect(() => {
@@ -129,17 +130,10 @@ export default function PropertiesPage() {
     }, 420);
   };
 
-  // DESELECT: collapse grid + scroll back
+  // DESELECT: collapse grid + scroll back to very top
   const handleDeselect = () => {
     setSelected(null);
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile && catSectionRef.current) {
-        // Just scroll to categories section start, not top of page
-        const rect = catSectionRef.current.getBoundingClientRect();
-        window.scrollBy({ top: rect.top - 20, behavior: 'smooth' }); // 20px padding
-    } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const activeCat = CATEGORIES.find(c => c.slug === selected);
@@ -194,9 +188,9 @@ export default function PropertiesPage() {
                         </span>
                       )}
                       {isActive && (
-                         <span className={styles.catCta} style={{ opacity: 0.8 }}>
-                            <ArrowLeft size={13} style={{ verticalAlign: 'middle' }} /> Back to Categories
-                         </span>
+                        <span className={styles.catCta} style={{ opacity: 0.8 }}>
+                          <ArrowLeft size={13} style={{ verticalAlign: 'middle' }} /> Back to Categories
+                        </span>
                       )}
                     </div>
                   </div>

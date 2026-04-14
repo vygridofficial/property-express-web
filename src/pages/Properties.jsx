@@ -129,8 +129,9 @@ export default function Properties() {
   };
 
   const handleBack = () => {
-    // Navigate explicitly back to PropertiesPage, re-opening the correct category accordion
-    navigate(`/properties${fromCategory ? `?open=${fromCategory}` : ''}`);
+    // Pass the category to re-open via route state (invisible in URL, gone on hard refresh)
+    navigate('/properties', { state: { openCategory: fromCategory || null } });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
