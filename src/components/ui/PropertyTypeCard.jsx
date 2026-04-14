@@ -9,7 +9,7 @@ export default function PropertyTypeCard({ type, categorySlug, index = 0 }) {
   const IconComponent = LucideIcons[type.icon] || LucideIcons.Building2;
 
   const handleClick = () => {
-    navigate(`/properties/listings?category=${encodeURIComponent(type.name)}`);
+    navigate(`/properties/listings?category=${encodeURIComponent(type.name)}${categorySlug ? `&from=${categorySlug}` : ''}`);
   };
 
   return (

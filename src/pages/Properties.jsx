@@ -131,7 +131,6 @@ export default function Properties() {
   const handleBack = () => {
     // Navigate explicitly back to PropertiesPage, re-opening the correct category accordion
     navigate(`/properties${fromCategory ? `?open=${fromCategory}` : ''}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

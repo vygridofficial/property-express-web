@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, X, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, X, ChevronRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { getPropertyTypes } from '../services/propertyService';
 import SEO from '../components/common/SEO';
@@ -83,13 +83,13 @@ function TypeCard({ type, categorySlug, index }) {
 /* ══════════════════════════════════════════════════════════ */
 export default function PropertiesPage() {
   const [searchParams] = useSearchParams();
-  const openParam = searchParams.get('open'); // auto-open from back navigation
-  const [selected, setSelected] = useState(openParam || null);
+  const openParam = searchParams.get('open');
+  const [selected, setSelected] = useState(null);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [allTypes, setAllTypes] = useState([]);
   const typesRef = useRef(null);
-  const catSectionRef = useRef(null); // ref on the category cards section
+  const catSectionRef = useRef(null);
 
   // Load all property types once
   useEffect(() => {
@@ -98,32 +98,13 @@ export default function PropertiesPage() {
       .catch(console.error);
   }, []);
 
-  // If open param changes (e.g. back navigation), sync selected
+  // Sync openParam to selected state only once on mount OR when param changes
+  // But Bug 2 fix: if user landed on /properties (fresh), it stays null.
   useEffect(() => {
-    if (openParam) setSelected(openParam);
+    if (openParam && openParam !== selected) {
+      setTimeout(() => setSelected(openParam), 100);
+    }
   }, [openParam]);
-
-  // ── Scroll handlers ──────────────────────────────────────
-  // SELECT: scroll down just enough so the bottom of the category cards is
-  //         partially visible (~25% peeking) and the types grid starts below.
-  const handleSelect = (slug) => {
-    setSelected(slug);
-    setTimeout(() => {
-      if (!catSectionRef.current) return;
-      const catRect = catSectionRef.current.getBoundingClientRect();
-      // Target: scroll so that the bottom 25% of the category card section
-      // sits at the very top of the viewport (plus 80px navbar offset).
-      // That means scrolling down by (catRect.bottom - viewportHeight * 0.28).
-      const targetScroll = window.scrollY + catRect.bottom - window.innerHeight * 0.28;
-      window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
-    }, 420); // wait for CSS flex transition + AnimatePresence enter
-  };
-
-  // DESELECT: collapse grid + scroll back to very top simultaneously.
-  const handleDeselect = () => {
-    setSelected(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   // Filter when category selected
   useEffect(() => {
@@ -135,6 +116,31 @@ export default function PropertiesPage() {
     const timer = setTimeout(() => { setTypes(filtered); setLoading(false); }, 200);
     return () => clearTimeout(timer);
   }, [selected, allTypes]);
+
+  // SELECT: scroll down just enough so the bottom of the category cards is
+  //         partially visible (~25% peeking) and the types grid starts below.
+  const handleSelect = (slug) => {
+    setSelected(slug);
+    setTimeout(() => {
+      if (!catSectionRef.current) return;
+      const catRect = catSectionRef.current.getBoundingClientRect();
+      const targetScroll = window.scrollY + catRect.bottom - window.innerHeight * 0.28;
+      window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+    }, 420);
+  };
+
+  // DESELECT: collapse grid + scroll back
+  const handleDeselect = () => {
+    setSelected(null);
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile && catSectionRef.current) {
+        // Just scroll to categories section start, not top of page
+        const rect = catSectionRef.current.getBoundingClientRect();
+        window.scrollBy({ top: rect.top - 20, behavior: 'smooth' }); // 20px padding
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const activeCat = CATEGORIES.find(c => c.slug === selected);
 
@@ -179,12 +185,18 @@ export default function PropertiesPage() {
                     <img src={cat.img} alt={cat.label} className={styles.catBgImg} />
                     <div className={styles.catOverlay} />
                     <div className={styles.catContent} style={{ position: 'relative' }}>
+                      {/* Back button is the card itself or user can click again to deselect */}
                       <h3 className={styles.catTitle}>{cat.label}</h3>
                       <p className={styles.catDesc}>{cat.desc}</p>
                       {!isActive && (
                         <span className={styles.catCta}>
                           Explore <ArrowRight size={13} style={{ verticalAlign: 'middle' }} />
                         </span>
+                      )}
+                      {isActive && (
+                         <span className={styles.catCta} style={{ opacity: 0.8 }}>
+                            <ArrowLeft size={13} style={{ verticalAlign: 'middle' }} /> Back to Categories
+                         </span>
                       )}
                     </div>
                   </div>
@@ -195,7 +207,7 @@ export default function PropertiesPage() {
         </div>
       </section>
 
-      {/* Property Types below selected category */}
+      {/* Property Types grid */}
       <AnimatePresence mode="wait">
         {selected && (
           <motion.section
