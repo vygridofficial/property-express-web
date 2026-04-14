@@ -194,7 +194,11 @@ export const filterProperties = (properties, query, filters, knownLocations = []
 
   // 3. Location Filter
   if (filters.location && filters.location !== 'All Locations') {
-    results = results.filter(p => p.location === filters.location);
+    const loc = filters.location.toLowerCase();
+    results = results.filter(p => 
+      (p.location || '').toLowerCase() === loc || 
+      (p.district || '').toLowerCase() === loc
+    );
   }
 
   // 4. Price Filter

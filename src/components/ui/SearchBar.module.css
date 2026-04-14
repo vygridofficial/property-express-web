@@ -12,6 +12,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 
               0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
 .searchWrapper:focus-within {
@@ -49,6 +50,26 @@
   color: #999;
 }
 
+.suggestionOverlay {
+  position: absolute;
+  left: 3.25rem; /* Matches .searchIcon margin + icon width */
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.6rem 0;
+  font-size: 1rem;
+  pointer-events: none;
+  white-space: pre;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.ghostText {
+  color: #ccc;
+  opacity: 0.8;
+}
+
 .marqueePlaceholder {
   display: none;
 }
@@ -76,6 +97,13 @@
 
 .searchBtn:active {
   transform: scale(0.98);
+}
+
+.searchBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.6;
 }
 
 /* Results Summary */

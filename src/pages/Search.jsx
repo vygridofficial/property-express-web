@@ -37,10 +37,23 @@ export default function Search() {
     sort: sortFilter
   };
 
-  const locations = useMemo(() => {
-    const locs = new Set(allProps.map(p => p.location).filter(Boolean));
-    return ['All Locations', ...Array.from(locs).sort()];
-  }, [allProps]);
+  const locations = useMemo(() => [
+    'All Locations',
+    'Alappuzha',
+    'Ernakulam',
+    'Idukki',
+    'Kannur',
+    'Kasaragod',
+    'Kollam',
+    'Kottayam',
+    'Kozhikode',
+    'Malappuram',
+    'Palakkad',
+    'Pathanamthitta',
+    'Thiruvananthapuram',
+    'Thrissur',
+    'Wayanad'
+  ], []);
 
   const parsedQuery = useMemo(() => parsePhraseQuery(query, locations), [query, locations]);
   const isTypeDisabled = !!parsedQuery.type;
@@ -186,10 +199,14 @@ export default function Search() {
                 {filteredResults.map((prop, idx) => (
                   <motion.div
                     key={prop.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    transition={{ 
+                      duration: 0.5, 
+                      delay: idx * 0.08,
+                      ease: "easeOut" 
+                    }}
                     layout
                   >
                     <PropertyCard property={prop} />

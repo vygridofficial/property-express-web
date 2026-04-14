@@ -106,11 +106,48 @@ export default function SearchBar({ properties = [] }) {
 
   const activeIndex = hoveredIndex >= 0 ? hoveredIndex : highlightedIndex;
 
+  const suggestion = useMemo(() => {
+    if (query.trim().length < 3) return '';
+    const q = query.toLowerCase();
+    
+    // 1. Check Categories/Types
+    const typeMatch = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().startsWith(q));
+    if (typeMatch) return typeMatch;
+
+    // 2. Check Locations
+    const locMatch = locations.find(l => l !== 'All Locations' && l.toLowerCase().startsWith(q));
+    if (locMatch) return locMatch;
+
+    // 3. Check Property Titles
+    const propMatch = properties.find(p => p.title.toLowerCase().startsWith(q));
+    if (propMatch) return propMatch.title;
+
+    // Fallback: Contains match
+    const typeCont = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().includes(q));
+    if (typeCont) return typeCont;
+    
+    const locCont = locations.find(l => l !== 'All Locations' && l.toLowerCase().includes(q));
+    if (locCont) return locCont;
+
+    return '';
+  }, [query, properties, locations]);
+
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       setIsFocused(false);
       setOpenDropdown(null);
       e.target.blur();
+    } else if (e.key === 'Tab' || e.key === 'ArrowRight') {
+      // Accept autocomplete suggestion
+      if (suggestion && suggestion.toLowerCase() !== query.toLowerCase()) {
+        e.preventDefault();
+        setQuery(suggestion);
+        return;
+      }
+      
+      if (e.key === 'ArrowRight') {
+         // Continue with default behavior if no suggestion
+      }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setHoveredIndex(-1);
@@ -180,6 +217,15 @@ export default function SearchBar({ properties = [] }) {
           </div>
         )}
 
+        <div className={styles.suggestionOverlay}>
+          {query}
+          {suggestion && suggestion.toLowerCase().startsWith(query.toLowerCase()) && (
+            <span className={styles.ghostText}>
+              {suggestion.slice(query.length)}
+            </span>
+          )}
+        </div>
+
         <input
           id="main-search-input"
           type="text"
@@ -192,6 +238,8 @@ export default function SearchBar({ properties = [] }) {
           }}
           onFocus={() => setIsFocused(true)}
           onKeyDown={handleKeyDown}
+          autoComplete="off"
+          spellCheck="false"
         />
         {query && (
           <button
@@ -211,7 +259,7 @@ export default function SearchBar({ properties = [] }) {
             <X size={18} />
           </button>
         )}
-        <button type="submit" className={styles.searchBtn}>
+        <button type="submit" className={styles.searchBtn} disabled={!query.trim()}>
           <Search size={18} className="mobile-only" />
           <span>Search</span>
         </button>
@@ -227,50 +275,6 @@ export default function SearchBar({ properties = [] }) {
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Filter Pills */}
-            <div className={styles.filterPillsRow}>
-              {['sort', 'price'].map(key => {
-                const isActive = key === 'sort' ? filters[key] !== 'Newest First' : filters[key] !== 'Any Price';
-                const label = filters[key];
-                return (
-                  <div key={key} style={{ position: 'relative' }}>
-                    <button
-                      type="button"
-                      className={`${styles.filterPill} ${isActive ? styles.filterPillActive : ''}`}
-                      onClick={() => setOpenDropdown(prev => prev === key ? null : key)}
-                    >
-                      {label} <ChevronDown size={14} />
-                    </button>
-                    
-                    <AnimatePresence>
-                      {openDropdown === key && (
-                        <motion.div
-                          className={styles.dropdownBox}
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -5 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          {dropdownOptions[key].map(opt => (
-                            <div
-                              key={opt}
-                              className={`${styles.dropdownOption} ${filters[key] === opt ? styles.dropdownOptionSelected : ''}`}
-                              onClick={() => {
-                                setFilters(prev => ({ ...prev, [key]: opt }));
-                                setOpenDropdown(null);
-                                document.querySelector(`.${styles.input}`).focus();
-                              }}
-                            >
-                              {opt}
-                            </div>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )
-              })}
-            </div>
 
             {/* Content Body */}
             <div style={{ flex: 1, overflowY: 'auto', margin: '4px -14px 0', padding: '0 14px' }}>
