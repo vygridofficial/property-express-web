@@ -78,24 +78,9 @@ export default function Footer() {
           <div className={styles.footerCol}>
             <h4>Categories</h4>
             <div className={`${styles.footerLinks} ${styles.catLinks}`}>
-              {types.length > 0 ? types.map(cat => {
-                if (settings?.visibility?.[cat.name] === false) return null;
-                // Prettier labels for base ones
-                let label = cat.name;
-                const low = cat.name.toLowerCase();
-                if (low === 'villa') label = 'Luxury Villas';
-                if (low === 'apartment') label = 'City Apartments';
-                if (low === 'commercial') label = 'Commercial Space';
-                if (low === 'plot') label = 'Lands & Plots';
-                return <Link key={cat.id} to={`/properties?category=${cat.name}`}>{label}</Link>
-              }) : (
-                <>
-                  <Link to={`/properties?category=Villa`}>Luxury Villas</Link>
-                  <Link to={`/properties?category=Apartment`}>City Apartments</Link>
-                  <Link to={`/properties?category=Commercial`}>Commercial Space</Link>
-                  <Link to={`/properties?category=Plot`}>Lands & Plots</Link>
-                </>
-              )}
+              <Link to="/properties" state={{ openCategory: 'residential' }}>Residential Properties</Link>
+              <Link to="/properties" state={{ openCategory: 'commercial' }}>Commercial Properties</Link>
+              <Link to="/properties" state={{ openCategory: 'industrial' }}>Industrial Properties</Link>
             </div>
           </div>
 

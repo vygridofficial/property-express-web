@@ -94,12 +94,19 @@
 
 .filterPillActive {
   background: var(--color-primary);
-  color: white;
+  color: white !important;
   border-color: var(--color-primary);
 }
 
 .filterPillActive:hover {
-  background: var(--color-primary-dark);
+  background: #e8eeff;
+  color: #1a1a1a !important;
+  border-color: var(--color-primary);
+}
+
+.filterPill:hover {
+  background: #ebebeb;
+  color: #333;
 }
 
 .dropdownBox {
@@ -203,4 +210,76 @@
   .filterPill {
     white-space: nowrap;
   }
+}
+/* Inline Search Form on Results Page */
+.inlineSearchForm {
+  margin-bottom: 0.5rem;
+}
+
+.inlineSearchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 32px;
+  overflow: hidden;
+  max-width: 560px;
+  transition: border-color 0.2s;
+}
+
+.inlineSearchWrap:focus-within {
+  border-color: #1a1a1a;
+}
+
+.inlineGhost {
+  position: absolute;
+  left: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+  white-space: pre;
+  color: transparent;
+  z-index: 1;
+}
+
+.ghostHint {
+  color: #bbb;
+  opacity: 0.8;
+}
+
+.inlineSearchInput {
+  flex: 1;
+  padding: 0.7rem 1.1rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #1a1a1a;
+  position: relative;
+  z-index: 2;
+}
+
+.inlineSearchBtn {
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.inlineSearchBtn:hover {
+  background: #000;
+}
+
+.inlineSearchBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }

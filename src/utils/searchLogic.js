@@ -204,47 +204,61 @@ export const filterProperties = (properties, query, filters, knownLocations = []
   // 4. Price Filter
   if (filters.price && filters.price !== 'Any Price') {
     results = results.filter(p => {
-      const priceStr = (p.price || 0).toString().replace(/,/g, '');
-      const price = parseFloat(priceStr);
-      switch(filters.price) {
-        case 'Under ₹50L':
-          return price < 5000000;
-        case '₹50L to ₹1Cr':
-          return price >= 5000000 && price <= 10000000;
-        case '₹1Cr to ₹3Cr':
-          return price >= 10000000 && price <= 30000000;
-        case 'Above ₹3Cr':
-          return price > 30000000;
-        default:
-          return true;
+      // Use numericPrice if available (set by admin), otherwise parse from price string
+      let priceVal = 0;
+      if (p.numericPrice && p.numericPrice > 0) {
+        priceVal = p.numericPrice;
+      } else {
+        const raw = (p.price || '0').toString().replace(/[^0-9.]/g, '');
+        priceVal = parseFloat(raw) || 0;
       }
+
+      const priceLower = filters.price.toLowerCase().replace(/[^a-z0-9]/g, '');
+      // Keyword pattern matching (avoids ₹ URL-encoding issues)
+      if (priceLower.startsWith('under') || (priceLower.includes('50') && priceLower.startsWith('under'))) {
+        return priceVal < 5000000;
+      }
+      if (priceLower.includes('50') && priceLower.includes('1cr')) {
+        return priceVal >= 5000000 && priceVal <= 10000000;
+      }
+      if (priceLower.includes('1cr') && priceLower.includes('3cr')) {
+        return priceVal >= 10000000 && priceVal <= 30000000;
+      }
+      if (priceLower.startsWith('above') || (priceLower.includes('3cr') && !priceLower.includes('1cr'))) {
+        return priceVal > 30000000;
+      }
+      return true;
     });
   }
 
   // 5. Sort
   if (filters.sort) {
+    const parseDate = (p) => {
+      // Support addedOn (ISO string or Firestore Timestamp) and createdAt
+      if (p.addedOn) {
+        if (typeof p.addedOn === 'string') return new Date(p.addedOn).getTime();
+        if (p.addedOn.seconds) return p.addedOn.seconds * 1000;
+      }
+      if (p.createdAt) {
+        if (typeof p.createdAt === 'string') return new Date(p.createdAt).getTime();
+        if (p.createdAt.seconds) return p.createdAt.seconds * 1000;
+      }
+      return 0;
+    };
+    const parsePrice = (p) => parseFloat((p.price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
+
     switch (filters.sort) {
       case 'Newest First':
-        // Assuming we sort by created date if it exists, otherwise leave as is. 
-        // We'll rely on the array order as a fallback, which is usually insertion order.
-        results.sort((a, b) => {
-           const timeA = a.createdAt?.seconds || Date.now();
-           const timeB = b.createdAt?.seconds || Date.now();
-           return timeB - timeA;
-        });
+        results.sort((a, b) => parseDate(b) - parseDate(a));
         break;
       case 'Oldest First':
-        results.sort((a, b) => {
-           const timeA = a.createdAt?.seconds || Date.now();
-           const timeB = b.createdAt?.seconds || Date.now();
-           return timeA - timeB;
-        });
+        results.sort((a, b) => parseDate(a) - parseDate(b));
         break;
       case 'Price Low to High':
-        results.sort((a, b) => parseFloat((a.price || 0).toString().replace(/,/g, '')) - parseFloat((b.price || 0).toString().replace(/,/g, '')));
+        results.sort((a, b) => parsePrice(a) - parsePrice(b));
         break;
       case 'Price High to Low':
-        results.sort((a, b) => parseFloat((b.price || 0).toString().replace(/,/g, '')) - parseFloat((a.price || 0).toString().replace(/,/g, '')));
+        results.sort((a, b) => parsePrice(b) - parsePrice(a));
         break;
       default:
         break;

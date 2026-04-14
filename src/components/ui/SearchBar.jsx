@@ -107,27 +107,39 @@ export default function SearchBar({ properties = [] }) {
   const activeIndex = hoveredIndex >= 0 ? hoveredIndex : highlightedIndex;
 
   const suggestion = useMemo(() => {
-    if (query.trim().length < 3) return '';
+    if (query.trim().length < 2) return '';
     const q = query.toLowerCase();
-    
-    // 1. Check Categories/Types
-    const typeMatch = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().startsWith(q));
-    if (typeMatch) return typeMatch;
 
-    // 2. Check Locations
+    // 1. Kerala districts first — most specific geographical match
+    const KERALA_DISTRICTS = [
+      'Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod',
+      'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad',
+      'Pathanamthitta', 'Thiruvananthapuram', 'Thrissur', 'Wayanad'
+    ];
+    const districtMatch = KERALA_DISTRICTS.find(d => d.toLowerCase().startsWith(q));
+    if (districtMatch && districtMatch.toLowerCase() !== q) return districtMatch;
+
+    // 2. Property location strings from dataset
     const locMatch = locations.find(l => l !== 'All Locations' && l.toLowerCase().startsWith(q));
-    if (locMatch) return locMatch;
+    if (locMatch && locMatch.toLowerCase() !== q) return locMatch;
 
-    // 3. Check Property Titles
-    const propMatch = properties.find(p => p.title.toLowerCase().startsWith(q));
-    if (propMatch) return propMatch.title;
+    // 3. Property types / categories
+    const typeMatch = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().startsWith(q));
+    if (typeMatch && typeMatch.toLowerCase() !== q) return typeMatch;
 
-    // Fallback: Contains match
-    const typeCont = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().includes(q));
-    if (typeCont) return typeCont;
-    
-    const locCont = locations.find(l => l !== 'All Locations' && l.toLowerCase().includes(q));
+    // 4. Property titles
+    const propMatch = properties.find(p => p.title && p.title.toLowerCase().startsWith(q));
+    if (propMatch && propMatch.title.toLowerCase() !== q) return propMatch.title;
+
+    // 5. Contains fallbacks (district → location → type)
+    const distCont = KERALA_DISTRICTS.find(d => d.toLowerCase().includes(q) && d.toLowerCase() !== q);
+    if (distCont) return distCont;
+
+    const locCont = locations.find(l => l !== 'All Locations' && l.toLowerCase().includes(q) && l.toLowerCase() !== q);
     if (locCont) return locCont;
+
+    const typeCont = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().includes(q) && t.toLowerCase() !== q);
+    if (typeCont) return typeCont;
 
     return '';
   }, [query, properties, locations]);
@@ -217,30 +229,52 @@ export default function SearchBar({ properties = [] }) {
           </div>
         )}
 
-        <div className={styles.suggestionOverlay}>
-          {query}
+        {/* Ghost text overlay using span technique — zero overlap */}
+        <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'stretch', minWidth: 0 }}>
           {suggestion && suggestion.toLowerCase().startsWith(query.toLowerCase()) && (
-            <span className={styles.ghostText}>
-              {suggestion.slice(query.length)}
-            </span>
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                padding: '0.6rem 0',
+                fontSize: '1rem',
+                fontFamily: 'inherit',
+                fontWeight: 'inherit',
+                letterSpacing: 'inherit',
+                lineHeight: 'inherit',
+                pointerEvents: 'none',
+                whiteSpace: 'pre',
+                overflow: 'hidden',
+                zIndex: 0,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              {/* Typed part: invisible but holds its width */}
+              <span style={{ color: 'transparent' }}>{query}</span>
+              {/* Ghost suffix: gray */}
+              <span style={{ color: '#bbb' }}>{suggestion.slice(query.length)}</span>
+            </div>
           )}
-        </div>
 
-        <input
-          id="main-search-input"
-          type="text"
-          className={styles.input}
-          placeholder="Search by location, property type, or name..."
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            if (!isFocused) setIsFocused(true);
-          }}
-          onFocus={() => setIsFocused(true)}
-          onKeyDown={handleKeyDown}
-          autoComplete="off"
-          spellCheck="false"
-        />
+          <input
+            id="main-search-input"
+            type="text"
+            className={styles.input}
+            style={{ flex: 1, position: 'relative', zIndex: 1, width: '100%' }}
+            placeholder="Search by location, property type, or name..."
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              if (!isFocused) setIsFocused(true);
+            }}
+            onFocus={() => setIsFocused(true)}
+            onKeyDown={handleKeyDown}
+            autoComplete="off"
+            spellCheck="false"
+          />
+        </div>
         {query && (
           <button
             type="button"

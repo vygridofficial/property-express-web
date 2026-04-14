@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useSearchParams, useNavigate, useLocation, useNavigationType } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search as SearchIcon, ChevronDown, ArrowLeft } from 'lucide-react';
+import { Search as SearchIcon, ChevronDown } from 'lucide-react';
 import { getAllProperties } from '../services/propertyService';
 import { filterProperties, parsePhraseQuery } from '../utils/searchLogic';
 import PropertyCard from '../components/ui/PropertyCard';
@@ -14,12 +14,23 @@ const DROPDOWN_OPTIONS = {
   price: ['Any Price', 'Under ₹50L', '₹50L to ₹1Cr', '₹1Cr to ₹3Cr', 'Above ₹3Cr']
 };
 
+const KERALA_DISTRICTS = [
+  'Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod',
+  'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad',
+  'Pathanamthitta', 'Thiruvananthapuram', 'Thrissur', 'Wayanad'
+];
+
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const navType = useNavigationType();
   const [allProps, setAllProps] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+  const [localQuery, setLocalQuery] = useState('');
+  const [suggestion, setSuggestion] = useState('');
+  const searchInputRef = useRef(null);
+
   const [openDropdown, setOpenDropdown] = useState(null);
   const filterRef = useRef(null);
 
@@ -59,8 +70,13 @@ export default function Search() {
   const isTypeDisabled = !!parsedQuery.type;
   const isLocationDisabled = !!parsedQuery.locationSearch;
 
+  // Sync localQuery to URL param on mount
   useEffect(() => {
-    // Fetch newly fresh properties on load
+    setLocalQuery(searchParams.get('q') || '');
+  }, []);
+
+  // Fetch properties
+  useEffect(() => {
     getAllProperties({}, false)
       .then(data => {
         setAllProps(data);
@@ -72,6 +88,42 @@ export default function Search() {
       });
   }, []);
 
+  // --- Scroll tracking ---
+  // Save scroll position on every scroll event, keyed to this exact history entry
+  useEffect(() => {
+    const key = `scroll_search_${location.key}`;
+    const handleScroll = () => {
+      sessionStorage.setItem(key, Math.round(window.scrollY).toString());
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.key]);
+
+  // INSTANT scroll restoration — runs before browser paints (useLayoutEffect)
+  useLayoutEffect(() => {
+    if (navType === 'POP') {
+      const saved = sessionStorage.getItem(`scroll_search_${location.key}`);
+      if (saved) {
+        const target = parseInt(saved, 10);
+        // Apply before first paint — no visible jump
+        window.scrollTo({ top: target, behavior: 'instant' });
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [location.key, navType]);
+
+  // Safety retry for async content (fires after data loads)
+  useEffect(() => {
+    if (navType !== 'POP' || loading) return;
+    const saved = sessionStorage.getItem(`scroll_search_${location.key}`);
+    if (!saved) return;
+    const target = parseInt(saved, 10);
+    if (Math.abs(window.scrollY - target) > 5) {
+      window.scrollTo({ top: target, behavior: 'instant' });
+    }
+  }, [loading, location.key, navType]);
+
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -82,6 +134,23 @@ export default function Search() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // --- Location autocomplete suggestion ---
+  useEffect(() => {
+    if (localQuery.length < 2) { setSuggestion(''); return; }
+    const q = localQuery.toLowerCase();
+    const districtMatch = KERALA_DISTRICTS.find(d => d.toLowerCase().startsWith(q));
+    if (districtMatch && districtMatch.toLowerCase() !== q) {
+      setSuggestion(districtMatch);
+      return;
+    }
+    const propMatch = allProps.find(p => p.location && p.location.toLowerCase().startsWith(q));
+    if (propMatch && propMatch.location.toLowerCase() !== q) {
+      setSuggestion(propMatch.location);
+      return;
+    }
+    setSuggestion('');
+  }, [localQuery, allProps]);
 
   const dropdownOptions = {
     ...DROPDOWN_OPTIONS,
@@ -96,15 +165,29 @@ export default function Search() {
   const setFilterParam = (key, value) => {
     setOpenDropdown(null);
     const newParams = new URLSearchParams(searchParams);
-    
-    // Using default check to keep URL clean, but explicitly setting if needed
-    if (value === 'All Types' || value === 'All Locations' || value === 'Any Price' || value === 'Newest First') {
+    const defaults = { sort: 'Newest First', type: 'All Types', location: 'All Locations', price: 'Any Price' };
+    if (value === defaults[key]) {
       newParams.delete(key);
     } else {
       newParams.set(key, value);
     }
-    
-    setSearchParams(newParams);
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!localQuery.trim()) return;
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('q', localQuery.trim());
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleKeyDown = (e) => {
+    if ((e.key === 'Tab' || e.key === 'ArrowRight') && suggestion) {
+      e.preventDefault();
+      setLocalQuery(suggestion);
+      setSuggestion('');
+    }
   };
 
   return (
@@ -118,16 +201,7 @@ export default function Search() {
         <div className="container">
           <div className={styles.headerContent}>
             <button 
-               onClick={() => {
-                   navigate('/');
-                   setTimeout(() => {
-                     const searchInput = document.getElementById('main-search-input');
-                     if (searchInput) {
-                       searchInput.focus();
-                       window.scrollTo({ top: 0, behavior: 'smooth' });
-                     }
-                   }, 100);
-               }}
+               onClick={() => navigate(-1)}
                className={styles.backBtn}
             >
               &larr; Back
@@ -136,7 +210,29 @@ export default function Search() {
               Search Results
               <span className={styles.resultCount}>({filteredResults.length} results)</span>
             </h1>
-            {query && <p className="subtitle" style={{ margin: 0 }}>Showing matches for "{query}"</p>}
+            {/* Inline search bar with autocomplete */}
+            <form onSubmit={handleSearchSubmit} className={styles.inlineSearchForm}>
+              <div className={styles.inlineSearchWrap}>
+                <span className={styles.inlineGhost}>
+                  {localQuery}
+                  {suggestion && suggestion.toLowerCase().startsWith(localQuery.toLowerCase()) && (
+                    <span className={styles.ghostHint}>{suggestion.slice(localQuery.length)}</span>
+                  )}
+                </span>
+                <input
+                  ref={searchInputRef}
+                  className={styles.inlineSearchInput}
+                  value={localQuery}
+                  onChange={e => setLocalQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Refine your search..."
+                  autoComplete="off"
+                  spellCheck="false"
+                />
+                <button type="submit" className={styles.inlineSearchBtn} disabled={!localQuery.trim()}>Search</button>
+              </div>
+            </form>
+            {query && <p className="subtitle" style={{ margin: 0 }}>Showing matches for &ldquo;{query}&rdquo;</p>}
           </div>
         </div>
       </header>
