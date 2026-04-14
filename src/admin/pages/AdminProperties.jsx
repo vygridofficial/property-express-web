@@ -66,7 +66,9 @@ export default function AdminProperties() {
     agentPhoto: null,
     description: '', amenities: [], dynamicFilters: {},
     addedOn: new Date().toISOString().slice(0, 10),
-    instagramLink: ''
+    instagramLink: '',
+    facebookLink: '',
+    youtubeLink: ''
   };
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState([]);
@@ -131,6 +133,8 @@ export default function AdminProperties() {
         dynamicFilters: selectedProperty.dynamicFilters || {},
         addedOn: selectedProperty.addedOn || new Date().toISOString().slice(0, 10),
         instagramLink: selectedProperty.instagramLink || '',
+        facebookLink: selectedProperty.facebookLink || '',
+        youtubeLink: selectedProperty.youtubeLink || '',
       });
       // Pre-fill existing images (Cloudinary URLs or base64 previews)
       setImages(selectedProperty.imageUrls || (selectedProperty.image ? [selectedProperty.image] : []));
@@ -398,6 +402,8 @@ export default function AdminProperties() {
             dynamicFilters: formData.dynamicFilters || {},
             addedOn: formData.addedOn || new Date().toISOString().slice(0, 10),
             instagramLink: formData.instagramLink || '',
+            facebookLink: formData.facebookLink || '',
+            youtubeLink: formData.youtubeLink || '',
             updatedAt: new Date(),
             image: uploadedImageUrls[0] || (editingId ? selectedProperty.image : fallbackImage),
             imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : (editingId ? selectedProperty.imageUrls : [fallbackImage]),
@@ -432,7 +438,9 @@ export default function AdminProperties() {
             amenities: ['Parking', 'Security', 'Gated Community'],
             dynamicFilters: {},
             addedOn: new Date().toISOString().slice(0, 10),
-            instagramLink: ''
+            instagramLink: '',
+            facebookLink: '',
+            youtubeLink: ''
           });
           setImages([]);
           setIsDrawerOpen(false);
@@ -940,15 +948,29 @@ export default function AdminProperties() {
                   <textarea placeholder="Write a detailed description..." rows={4} value={formData.description} onChange={e => handleFormChange('description', e.target.value)} style={{ ...getInputStyle('description'), minHeight: 120, resize: 'vertical' }} />
                 </div>
 
-                {/* Instagram Link (Optional) */}
-                <div style={{ marginTop: '1rem' }}>
-                  <Label>Instagram Reel / Post URL <span style={{ fontWeight: 400, color: 'var(--admin-text-muted)' }}>(optional)</span></Label>
+                {/* Social Media Links (Optional) */}
+                <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <Label>Social Media Links <span style={{ fontWeight: 400, color: 'var(--admin-text-muted)' }}>(all optional — buttons shown only if filled)</span></Label>
                   <input
                     type="url"
-                    placeholder="https://www.instagram.com/reel/..."
+                    placeholder="Instagram Reel / Post URL — https://www.instagram.com/reel/..."
                     value={formData.instagramLink}
                     onChange={e => handleFormChange('instagramLink', e.target.value)}
-                    style={getInputStyle('instagramLink')}
+                    style={{ ...getInputStyle('instagramLink'), borderLeft: '3px solid #E1306C' }}
+                  />
+                  <input
+                    type="url"
+                    placeholder="Facebook Post / Reel URL — https://www.facebook.com/..."
+                    value={formData.facebookLink}
+                    onChange={e => handleFormChange('facebookLink', e.target.value)}
+                    style={{ ...getInputStyle('facebookLink'), borderLeft: '3px solid #1877F2' }}
+                  />
+                  <input
+                    type="url"
+                    placeholder="YouTube Video URL — https://www.youtube.com/watch?v=..."
+                    value={formData.youtubeLink}
+                    onChange={e => handleFormChange('youtubeLink', e.target.value)}
+                    style={{ ...getInputStyle('youtubeLink'), borderLeft: '3px solid #FF0000' }}
                   />
                 </div>
 
