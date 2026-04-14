@@ -62,17 +62,20 @@ export default function About() {
           
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', marginTop: '3rem' }}>
             {[
-              { icon: Target, title: 'Mission-Driven' },
-              { icon: Users, title: 'Client-First' },
-              { icon: CheckCircle, title: 'Transparent' }
+              { icon: Target, title: 'Mission-Driven', desc: 'Relentlessly pursuing excellence in the real estate market through dedicated service.' },
+              { icon: Users, title: 'Client-First', desc: 'Prioritizing your needs and dreams at every stage of the property journey.' },
+              { icon: CheckCircle, title: 'Transparent', desc: 'Honest communication and ethical practices in every transaction we handle.' }
             ].map((val, i) => (
               <motion.div 
                 key={i} className={styles.valueCard}
                 variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
                 transition={{ delay: i * 0.1 }}
               >
-                <val.icon size={48} className={styles.valueIcon} />
-                <h3>{val.title}</h3>
+                <div className={styles.valueCardInner}>
+                  <val.icon size={48} className={styles.valueIcon} />
+                  <h3>{val.title}</h3>
+                  <p className={styles.valueDesc}>{val.desc}</p>
+                </div>
               </motion.div>
             ))}
           </div>
