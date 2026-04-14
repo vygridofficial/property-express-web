@@ -35,7 +35,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="section">
+      <section className={`section ${styles.aboutSection}`}>
         <div className="container">
           <motion.div 
             className={styles.storySection}
@@ -53,7 +53,7 @@ export default function About() {
       </section>
 
 
-      <section className="section" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <section className={`section ${styles.aboutSection}`} style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="container">
           <div className="section-header" style={{ textAlign: 'center' }}>
             <h2>Our Core Values</h2>
@@ -62,9 +62,24 @@ export default function About() {
           
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', marginTop: '3rem' }}>
             {[
-              { icon: Target, title: 'Mission-Driven', desc: 'Relentlessly pursuing excellence in the real estate market through dedicated service.' },
-              { icon: Users, title: 'Client-First', desc: 'Prioritizing your needs and dreams at every stage of the property journey.' },
-              { icon: CheckCircle, title: 'Transparent', desc: 'Honest communication and ethical practices in every transaction we handle.' }
+              { 
+                icon: Target, 
+                title: 'Mission-Driven', 
+                desc: 'Relentlessly pursuing excellence.',
+                explanation: 'We are committed to delivering the highest standards of service, ensuring that every property we manage meets our rigorous criteria for quality and luxury.'
+              },
+              { 
+                icon: Users, 
+                title: 'Client-First', 
+                desc: 'Prioritizing your needs and dreams.',
+                explanation: 'Your journey is our priority. We listen closely to your requirements and work tirelessly to find the perfect match for your lifestyle and aspirations.'
+              },
+              { 
+                icon: CheckCircle, 
+                title: 'Transparent', 
+                desc: 'Honest and ethical practices.',
+                explanation: 'Trust is the foundation of our business. We ensure complete transparency in all transactions, providing clear communication and ethical guidance at every step.'
+              }
             ].map((val, i) => (
               <motion.div 
                 key={i} className={styles.valueCard}
@@ -72,9 +87,14 @@ export default function About() {
                 transition={{ delay: i * 0.1 }}
               >
                 <div className={styles.valueCardInner}>
-                  <val.icon size={48} className={styles.valueIcon} />
-                  <h3>{val.title}</h3>
-                  <p className={styles.valueDesc}>{val.desc}</p>
+                  <div className={styles.valueHeader}>
+                    <val.icon size={48} className={styles.valueIcon} />
+                    <h3>{val.title}</h3>
+                    <p className={styles.valueDesc}>{val.desc}</p>
+                  </div>
+                  <div className={styles.valueExplanation}>
+                    <p>{val.explanation}</p>
+                  </div>
                 </div>
               </motion.div>
             ))}

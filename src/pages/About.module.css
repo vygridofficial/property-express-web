@@ -36,7 +36,7 @@
 
 .storySection {
   max-width: 720px;
-  padding: 4rem 0;
+  padding: 1rem 0 3rem;
 }
 
 .storySection h2 {
@@ -56,33 +56,90 @@
 
 .valueCard {
   background: white;
-  padding: 4rem 2.5rem;
+  padding: 3.5rem 2rem;
   border-radius: var(--radius-lg);
   text-align: center;
   box-shadow: var(--shadow-md);
-  transition: var(--transition);
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  position: relative;
+}
+
+.valueCard:hover {
+  transform: translateY(-12px);
+  box-shadow: var(--shadow-lg);
+  background: var(--color-surface);
+}
+
+.valueCardInner {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
 }
 
-.valueCard:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-lg);
+.valueHeader {
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .valueIcon {
   color: var(--color-primary);
   margin-bottom: 0.5rem;
   opacity: 0.9;
+  transition: transform 0.4s ease;
+}
+
+.valueCard:hover .valueIcon {
+  transform: scale(1.1);
 }
 
 .valueCard h3 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+}
+
+.valueDesc {
+  color: var(--color-text-light);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+  transition: opacity 0.3s ease;
+}
+
+.valueExplanation {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.valueCard:hover .valueExplanation {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 1rem;
+}
+
+.valueExplanation p {
+  color: var(--color-text-light);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.aboutSection {
+  padding: 4rem 0 !important;
 }
 
 @media (max-width: 768px) {

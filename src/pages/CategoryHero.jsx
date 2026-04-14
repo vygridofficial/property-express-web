@@ -56,8 +56,8 @@ function FloatingImage({ src, position, scrollProgress, index, onClick }) {
 
 function PropertyListingCard({ property, index }) {
   // Ensure we have an image to show
-  const displayImage = property.images && property.images.length > 0 
-    ? property.images[0] 
+  const displayImage = property.images && property.images.length > 0
+    ? property.images[0]
     : (property.image || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80');
 
   const displayPrice = formatPrice(property.price);
@@ -108,10 +108,10 @@ function PropertyListingCard({ property, index }) {
           )}
           <span>📐 {(property.sqft || property.area || 0).toLocaleString()} {(property.areaUnit || 'sqft')}</span>
         </div>
-        <Link 
-          to={`/properties/${property.id}`} 
+        <Link
+          to={`/properties/${property.id}`}
           state={{ property }}
-          className={styles.viewBtn} 
+          className={styles.viewBtn}
           style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}
         >
           View Details
@@ -134,7 +134,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
   const [showSubFilters, setShowSubFilters] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const taxonomy = React.useMemo(() => {
     // 1. Check if DB has custom taxonomy for this category
     if (siteSettings?.taxonomy?.[categoryId]) {
@@ -185,7 +185,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     setIsMobile(mq.matches);
     const handler = (e) => setIsMobile(e.matches);
     mq.addEventListener('change', handler);
-    
+
     const isAutoGeo = searchParams.get('autoGeo') === 'true';
 
     setLocalFilters({
@@ -199,9 +199,9 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
       searchParams.delete('autoGeo');
       setSearchParams(searchParams, { replace: true });
     }
-    
+
     setShowSubFilters(false);
-    
+
     return () => mq.removeEventListener('change', handler);
   }, [categoryId, taxonomy]);
 
@@ -260,7 +260,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
   // Apply filters to images & sort by haversine distance
   const filteredImages = React.useMemo(() => {
     let result = [...images];
-    
+
     // Filter District
     if (localFilters.district) {
       result = result.filter(img => (img.district || '').toLowerCase() === localFilters.district.toLowerCase());
@@ -286,16 +286,16 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
               }
             }
           });
-          
+
           // Strict Max 50km Radius filter
           result = result.filter(img => img._distance <= 50);
 
           // Arrange from Nearest to Farthest
           result.sort((a, b) => a._distance - b._distance);
-        } catch(e) {}
+        } catch (e) { }
       }
     }
-    
+
     // Filter Price
     if (localFilters.priceMax) {
       result = result.filter(img => (img.numericPrice || 0) <= parseFloat(localFilters.priceMax));
@@ -310,7 +310,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     allSubFilterKeys.forEach(k => {
       if (localFilters[k]) {
         const filterVal = localFilters[k].toString().toLowerCase();
-        
+
         result = result.filter(img => {
           // 1. Check top-level property
           const topVal = img[k];
@@ -419,9 +419,9 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
                 <span>Location Filter</span>
                 <span>{isDetectingLocation ? 'Detecting...' : (localFilters.location === 'My Location' ? 'Within 50km' : 'All Areas')}</span>
               </div>
-              <button 
+              <button
                 type="button"
-                className={styles.toggleSwitch} 
+                className={styles.toggleSwitch}
                 data-active={localFilters.location === 'My Location'}
                 onClick={handleGeoToggle}
                 disabled={isDetectingLocation}
@@ -485,7 +485,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
                     </select>
                   </div>
                 ))}
-                
+
                 {/* Dynamically Injected Admin Subfilters */}
                 {dynamicKeys.map(key => (
                   <div key={key} className={styles.filterGroup}>
@@ -511,22 +511,22 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
             : (
               <div className={styles.noResults} style={{ textAlign: 'center', padding: '4rem 2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
                 <p style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                  {localFilters.district 
-                    ? `No properties found in ${localFilters.district}` 
-                    : localFilters.location === 'My Location' 
-                      ? 'No properties found within 50km' 
+                  {localFilters.district
+                    ? `No properties found in ${localFilters.district}`
+                    : localFilters.location === 'My Location'
+                      ? 'No properties found within 50km'
                       : 'No properties found'
                   }
                 </p>
                 <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-                  {localFilters.district 
-                    ? `We couldn't find any ${categoryTitle.toLowerCase()} in the ${localFilters.district} district matching your criteria.` 
+                  {localFilters.district
+                    ? `We couldn't find any ${categoryTitle.toLowerCase()} in the ${localFilters.district} district matching your criteria.`
                     : localFilters.location === 'My Location'
                       ? `We couldn't find any ${categoryTitle.toLowerCase()} near your current location.`
                       : `Try adjusting your filters to find more ${categoryTitle.toLowerCase()}.`
                   }
                 </p>
-                <button 
+                <button
                   onClick={() => setLocalFilters({ district: '', location: '', priceMax: '', ...Object.fromEntries((taxonomy?.subFilters || []).map(sf => [sf.key, ''])) })}
                   style={{ background: 'white', color: 'black', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
                 >
