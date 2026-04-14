@@ -339,24 +339,28 @@ export default function PropertyDetail() {
                     <input
                       type="text"
                       required
+                      placeholder="Your Full Name"
                       value={inquiryForm.name}
                       onChange={e => setInquiryForm(f => ({ ...f, name: e.target.value }))}
                     />
                     <input
                       type="tel"
                       required
+                      placeholder="Your Phone Number"
                       value={inquiryForm.phone}
                       onChange={e => setInquiryForm(f => ({ ...f, phone: e.target.value }))}
                     />
                     <input
                       type="email"
                       required
+                      placeholder="Your Email Address"
                       value={inquiryForm.email}
                       onChange={e => setInquiryForm(f => ({ ...f, email: e.target.value }))}
                     />
                     <textarea
                       rows="2"
                       required
+                      placeholder="Your message or any specific requirements..."
                       value={inquiryForm.message}
                       onChange={e => setInquiryForm(f => ({ ...f, message: e.target.value }))}
                     ></textarea>
