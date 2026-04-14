@@ -64,7 +64,9 @@ export default function AdminProperties() {
     agentName: 'Property Express', 
     agentPhone: '+91 97787 45146', 
     agentPhoto: null,
-    description: '', amenities: [], dynamicFilters: {}
+    description: '', amenities: [], dynamicFilters: {},
+    addedOn: new Date().toISOString().slice(0, 10),
+    instagramLink: ''
   };
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState([]);
@@ -127,6 +129,8 @@ export default function AdminProperties() {
         description: selectedProperty.description || '',
         amenities:   selectedProperty.amenities || [],
         dynamicFilters: selectedProperty.dynamicFilters || {},
+        addedOn: selectedProperty.addedOn || new Date().toISOString().slice(0, 10),
+        instagramLink: selectedProperty.instagramLink || '',
       });
       // Pre-fill existing images (Cloudinary URLs or base64 previews)
       setImages(selectedProperty.imageUrls || (selectedProperty.image ? [selectedProperty.image] : []));
@@ -331,6 +335,9 @@ export default function AdminProperties() {
       const required = ['title', 'category', 'status', 'price', 'area', 'address', 'district', 'mapsUrl', 'description'];
       const newErrors = [];
       required.forEach(req => { if (!formData[req]) newErrors.push(req); });
+
+      // Enforce minimum 5 images
+      if (images.length < 5) newErrors.push('images');
       
       if (newErrors.length > 0) {
         setFormErrors(newErrors);
@@ -389,6 +396,8 @@ export default function AdminProperties() {
             description: formData.description,
             amenities: formData.amenities,
             dynamicFilters: formData.dynamicFilters || {},
+            addedOn: formData.addedOn || new Date().toISOString().slice(0, 10),
+            instagramLink: formData.instagramLink || '',
             updatedAt: new Date(),
             image: uploadedImageUrls[0] || (editingId ? selectedProperty.image : fallbackImage),
             imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : (editingId ? selectedProperty.imageUrls : [fallbackImage]),
@@ -421,7 +430,9 @@ export default function AdminProperties() {
             agentPhoto: '',
             description: '',
             amenities: ['Parking', 'Security', 'Gated Community'],
-            dynamicFilters: {}
+            dynamicFilters: {},
+            addedOn: new Date().toISOString().slice(0, 10),
+            instagramLink: ''
           });
           setImages([]);
           setIsDrawerOpen(false);
@@ -845,6 +856,17 @@ export default function AdminProperties() {
                   </div>
                 </div>
 
+                {/* Added On Date */}
+                <div style={{ marginTop: '1rem' }}>
+                  <Label required>Added On Date</Label>
+                  <input
+                    type="date"
+                    value={formData.addedOn}
+                    onChange={e => handleFormChange('addedOn', e.target.value)}
+                    style={getInputStyle('addedOn')}
+                  />
+                </div>
+
                 {/* Section 2 */}
                 <SectionHeading>Section 2 — Pricing & Size</SectionHeading>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -918,6 +940,18 @@ export default function AdminProperties() {
                   <textarea placeholder="Write a detailed description..." rows={4} value={formData.description} onChange={e => handleFormChange('description', e.target.value)} style={{ ...getInputStyle('description'), minHeight: 120, resize: 'vertical' }} />
                 </div>
 
+                {/* Instagram Link (Optional) */}
+                <div style={{ marginTop: '1rem' }}>
+                  <Label>Instagram Reel / Post URL <span style={{ fontWeight: 400, color: 'var(--admin-text-muted)' }}>(optional)</span></Label>
+                  <input
+                    type="url"
+                    placeholder="https://www.instagram.com/reel/..."
+                    value={formData.instagramLink}
+                    onChange={e => handleFormChange('instagramLink', e.target.value)}
+                    style={getInputStyle('instagramLink')}
+                  />
+                </div>
+
                 {/* Section 6 */}
                 <SectionHeading>Section 6 — Amenities</SectionHeading>
                 <div>
@@ -970,7 +1004,7 @@ export default function AdminProperties() {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <Label required>Upload Images</Label>
-                    <span style={{ fontSize: '0.8rem', color: images.length >= 8 ? '#ed1b24' : 'var(--admin-text-muted)' }}>{images.length}/8 max</span>
+                    <span style={{ fontSize: '0.8rem', color: images.length >= 8 ? '#ed1b24' : 'var(--admin-text-muted)' }}>{images.length}/8 — min 5 required</span>
                   </div>
                   
                   <div onClick={() => images.length < 8 && fileInputRef.current?.click()} style={{ border: formErrors.includes('images') ? '2px dashed #ed1b24' : '2px dashed var(--admin-stroke)', borderRadius: 12, padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.4)', cursor: images.length < 8 ? 'pointer' : 'not-allowed', opacity: images.length < 8 ? 1 : 0.5 }}>
@@ -978,7 +1012,7 @@ export default function AdminProperties() {
                     <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--admin-text-body)', fontWeight: 300 }}>Drag images here or click to browse</p>
                     <input type="file" multiple accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
                   </div>
-                  {formErrors.includes('images') && <span style={{ color: '#ed1b24', fontSize: '12px', marginTop: '0.25rem', display: 'block' }}>Please upload at least one image.</span>}
+                  {formErrors.includes('images') && <span style={{ color: '#ed1b24', fontSize: '12px', marginTop: '0.25rem', display: 'block' }}>Please upload at least 5 images (minimum required).</span>}
 
                   {images.length > 0 && (
                     <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', padding: '1rem 0', marginTop: '0.5rem' }}>
