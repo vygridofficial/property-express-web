@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { Link, useSearchParams, useNavigationType } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
 import { KERALA_DISTRICTS, DISTRICT_COORDINATES } from '../data/districts';
 import { getPropertyCoordinates, getDistanceFromLatLonInKm } from '../utils/geo';
@@ -54,7 +54,7 @@ function FloatingImage({ src, position, scrollProgress, index, onClick }) {
   );
 }
 
-function PropertyListingCard({ property, index, skipAnimation }) {
+function PropertyListingCard({ property, index }) {
   // Ensure we have an image to show
   const displayImage = property.images && property.images.length > 0 
     ? property.images[0] 
@@ -65,9 +65,9 @@ function PropertyListingCard({ property, index, skipAnimation }) {
   return (
     <motion.div
       className={styles.listingCard}
-      initial={skipAnimation ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
-      whileInView={skipAnimation ? undefined : { opacity: 1, y: 0 }}
-      viewport={skipAnimation ? undefined : { once: true, margin: '-80px' }}
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.6, delay: index * 0.08, ease: 'easeOut' }}
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
     >
@@ -124,7 +124,6 @@ function PropertyListingCard({ property, index, skipAnimation }) {
 export default function CategoryHero({ categoryId, categoryTitle, onBack, liveProperties, siteSettings }) {
   const containerRef = useRef(null);
   const heroRef = useRef(null);
-  const navType = useNavigationType(); // 'POP' = back navigation
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -507,7 +506,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
         <div className={styles.listingsGrid}>
           {filteredImages.length > 0
             ? filteredImages.map((property, i) => (
-              <PropertyListingCard key={property.id} property={property} index={i} skipAnimation={navType === 'POP'} />
+              <PropertyListingCard key={property.id} property={property} index={i} />
             ))
             : (
               <div className={styles.noResults} style={{ textAlign: 'center', padding: '4rem 2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
