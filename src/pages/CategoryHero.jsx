@@ -67,7 +67,7 @@ function PropertyListingCard({ property, index }) {
       className={styles.listingCard}
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, margin: '-80px' }}
+      viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.6, delay: index * 0.08, ease: 'easeOut' }}
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
     >
