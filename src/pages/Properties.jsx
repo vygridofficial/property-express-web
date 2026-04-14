@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Building, Store, Map, LayoutGrid } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { getSiteSettings, getAllProperties, searchProperties, getPropertyTypes, getPropertiesByCategory } from '../services/propertyService';
+import { getSiteSettings, getAllProperties, searchProperties, getPropertyTypes, getPropertiesByCategory, getCachedProperties } from '../services/propertyService';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import CategoryHero from './CategoryHero';
 import SEO from '../components/common/SEO';
@@ -98,7 +98,16 @@ export default function Properties() {
         });
     } else if (catId) {
       setIsSearchMode(false);
-      setLoading(true);
+
+      // SYNC CHECK: If data is in cache, load it immediately to prevent flicker
+      const cached = getCachedProperties(catId);
+      if (cached && cached.length > 0) {
+        setCategoryProperties(cached);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+
       // Find the matched category — may include an originalId/slug for fallback
       const matchedCat = dynamicCategories.find(c => c.id === catId);
       const fetchCategory = async () => {

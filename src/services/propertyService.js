@@ -6,6 +6,11 @@ const PROPERTIES_COLLECTION = 'properties';
 // Simple session-level cache to enable instant back-navigation and reliable scroll restoration
 const categoryCache = new Map();
 
+export const getCachedProperties = (category) => {
+  const normalized = category?.toString().trim() || '';
+  return categoryCache.get(normalized) || null;
+};
+
 export const getFeaturedProperties = async (includeInactive = false) => {
   let q = query(collection(db, PROPERTIES_COLLECTION), where("isFeatured", "==", true));
   if (!includeInactive) {
