@@ -506,7 +506,6 @@ export default function Home() {
             style={{ textAlign: 'center', marginTop: '3rem' }}
             variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
           >
-            <p style={{ color: 'var(--color-text-light)', marginBottom: '1.25rem' }}>Share Your Experience With Us</p>
             <button
               onClick={() => setShowReviewModal(true)}
               className="btn btn-outline"
