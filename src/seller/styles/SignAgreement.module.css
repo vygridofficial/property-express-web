@@ -1,0 +1,278 @@
+.signPage {
+  min-height: 100vh;
+  padding-bottom: 5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.signHeader {
+  height: 70px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 2rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.backBtn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 0.6rem 1.2rem;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.backBtn:hover {
+  background: var(--glass-solid);
+  color: #ed1b24;
+  border-color: #ed1b24;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: var(--stroke);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 400px;
+}
+
+.progressFill {
+  height: 100%;
+  background: #ed1b24;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.signContainer {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+.stepBox {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--glass-border);
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  color: var(--text-main);
+}
+
+.titleArea h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.docBox {
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  background: var(--glass-bg);
+}
+
+.docHeader {
+  background: var(--glass-bg);
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.docHeader h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+  color: var(--text-main);
+}
+
+.docHeader p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.docBody {
+  padding: 2.5rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-body);
+  white-space: pre-line;
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.consentBox {
+  background: var(--glass-bg);
+  padding: 2rem;
+  border-radius: 20px;
+  margin-bottom: 2.5rem;
+  border: 1px solid var(--glass-border);
+}
+
+.consentBox p {
+  font-size: 1.1rem;
+  color: var(--text-body);
+  margin-bottom: 1.5rem;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.checkLabel input {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.ctaBtn {
+  width: 100%;
+  background: #ed1b24;
+  color: white;
+  border: none;
+  padding: 1.25rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s;
+  box-shadow: 0 10px 20px rgba(237, 27, 36, 0.2);
+}
+
+.ctaBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(237, 27, 36, 0.3);
+}
+
+.ctaBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ghostBtn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 1.25rem 2rem;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.btnRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.otpField {
+  width: 100%;
+  max-width: 320px;
+  font-size: 2.5rem;
+  text-align: center;
+  letter-spacing: 0.5rem;
+  padding: 1rem;
+  border: 2px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-main);
+  border-radius: 16px;
+  margin: 0 auto 2rem;
+  font-weight: 800;
+  outline: none;
+  display: block;
+}
+
+.otpField:focus {
+  border-color: #ed1b24;
+}
+
+
+.errorText {
+  color: #ef4444;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.successCard {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.successCard h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 2rem 0 1rem;
+}
+
+.successCard p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 3rem;
+}
+
+.successActions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+.loaderArea {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spin {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .stepBox { padding: 1.5rem; }
+  .titleArea h2 { font-size: 1.4rem; }
+  .docBody { padding: 1.5rem; }
+}

@@ -1,0 +1,138 @@
+.container {
+  padding: 1.5rem;
+}
+
+.methodTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.4rem;
+  border-radius: 12px;
+}
+
+.methodBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border: none;
+  background: none;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.methodBtn.active {
+  background: white;
+  color: #ed1b24;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.canvasArea {
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.6));
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  height: 250px;
+  position: relative;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+
+.sigCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+.clearBtn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #ef4444;
+  transition: all 0.2s;
+}
+
+.clearBtn:hover {
+  background: #fffafa;
+  border-color: #fca5a5;
+}
+
+.typeBlock {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: center;
+}
+
+.nameInput {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 1rem;
+  border: none;
+  border-bottom: 2px solid #e2e8f0;
+  background: transparent;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.nameInput:focus {
+  border-bottom-color: #ed1b24;
+}
+
+.previewText {
+  margin-top: 2rem;
+  font-size: 2.5rem;
+  color: #1e293b;
+  opacity: 0.8;
+}
+
+.uploadBlock {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.primaryBtn {
+  width: 100%;
+  background: #ed1b24;
+  color: white;
+  border: none;
+  padding: 1.2rem;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primaryBtn:not(:disabled):hover {
+  opacity: 0.9;
+}

@@ -1,0 +1,322 @@
+.dashboardWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.statsRow {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.statCard {
+  flex: 1;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.45));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.6));
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: var(--glass-shadow, 0 8px 32px rgba(0, 0, 0, 0.05));
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statInfo label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.statInfo span {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.mainCard {
+  background: var(--glass-bg, rgba(255, 255, 255, 0.45));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.6));
+  box-shadow: var(--glass-shadow, 0 8px 32px rgba(0, 0, 0, 0.05));
+  overflow: hidden;
+}
+
+.tabsRow {
+  display: flex;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.6));
+}
+
+.tabItem {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  background: none;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.activeTab {
+  background: var(--glass-solid);
+  color: #ed1b24;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.content {
+  padding: 2rem;
+  min-height: 400px;
+}
+
+.agreementsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.agreementCard {
+  background: var(--glass-bg, rgba(255, 255, 255, 0.45));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.6));
+  border-radius: 20px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--glass-shadow, 0 8px 32px rgba(0, 0, 0, 0.05));
+}
+
+.agreementCard:hover {
+  border-color: var(--glass-border);
+  transform: translateY(-4px);
+  background: var(--glass-solid);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.iconWrapper {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ed1b24;
+}
+
+
+.cardHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.dateLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.cardFooter {
+  display: flex;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--stroke);
+  gap: 1rem;
+}
+
+.footerCol {
+  flex: 1;
+}
+
+.footerCol label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.footerCol span {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-body);
+}
+
+.chevron {
+  color: #cbd5e1;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  padding: 5rem 0;
+}
+
+.spin {
+  animation: rotate 1s linear infinite;
+  color: #cbd5e1;
+}
+
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.empty {
+  text-align: center;
+  padding: 6rem 0;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .statsRow { flex-direction: column; }
+  .header h1 { font-size: 1.8rem; }
+}
+
+/* ─── Filter Pills (Dashboard Properties Tab) ─── */
+.filterRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  padding: 0.5rem 1rem;
+}
+
+.filterPill {
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.filterPill:hover {
+  background: var(--glass-solid);
+  color: var(--text-main);
+}
+
+.filterPillActive {
+  background: #ed1b24;
+  border-color: #ed1b24;
+  color: white;
+  box-shadow: 0 4px 12px rgba(237, 27, 36, 0.25);
+}
+
+.filterPillActive:hover {
+  background: #c41219;
+  color: white;
+}
+
+/* ─── Glassmorphic Form Inputs ─── */
+.glassInput,
+.glassSelect,
+.glassTextarea {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.glassInput:focus,
+.glassSelect:focus,
+.glassTextarea:focus {
+  outline: none;
+  border-color: #ed1b24;
+  background: var(--glass-solid);
+  box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.glassInput::placeholder,
+.glassTextarea::placeholder {
+  color: var(--text-muted);
+}
+
+.glassSelect {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  padding-right: 2.5rem;
+}
+
+.glassLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #475569;
+  letter-spacing: 0.01em;
+}
+
+.glassUploadBox {
+  background: rgba(248, 250, 252, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1.5px dashed rgba(203, 213, 225, 0.8);
+  transition: border-color 0.2s ease;
+}
+
+.glassUploadBox:hover {
+  border-color: #ed1b24;
+}
+

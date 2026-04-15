@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation, useNavigationType, Outlet } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigationType, Outlet, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 import Navbar from './components/common/Navbar';
@@ -25,6 +25,15 @@ import Inquiries from './admin/pages/Inquiries';
 import Reviews from './admin/pages/Reviews';
 import Settings from './admin/pages/Settings';
 import ContactSocial from './admin/pages/ContactSocial';
+import Agreements from './admin/pages/Agreements';
+import Approvals from './admin/pages/Approvals';
+import SellersHistory from './admin/pages/SellersHistory';
+
+// Seller Portal (Isolated)
+import { SellerProvider } from './seller/context/SellerContext';
+import SellerLayout from './seller/layouts/SellerLayout';
+import SellerDashboard from './seller/pages/Dashboard';
+import SignAgreement from './seller/pages/SignAgreement';
 
 function PublicLayout() {
   return (
@@ -38,6 +47,11 @@ function PublicLayout() {
 }
 
 
+
+const LegacyRedirect = ({ to }) => {
+  const { search } = useLocation();
+  return <Navigate to={`${to}${search}`} replace />;
+};
 
 function AppContent() {
   const location = useLocation();
@@ -109,11 +123,11 @@ function AppContent() {
   if (isMaintenanceMode && !isAdminPath) {
     return <Maintenance message={siteSettings.maintenanceMessage} />;
   }
-
   return (
     <>
       <AnimatePresence>
         <Routes location={location} key={location.pathname.startsWith('/admin') ? 'admin' : location.pathname}>
+
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
@@ -126,13 +140,27 @@ function AppContent() {
             <Route path="/properties/:id" element={<PropertyDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/sellerportal/*" element={<LegacyRedirect to="/agreements" />} />
           </Route>
+
+          {/* Standalone Seller Portal Routes (Isolated) */}
+          <Route 
+            path="/agreements/*" 
+            element={
+              <SellerProvider>
+                <SellerLayout />
+              </SellerProvider>
+            }
+          />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="properties" element={<AdminProperties />} />
             <Route path="properties/:category" element={<AdminProperties />} />
+            <Route path="submissions" element={<Approvals />} />
+            <Route path="sellers-history" element={<SellersHistory />} />
+            <Route path="agreements" element={<Agreements />} />
             <Route path="inquiries" element={<Inquiries />} />
             <Route path="reviews" element={<Reviews />} />
             <Route path="settings" element={<Settings />} />
