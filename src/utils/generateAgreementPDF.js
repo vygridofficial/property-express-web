@@ -39,13 +39,17 @@ export const generateAgreementPDF = async (submissionData, adminSignatureData, d
         throw new Error('No template content found. Please re-upload in Agreement Format tab.');
       }
 
-      // Create container with visible positioning for reliable capture
+      // Render off-screen so it NEVER flashes visible to the user
       const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.left = '0';
-      container.style.top = '0';
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      container.style.top = '-9999px';
       container.style.width = '800px';
       container.style.backgroundColor = '#fff';
+      container.style.visibility = 'hidden';
+      container.style.opacity = '0';
+      container.style.pointerEvents = 'none';
+      container.style.zIndex = '-9999';
       container.innerHTML = populatedHtml;
       document.body.appendChild(container);
 

@@ -59,8 +59,9 @@ export default function SellerDashboard() {
 
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch]             = useState('');
-  const [deleteTarget, setDeleteTarget] = useState(null); // {id, title}
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting]     = useState(false);
+  const [downloadingId, setDownloadingId] = useState(null); // track which card is downloading
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -238,13 +239,20 @@ export default function SellerDashboard() {
                       <div className={styles.cardFooter} style={{ borderTop: '1px solid var(--stroke)', paddingTop: '0.85rem', marginTop: '0.85rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
                         {sub.status === 'approved' ? (
                           <button
-                            onClick={async () => {
-                              const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
-                              await generateAgreementPDF(sub, sub.adminSignature, true);
+                            disabled={downloadingId === sub.id}
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              setDownloadingId(sub.id);
+                              try {
+                                const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
+                                await generateAgreementPDF(sub, sub.adminSignature, true);
+                              } finally {
+                                setDownloadingId(null);
+                              }
                             }}
-                            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#3b82f6', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600, padding: 0, fontSize: '0.85rem' }}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: downloadingId === sub.id ? 'var(--text-muted)' : '#3b82f6', background: 'transparent', border: 'none', cursor: downloadingId === sub.id ? 'not-allowed' : 'pointer', fontWeight: 600, padding: 0, fontSize: '0.85rem', opacity: downloadingId === sub.id ? 0.6 : 1, minHeight: 44 }}
                           >
-                            <Download size={15} /> Download Agreement
+                            <Download size={15} /> {downloadingId === sub.id ? 'Generating…' : 'Download Agreement'}
                           </button>
                         ) : <div />}
 

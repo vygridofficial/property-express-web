@@ -47,6 +47,7 @@ export default function SubmissionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { submissions, loading } = useSeller();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const sub = submissions.find(s => s.id === id);
 
@@ -173,13 +174,27 @@ export default function SubmissionDetail() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
               {sub.status === 'approved' && (
                 <button
+                  disabled={isDownloading}
                   onClick={async () => {
-                    const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
-                    await generateAgreementPDF(sub, sub.adminSignature, true);
+                    setIsDownloading(true);
+                    try {
+                      const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
+                      await generateAgreementPDF(sub, sub.adminSignature, true);
+                    } finally {
+                      setIsDownloading(false);
+                    }
                   }}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', background: '#3b82f6', color: 'white', padding: '1rem 2rem', borderRadius: 12, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '1rem', boxShadow: '0 8px 24px rgba(59,130,246,0.25)' }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
+                    background: isDownloading ? '#64748b' : '#3b82f6',
+                    color: 'white', padding: '1rem 2rem', borderRadius: 12, border: 'none',
+                    cursor: isDownloading ? 'not-allowed' : 'pointer',
+                    fontWeight: 700, fontSize: '1rem',
+                    boxShadow: isDownloading ? 'none' : '0 8px 24px rgba(59,130,246,0.25)',
+                    minHeight: 52, transition: 'all 0.2s'
+                  }}
                 >
-                  <Download size={20} /> Download Agreement PDF
+                  <Download size={20} /> {isDownloading ? 'Generating PDF…' : 'Download Agreement PDF'}
                 </button>
               )}
               
