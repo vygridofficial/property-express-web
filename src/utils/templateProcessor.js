@@ -106,17 +106,29 @@ export const mergeHtmlTemplate = async (htmlString, submissionData, mapping, sig
 
     // 4. Wrap in a standard A4 container for preview/print
     return `
-      <div style="
+      <div class="agreement-document" style="
         font-family: 'Times New Roman', serif; 
-        padding: 40px 60px; 
+        padding: 60px 80px; 
         color: #000; 
-        line-height: 1.5; 
+        line-height: 1.6; 
         background: #fff;
-        font-size: 14px;
-        text-align: justify;
+        font-size: 15px;
         width: 800px;
         box-sizing: border-box;
       ">
+        <style>
+          .agreement-document p { margin-bottom: 1em; text-align: justify; }
+          .agreement-document h1, .agreement-document h2, .agreement-document h3 { 
+            text-align: center; 
+            text-transform: uppercase; 
+            margin-bottom: 1.2em;
+            letter-spacing: 0.5px;
+          }
+          .agreement-document strong { color: #000; font-weight: 700; }
+          .agreement-document table { width: 100%; border-collapse: collapse; margin-bottom: 1.5em; }
+          .agreement-document td { padding: 8px; vertical-align: top; border: 1px solid #eee; }
+          .agreement-document img { display: inline-block; }
+        </style>
         ${html}
       </div>
     `;

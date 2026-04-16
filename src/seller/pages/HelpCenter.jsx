@@ -10,6 +10,7 @@ import {
   DollarSign
 } from 'lucide-react';
 import styles from '../styles/Dashboard.module.css';
+import Skeleton from 'react-loading-skeleton';
 
 const faqs = [
   {
@@ -170,69 +171,65 @@ export default function HelpCenter() {
   return (
     <div className={styles.dashboardWrapper}>
       <header className={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-          <div style={{ width: 42, height: 42, borderRadius: 12, background: 'rgba(237,27,36,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ed1b24' }}>
-            <HelpCircle size={22} />
-          </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Help Center</h1>
-        </div>
-        <p style={{ color: 'var(--text-muted)', marginLeft: 58, marginBottom: 0 }}>Answers to common questions about the Seller Portal.</p>
+        {loading ? <Skeleton height={40} width={200} /> : <h1>Help Center</h1>}
       </header>
+      {loading ? (
+        <Skeleton count={5} height={30} style={{ marginBottom: '1rem' }} />
+      ) : (
+        <div>
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.15rem', marginBottom: '1rem' }}>Terms & Conditions</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+              {termsLinks.map(term => (
+                <motion.button
+                  key={term.id}
+                  whileHover={{ translateY: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}
+                  onClick={() => setActiveTerm(term)}
+                  style={{
+                    background: 'var(--glass-bg, rgba(255,255,255,0.45))',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid var(--glass-border, rgba(255,255,255,0.6))',
+                    borderRadius: 18,
+                    padding: '1.5rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                    transition: 'box-shadow 0.2s ease'
+                  }}
+                >
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: term.bg, color: term.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <term.icon size={20} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.95rem', marginBottom: 4 }}>{term.title}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.5 }}>{term.desc}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: term.color, fontSize: '0.8rem', fontWeight: 600, marginTop: 'auto' }}>
+                    <ExternalLink size={13} /> Read Full Terms
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </div>
 
-      {/* Terms Section */}
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.15rem', marginBottom: '1rem' }}>Terms & Conditions</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-          {termsLinks.map(term => (
-            <motion.button
-              key={term.id}
-              whileHover={{ translateY: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}
-              onClick={() => setActiveTerm(term)}
-              style={{
-                background: 'var(--glass-bg, rgba(255,255,255,0.45))',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid var(--glass-border, rgba(255,255,255,0.6))',
-                borderRadius: 18,
-                padding: '1.5rem',
-                cursor: 'pointer',
-                textAlign: 'left',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
-                transition: 'box-shadow 0.2s ease'
-              }}
-            >
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: term.bg, color: term.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <term.icon size={20} />
-              </div>
-              <div>
-                <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.95rem', marginBottom: 4 }}>{term.title}</div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.5 }}>{term.desc}</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: term.color, fontSize: '0.8rem', fontWeight: 600, marginTop: 'auto' }}>
-                <ExternalLink size={13} /> Read Full Terms
-              </div>
-            </motion.button>
-          ))}
+          <div>
+            <h2 style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.15rem', marginBottom: '1rem' }}>Frequently Asked Questions</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {faqs.map((faq, i) => (
+                <FAQItem key={i} q={faq.q} a={faq.a} index={i} />
+              ))}
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {activeTerm && <TermsModal term={activeTerm} onClose={() => setActiveTerm(null)} />}
+          </AnimatePresence>
         </div>
-      </div>
-
-      {/* FAQs */}
-      <div>
-        <h2 style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.15rem', marginBottom: '1rem' }}>Frequently Asked Questions</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {faqs.map((faq, i) => (
-            <FAQItem key={i} q={faq.q} a={faq.a} index={i} />
-          ))}
-        </div>
-      </div>
-
-      {/* Terms Modal */}
-      <AnimatePresence>
-        {activeTerm && <TermsModal term={activeTerm} onClose={() => setActiveTerm(null)} />}
-      </AnimatePresence>
+      )}
     </div>
   );
 }

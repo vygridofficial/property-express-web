@@ -12,15 +12,37 @@ import SigningHistory from '../pages/SigningHistory';
 import SubmissionDetail from '../pages/SubmissionDetail';
 import HelpCenter from '../pages/HelpCenter';
 import styles from '../styles/seller.module.css';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function SellerLayout() {
   const { isAuthenticated, loading, theme } = useSeller();
 
+  // Skeleton layout for the entire portal while checking authentication
   if (loading) {
     return (
-      <div className={styles.loaderWrapper} data-theme={theme}>
-        <div className={styles.spinner}></div>
-        <p>Initializing Secure Portal...</p>
+      <div className={styles.sellerApp} data-theme={theme}>
+        <div className={styles.sellerCanvas}></div>
+        {/* Desktop Sidebar Skeleton */}
+        <div className={styles.desktopSidebar}>
+          <div style={{ padding: '2rem' }}>
+            <Skeleton height={40} width="80%" style={{ marginBottom: '3rem' }} />
+            <Skeleton count={5} height={45} style={{ marginBottom: '1rem', borderRadius: '12px' }} />
+          </div>
+        </div>
+        <div className={styles.mainContent}>
+          <main className={styles.pageContainer}>
+            <div style={{ padding: '2rem' }}>
+              <Skeleton height={40} width={250} style={{ marginBottom: '2rem' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+                <Skeleton height={100} borderRadius="1rem" />
+                <Skeleton height={100} borderRadius="1rem" />
+                <Skeleton height={100} borderRadius="1rem" />
+              </div>
+              <Skeleton height={300} borderRadius="1.5rem" />
+            </div>
+          </main>
+        </div>
       </div>
     );
   }

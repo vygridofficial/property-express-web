@@ -7,24 +7,27 @@ const AdminContext = createContext();
 
 export function AdminProvider({ children }) {
   // ─── Auth: true=logged in, false=logged out, null=loading ───
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('property_express_admin_auth') === 'true';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [properties, setProperties] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [propertyTypes, setPropertyTypes] = useState([]);
 
-  // ── Issue 1: Auth Persistence ──
-  // Using pure local storage since authentication uses custom env static hash 
+  // ── Auth Persistence via Firebase ──
   useEffect(() => {
-    if (isAuthenticated) {
-      localStorage.setItem('property_express_admin_auth', 'true');
-    } else {
-      localStorage.removeItem('property_express_admin_auth');
-    }
-  }, [isAuthenticated]);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      // Only allow the admin email to be authenticated here 
+      // (or we can just check if any user is logged in, but better to enforce an admin email or admin claim)
+      if (user && user.email === 'admin@propertyexpress.com') {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // ── Real-time Properties Sync ──
   useEffect(() => {
@@ -171,12 +174,13 @@ export function AdminProvider({ children }) {
   const clearAllNotifications = () => setNotifications([]);
 
   const login = () => {
-    localStorage.setItem('property_express_admin_auth', 'true');
+    // Firebase auth handles login via signInWithEmailAndPassword in Login.jsx
     setIsAuthenticated(true);
   };
   const logout = () => {
-    localStorage.removeItem('property_express_admin_auth');
-    setIsAuthenticated(false);
+    auth.signOut().then(() => {
+      setIsAuthenticated(false);
+    });
   };
 
   // ── Issues 2, 3, 4, 5: Global Site Settings ──

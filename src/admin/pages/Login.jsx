@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
-import { ADMIN_HASHED_PASSWORD } from '../auth.config';
+import { auth } from '../../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import styles from '../styles/admin.module.css';
 
 // We import the actual logo from assets folder
@@ -10,25 +11,33 @@ import logo from '../../assets/logo.png';
 
 export default function Login() {
   const { login } = useAdmin();
+  const [email, setEmail] = useState('admin@propertyexpress.com'); // Default admin email
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
-    // Hash the input password and compare to env hash
-    const hashBuffer = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
-    const hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    if (hash !== ADMIN_HASHED_PASSWORD) {
-      setError('Invalid password.');
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Extra verification just in case
+      if (userCredential.user.email !== 'admin@propertyexpress.com') {
+        throw new Error('Not authorized as admin.');
+      }
+      login(); // Calls the context login
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Invalid credentials.');
       setShake(true);
       setTimeout(() => setShake(false), 500);
-      return;
+    } finally {
+      setIsLoading(false);
     }
-    login();
   };
 
   return (
@@ -61,6 +70,30 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleLogin} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          
+          <div style={{ position: 'relative' }}>
+            <input 
+              type="email" 
+              placeholder="Admin Email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              readOnly
+              style={{
+                width: '100%',
+                padding: '1rem 1.25rem',
+                fontSize: '1rem',
+                fontWeight: 300,
+                background: 'rgba(0,0,0,0.05)',
+                border: '1px solid var(--admin-glass-border)',
+                borderRadius: 12,
+                outline: 'none',
+                color: 'var(--admin-text-muted)',
+                cursor: 'not-allowed'
+              }}
+            />
+          </div>
+
           <div style={{ position: 'relative' }}>
             <input 
               type={showPassword ? "text" : "password"} 
@@ -100,23 +133,24 @@ export default function Login() {
           </div>
 
           <button 
-            type="submit" 
+            type="submit"
+            disabled={isLoading}
             style={{
               width: '100%',
               padding: '1rem',
-              background: '#ed1b24',
+              background: isLoading ? '#fc8181' : '#ed1b24',
               color: 'white',
               border: 'none',
               borderRadius: 12,
               fontWeight: 700,
               fontSize: '1rem',
-              cursor: 'pointer',
+              cursor: isLoading ? 'wait' : 'pointer',
               marginTop: '1rem',
               transition: 'all 0.2s ease',
-              boxShadow: '0 8px 24px rgba(237, 27, 36, 0.2)'
+              boxShadow: isLoading ? 'none' : '0 8px 24px rgba(237, 27, 36, 0.2)'
             }}
           >
-            Sign In
+            {isLoading ? 'Authenticating...' : 'Enter Dashboard'}
           </button>
 
           <AnimatePresence>
