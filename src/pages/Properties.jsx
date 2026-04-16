@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Building, Store, Map, LayoutGrid } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { getSiteSettings, getAllProperties, searchProperties, getPropertyTypes, getPropertiesByCategory, getCachedProperties } from '../services/propertyService';
+import { getSiteSettings, getAllProperties, searchProperties, getPropertiesByCategory, getCachedProperties } from '../services/propertyService';
+import { db } from '../firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import CategoryHero from './CategoryHero';
 import SEO from '../components/common/SEO';
@@ -55,30 +57,45 @@ export default function Properties() {
   const [searchTitle, setSearchTitle] = useState('');
 
   useEffect(() => {
-    Promise.all([getSiteSettings(), getPropertyTypes()]).then(([data, types]) => {
-      if (data) setSiteSettings(data);
-      if (types) {
-        const visibleTypes = types.filter(t => data?.visibility?.[t.name] !== false);
-        const mappedCats = visibleTypes.map(t => {
-          let icon = LayoutGrid;
-          let desc = `Explore ${t.name} listings`;
-          const cDef = CATEGORIES.find(c => c.id === t.id || c.id === t.name);
-          if (cDef) {
-            icon = cDef.icon;
-            desc = cDef.desc;
-          }
-          return {
-            id: t.name,         // URL param uses current name
-            originalId: t.id,   // Firestore doc ID (slug) kept for fallback query
-            title: t.name,
-            icon,
-            desc,
-            img: t.image || cDef?.img || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
-          };
-        });
-        setDynamicCategories(mappedCats);
+    let active = true;
+    let currentSettings = null;
+
+    getSiteSettings().then(data => {
+      if (active && data) {
+        setSiteSettings(data);
+        currentSettings = data;
       }
     });
+
+    const unsubscribe = onSnapshot(collection(db, 'propertyTypes'), (snapshot) => {
+      if (!active) return;
+      const types = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (a.order || 0) - (b.order || 0));
+      
+      const visibleTypes = types.filter(t => currentSettings?.visibility?.[t.name] !== false);
+      const mappedCats = visibleTypes.map(t => {
+        let icon = LayoutGrid;
+        let desc = `Explore ${t.name} listings`;
+        const cDef = CATEGORIES.find(c => c.id === t.id || c.title.toLowerCase().includes((t.name || '').toLowerCase()));
+        if (cDef) {
+          icon = cDef.icon;
+          desc = cDef.desc;
+        }
+        return {
+          id: t.name,         // URL param uses current name
+          originalId: t.id,   // Firestore doc ID (slug) kept for fallback query
+          title: t.name,
+          icon,
+          desc,
+          img: t.image || cDef?.img || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
+        };
+      });
+      setDynamicCategories(mappedCats);
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

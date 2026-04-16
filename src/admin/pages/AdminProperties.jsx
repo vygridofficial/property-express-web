@@ -197,11 +197,11 @@ export default function AdminProperties() {
       const isBaseRoute = path.endsWith('/admin/properties') || path.endsWith('/admin/properties/');
 
       const catMap = {
-        flats: ['flat', 'apartment'],
-        apartments: ['flat', 'apartment'],
-        villas: ['villa'],
+        apartments: ['apartment'],          // Apartment-type properties only
+        flats:      ['flat'],               // Flat-type properties only (separate)
+        villas:     ['villa'],
         warehouses: ['warehouse', 'commercial'],
-        plots: ['plot']
+        plots:      ['plot']
       };
 
       return properties.filter(p => {
@@ -505,7 +505,8 @@ export default function AdminProperties() {
               let prefilledCat = '';
               if (activeCategory !== 'properties') {
                 const low = activeCategory.toLowerCase();
-                if (['apartments', 'flats'].includes(low)) prefilledCat = 'Apartment';
+                if (low === 'apartments') prefilledCat = 'Apartment';
+                else if (low === 'flats') prefilledCat = 'Flat';
                 else if (low === 'villas') prefilledCat = 'Villa';
                 else if (['commercial', 'warehouses'].includes(low)) prefilledCat = 'Commercial';
                 else if (low === 'plots') prefilledCat = 'Plot';
@@ -1254,8 +1255,9 @@ export default function AdminProperties() {
 function resolveCategoryFromSlug(slug, propertyTypes) {
   const low = slug.toLowerCase();
   
-  // Base categories resolution
-  if (low === 'apartments' || low === 'flats') return 'Apartment';
+  // Base categories resolution — Flats and Apartments are SEPARATE types
+  if (low === 'apartments') return 'Apartment';
+  if (low === 'flats') return 'Flat';
   if (low === 'villas') return 'Villa';
   if (low === 'plots') return 'Plot';
   if (low === 'commercial' || low === 'warehouses') return 'Commercial';

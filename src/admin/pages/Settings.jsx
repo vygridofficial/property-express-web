@@ -48,7 +48,7 @@ function useIsMobile() {
 
 export default function Settings() {
   const isMobile = useIsMobile();
-  const { siteSettings, updateSiteSettings, properties, propertyTypes = [], removePropertyType, updatePropertyType, reorderPropertyTypes } = useAdmin();
+  const { siteSettings, updateSiteSettings, properties, propertyTypes = [], removePropertyType, updatePropertyType, reorderPropertyTypes, addPropertyType } = useAdmin();
   
   // Local drafted state for dirty checking
   const [draft, setDraft] = useState(siteSettings);
@@ -59,6 +59,7 @@ export default function Settings() {
   const [subTypeInput, setSubTypeInput] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [editImage, setEditImage] = useState(null); // base64 preview or null = unchanged
+  const [isAddingNew, setIsAddingNew] = useState(false); // Flag if modal is adding rather than editing
 
   const uploadToCloudinary = async (base64) => {
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dm9tmagpg';
@@ -207,8 +208,24 @@ export default function Settings() {
       </div>
 
       <div className={styles.glassCard} style={{ marginBottom: '2rem' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>Property Types Management</h3>
-        <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>View, manage visibility, and delete property types. Default types cannot be permanently deleted.</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', margin: 0 }}>Property Types Management</h3>
+          <button
+            onClick={() => {
+              setIsAddingNew(true);
+              setEditData({ id: '', name: '', slug: '', category: 'residential', icon: 'Building2', isActive: true, subTypes: [], image: null, isDefault: false });
+              setSubTypeInput('');
+              setEditImage(null);
+            }}
+            style={{ 
+              background: '#ed1b24', color: 'white', border: 'none', padding: '0.5rem 1rem', 
+              borderRadius: 8, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'Outfit'
+            }}
+          >
+            + Add Type
+          </button>
+        </div>
+        <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>View, manage visibility, edit, and delete property types.</p>
         
         <div>
           {/* Property Types mapped from database */}
@@ -267,6 +284,7 @@ export default function Settings() {
                 
                                 <button
                   onClick={() => {
+                    setIsAddingNew(false);
                     setEditData({
                       id: cat.id,
                       name: cat.name || '',
@@ -281,9 +299,7 @@ export default function Settings() {
                     setSubTypeInput('');
                     setEditImage(null);
                   }}
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--admin-text-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: 8, transition: 'background 0.2s', marginRight: '0.25rem' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                  style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', cursor: 'pointer', color: 'var(--admin-text-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: 8, transition: 'background 0.2s', marginRight: '0.25rem' }}
                   title={'Edit'}
                 >
                   <Edit2 size={18} />
@@ -292,23 +308,21 @@ export default function Settings() {
                   <button 
                     onClick={() => reorderPropertyTypes(index, 'up')}
                     disabled={index === 0}
-                    style={{ background: 'transparent', border: 'none', padding: '2px', cursor: index === 0 ? 'not-allowed' : 'pointer', opacity: index === 0 ? 0.3 : 1, color: 'var(--admin-text-main)' }}
+                    style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '3px', borderRadius: 4, cursor: index === 0 ? 'not-allowed' : 'pointer', opacity: index === 0 ? 0.3 : 1, color: 'var(--admin-text-main)' }}
                   >
-                    <ArrowUp size={14} />
+                    <ArrowUp size={12} />
                   </button>
                   <button 
                     onClick={() => reorderPropertyTypes(index, 'down')}
                     disabled={index === propertyTypes.length - 1}
-                    style={{ background: 'transparent', border: 'none', padding: '2px', cursor: index === propertyTypes.length - 1 ? 'not-allowed' : 'pointer', opacity: index === propertyTypes.length - 1 ? 0.3 : 1, color: 'var(--admin-text-main)' }}
+                    style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '3px', borderRadius: 4, cursor: index === propertyTypes.length - 1 ? 'not-allowed' : 'pointer', opacity: index === propertyTypes.length - 1 ? 0.3 : 1, color: 'var(--admin-text-main)' }}
                   >
-                    <ArrowDown size={14} />
+                    <ArrowDown size={12} />
                   </button>
                 </div>
                 <button
                   onClick={() => initiateDelete(cat.name)}
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#E53935', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: 8, transition: 'background 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(229,57,53,0.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                  style={{ background: 'rgba(229,57,53,0.1)', border: '1px solid rgba(229,57,53,0.2)', cursor: 'pointer', color: '#E53935', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: 8 }}
                   title={`Delete ${cat.name}`}
                 >
                   <Trash2 size={18} />
@@ -476,15 +490,15 @@ export default function Settings() {
       <AnimatePresence>
         {editData && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)' }} onClick={() => setEditData(null)} />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', zIndex: -1 }} onClick={() => setEditData(null)} />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -10 }}
               className={styles.glassCard}
-              style={{ position: 'relative', width: '100%', maxWidth: 500, padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', fontFamily: 'Outfit', maxHeight: '90vh', overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', fontFamily: 'Outfit', width: '90vw', maxWidth: 500, maxHeight: '85vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', position: 'relative', zIndex: 1, pointerEvents: 'auto' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Edit Property Type</h3>
-                <button onClick={() => { setEditData(null); setEditImage(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--admin-text-muted)' }}><X size={20} /></button>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>{isAddingNew ? 'Add Property Type' : 'Edit Property Type'}</h3>
+                <button onClick={() => { setEditData(null); setEditImage(null); }} style={{ background: 'rgba(0,0,0,0.05)', border: 'none', cursor: 'pointer', color: 'var(--admin-text-main)', padding: '0.4rem', borderRadius: '50%' }}><X size={20} /></button>
               </div>
 
 
@@ -617,16 +631,24 @@ export default function Settings() {
                       if (editImage) {
                         finalImageUrl = await uploadToCloudinary(editImage);
                       }
-                      const payload = {
-                        name: editData.name.trim(),
-                        category: editData.category,
-                        subTypes: finalSubTypes,
-                        icon: editData.icon.trim(),
-                        isActive: editData.isActive,
-                        ...(finalImageUrl !== undefined && { image: finalImageUrl })
-                      };
-                      await updatePropertyType(editData.id, payload);
-                      triggerToast('Property type updated successfully.');
+                      
+                      if (isAddingNew) {
+                         const payload = { category: editData.category };
+                         await addPropertyType(editData.name.trim(), finalImageUrl, finalSubTypes, payload);
+                         triggerToast('Property type added successfully.');
+                      } else {
+                         const payload = {
+                           name: editData.name.trim(),
+                           category: editData.category,
+                           subTypes: finalSubTypes,
+                           icon: editData.icon.trim(),
+                           isActive: editData.isActive,
+                           ...(finalImageUrl !== undefined && { image: finalImageUrl })
+                         };
+                         await updatePropertyType(editData.id, payload);
+                         triggerToast('Property type updated successfully.');
+                      }
+                      
                       setEditData(null);
                     } catch (err) {
                       console.error(err);

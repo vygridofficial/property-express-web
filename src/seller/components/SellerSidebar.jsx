@@ -9,7 +9,8 @@ import {
   ChevronRight,
   LayoutDashboard,
   Moon,
-  Sun
+  Sun,
+  Plus
 } from 'lucide-react';
 import { useSeller } from '../context/SellerContext';
 import styles from '../styles/seller.module.css';
@@ -79,7 +80,6 @@ export default function SellerSidebar() {
         </div>
       </nav>
 
-      {/* Footer — always visible; stacks vertically when collapsed */}
       <div
         className={styles.sidebarFooter}
         style={{
@@ -88,6 +88,34 @@ export default function SellerSidebar() {
           gap: '0.75rem'
         }}
       >
+        {/* ── List Property CTA ── */}
+        <NavLink
+          to="/agreements/list"
+          title="List a Property"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start', gap: '0.6rem',
+            background: 'linear-gradient(135deg, #ed1b24, #c41219)',
+            color: 'white', borderRadius: 14, fontWeight: 700, fontSize: '0.95rem',
+            padding: collapsed ? '0.85rem' : '0.85rem 1.25rem',
+            textDecoration: 'none', boxShadow: '0 4px 16px rgba(237,27,36,0.3)',
+            transition: 'opacity 0.2s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+        >
+          <Plus size={20} style={{ minWidth: 20 }} />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
+              >
+                List Property
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </NavLink>
         {/* Collapse toggle */}
         <button
           className={styles.collapseBtn}

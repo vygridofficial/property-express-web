@@ -24,15 +24,13 @@ const DEFAULT_AMENITIES = [
 ];
 import { KERALA_DISTRICTS } from '../../data/districts';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { useSeller } from '../context/SellerContext';
 import { createPropertySubmission } from '../../services/submissionService';
 import SignaturePad from '../components/SignaturePad';
 import dashStyles from '../styles/Dashboard.module.css';
 import Skeleton from 'react-loading-skeleton';
 import { isValidPhone } from '../../utils/validation';
-
-const BASE_PROPERTY_TYPES = ['Apartment', 'Villa', 'Plot', 'Commercial'];
 
 function isBlockedByClientError(err) {
   const msg = (err?.message || err?.toString() || '').toLowerCase();
@@ -53,42 +51,45 @@ export default function ListProperty() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [isBlockedErr, setIsBlockedErr] = useState(false);
-  const [propertyTypes, setPropertyTypes] = useState(BASE_PROPERTY_TYPES);
+  const [propertyTypes, setPropertyTypes] = useState([]);
   const [dynamicAmenities, setDynamicAmenities] = useState(DEFAULT_AMENITIES);
 
-  // Fetch admin-configured property types from the 'propertyTypes' Firestore collection
+  // Real-time synchronization with admin property types
   useEffect(() => {
-    const fetchTypes = async () => {
+    let active = true;
+
+    // Real-time listener for exact Property Types
+    const unsubscribeTypes = onSnapshot(collection(db, 'propertyTypes'), (snapshot) => {
+      if (!snapshot.empty) {
+        const fromFirestore = snapshot.docs
+          .map(d => ({ name: d.data().name || d.id, order: d.data().order ?? 999, isActive: d.data().isActive !== false }))
+          .filter(t => t.isActive)
+          .sort((a, b) => a.order - b.order)
+          .map(t => t.name);
+        
+        setPropertyTypes(fromFirestore);
+      } else {
+        setPropertyTypes([]);
+      }
+    });
+
+    // Fetch amenities from settings/global if present (one-time fetch is okay per session)
+    const fetchGlobalSettings = async () => {
       try {
-        // Primary source: 'propertyTypes' collection (created by Admin Portal)
-        const snapshot = await getDocs(collection(db, 'propertyTypes'));
-        if (!snapshot.empty) {
-          const fromFirestore = snapshot.docs
-            .map(d => ({ name: d.data().name || d.id, order: d.data().order ?? 999, isActive: d.data().isActive !== false }))
-            .filter(t => t.isActive)
-            .sort((a, b) => a.order - b.order)
-            .map(t => t.name);
-
-          // Merge with BASE, deduplicate case-insensitively, Firestore types come first
-          const merged = [...fromFirestore];
-          BASE_PROPERTY_TYPES.forEach(base => {
-            if (!merged.some(m => m.toLowerCase() === base.toLowerCase())) {
-              merged.push(base);
-            }
-          });
-          setPropertyTypes(merged);
-        }
-
-        // Also fetch amenities from settings/global if present
         const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
-        if (settingsSnap.exists() && Array.isArray(settingsSnap.data().amenities)) {
+        if (settingsSnap.exists() && Array.isArray(settingsSnap.data().amenities) && active) {
           setDynamicAmenities(settingsSnap.data().amenities);
         }
-      } catch {
-        // Non-critical — silently fall back to base types
+      } catch (err) {
+        console.error('Failed to fetch global settings amenities', err);
       }
     };
-    fetchTypes();
+    fetchGlobalSettings();
+
+    return () => {
+      active = false;
+      unsubscribeTypes();
+    };
   }, []);
 
   // Step 1 Data
