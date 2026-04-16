@@ -42,12 +42,12 @@ export default function PropertyDetail() {
   useEffect(() => {
     // If we have data from state, we can already initialize agent info
     if (property) {
-      if (property.agentName) {
+      if (property.sellerName || property.agentName) {
         setAgent({
-          name: property.agentName,
+          name: property.sellerName || property.agentName,
           photo: property.agentPhoto || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
-          role: 'Property Agent',
-          phone: property.agentPhone || '+91 98765 43210'
+          role: property.sellerName ? 'Property Owner' : 'Property Agent',
+          phone: property.sellerPhone || property.agentPhone || '+91 98765 43210'
         });
       } else {
         setAgent(MOCK_AGENTS.find(a => a.id === property.agentId) || MOCK_AGENTS[0]);
@@ -58,19 +58,19 @@ export default function PropertyDetail() {
     getPropertyById(id).then(data => {
       if (data) {
         setProperty(data);
-        if (data.agentName) {
+        if (data.sellerName || data.agentName) {
           setAgent({
-            name: data.agentName,
+            name: data.sellerName || data.agentName,
             photo: data.agentPhoto || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
-            role: 'Property Agent',
-            phone: data.agentPhone || '+91 98765 43210'
+            role: data.sellerName ? 'Property Owner' : 'Property Agent',
+            phone: data.sellerPhone || data.agentPhone || '+91 98765 43210'
           });
         } else {
           setAgent(MOCK_AGENTS.find(a => a.id === data.agentId) || MOCK_AGENTS[0]);
         }
       }
     });
-  }, [id]);
+  }, [id, property]);
 
   if (!property) return <div style={{ padding: '8rem 2rem', textAlign: 'center' }}>Loading or not found...</div>;
 
@@ -254,7 +254,7 @@ export default function PropertyDetail() {
           <motion.div className={styles.amenitiesSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
             <h3>Amenities</h3>
             <div className={styles.amenitiesGrid}>
-              {DEFAULT_AMENITIES.map((amenity, idx) => (
+              {((property.features && property.features.length) ? property.features : DEFAULT_AMENITIES).map((amenity, idx) => (
                 <div key={idx} className={styles.amenityItem}>
                   <Check size={18} color="#c53030" />
                   <span>{amenity}</span>

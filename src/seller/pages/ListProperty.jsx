@@ -12,8 +12,16 @@ import {
   FileSignature,
   Phone,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  X
 } from 'lucide-react';
+
+const PRESET_AMENITIES = [
+  'Swimming Pool', '24/7 Security', 'Private Garage', 
+  'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',
+  'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
+  'CCTV', 'Power Backup'
+];
 import { db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useSeller } from '../context/SellerContext';
@@ -74,6 +82,7 @@ export default function ListProperty() {
   // Step 1 Data
   const [details, setDetails] = useState({
     propertyTitle: '',
+    sellerName: '',
     propertyType: 'Apartment',
     configuration: '1BHK',
     area: '',
@@ -82,7 +91,11 @@ export default function ListProperty() {
     address: '',
     phone: '',
     description: '',
+    features: [], // Array for chip-based selection
+    bedrooms: '',
+    bathrooms: ''
   });
+  const [customAmenity, setCustomAmenity] = useState('');
   const [images, setImages] = useState([]);
 
   // Step 2 Data
@@ -94,6 +107,25 @@ export default function ListProperty() {
 
   // Step 3 Data
   const [signature, setSignature] = useState(null);
+
+  const toggleAmenity = (name) => {
+    setDetails(prev => {
+      const current = Array.isArray(prev.features) ? prev.features : [];
+      if (current.includes(name)) {
+        return { ...prev, features: current.filter(a => a !== name) };
+      } else {
+        return { ...prev, features: [...current, name] };
+      }
+    });
+  };
+
+  const handleCustomAmenity = (e) => {
+    if (e.key === 'Enter' && customAmenity.trim()) {
+      e.preventDefault();
+      toggleAmenity(customAmenity.trim());
+      setCustomAmenity('');
+    }
+  };
 
   const handleNext = () => setStep(s => s + 1);
   const handlePrev = () => setStep(s => s - 1);
@@ -122,9 +154,10 @@ export default function ListProperty() {
     try {
       const submissionData = {
         ...details,
-        sellerName: user?.displayName || 'Unknown Seller',
+        sellerName: details.sellerName || user?.displayName || 'Unknown Seller',
         sellerEmail: user?.email || '',
         sellerPhone: details.phone || user?.phoneNumber || '',
+        features: Array.isArray(details.features) ? details.features : [],
         termsAccepted: terms
       };
 
@@ -278,6 +311,16 @@ export default function ListProperty() {
                   </div>
 
                   <div>
+                    <label style={label}>Owner / Seller Name</label>
+                    <input
+                      type="text" value={details.sellerName}
+                      placeholder={user?.displayName || 'Leave empty to use Google name'}
+                      onChange={e => setDetails({...details, sellerName: e.target.value})}
+                      style={inp} onFocus={onFocus} onBlur={onBlur}
+                    />
+                  </div>
+
+                  <div>
                     <label style={label}>Property Type</label>
                     <select
                       value={details.propertyType}
@@ -305,6 +348,84 @@ export default function ListProperty() {
                       onChange={e => setDetails({...details, area: e.target.value})}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
+                  </div>
+
+                  <div>
+                    <label style={label}>Bedrooms</label>
+                    <input
+                      type="number" value={details.bedrooms}
+                      placeholder="e.g. 3"
+                      onChange={e => setDetails({...details, bedrooms: e.target.value})}
+                      style={inp} onFocus={onFocus} onBlur={onBlur}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={label}>Bathrooms</label>
+                    <input
+                      type="number" value={details.bathrooms}
+                      placeholder="e.g. 2"
+                      onChange={e => setDetails({...details, bathrooms: e.target.value})}
+                      style={inp} onFocus={onFocus} onBlur={onBlur}
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={label}>Amenities / Features</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                      {PRESET_AMENITIES.map(amenity => {
+                        const isActive = Array.isArray(details.features) && details.features.includes(amenity);
+                        return (
+                          <button
+                            key={amenity}
+                            type="button"
+                            onClick={() => toggleAmenity(amenity)}
+                            style={{
+                              padding: '0.4rem 0.8rem',
+                              borderRadius: 20,
+                              background: isActive ? '#ed1b24' : 'rgba(255,255,255,0.6)',
+                              color: isActive ? 'white' : 'var(--text-main)',
+                              border: isActive ? '1px solid transparent' : '1px solid rgba(200,210,230,0.7)',
+                              fontSize: '0.85rem',
+                              cursor: 'pointer',
+                              outline: 'none',
+                              transition: 'all 0.2s ease',
+                              boxShadow: isActive ? '0 2px 8px rgba(237,27,36,0.3)' : 'none'
+                            }}
+                          >
+                            {amenity}
+                          </button>
+                        );
+                      })}
+                      {Array.isArray(details.features) && details.features.filter(a => !PRESET_AMENITIES.includes(a)).map(amenity => (
+                        <span
+                          key={amenity}
+                          style={{
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: 20,
+                            background: '#ed1b24',
+                            color: 'white',
+                            border: '1px solid transparent',
+                            fontSize: '0.85rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            boxShadow: '0 2px 8px rgba(237,27,36,0.3)'
+                          }}
+                        >
+                          {amenity} <X size={12} style={{ cursor: 'pointer' }} onClick={() => toggleAmenity(amenity)} />
+                        </span>
+                      ))}
+                      <input
+                        type="text"
+                        placeholder="Type custom amenity & press Enter..."
+                        value={customAmenity}
+                        onChange={e => setCustomAmenity(e.target.value)}
+                        onKeyDown={handleCustomAmenity}
+                        style={{ ...inp, width: '220px', padding: '0.4rem 1rem', borderRadius: 20, marginBottom: 0 }}
+                        onFocus={onFocus} onBlur={onBlur}
+                      />
+                    </div>
                   </div>
 
                   <div>

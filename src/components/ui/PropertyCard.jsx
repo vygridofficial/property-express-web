@@ -26,8 +26,8 @@ export default function PropertyCard({ property }) {
 
   const displayPrice = formatPrice(price);
 
-  // WhatsApp & Call using agent's phone
-  const phone = agentPhone || property.agentPhone || '';
+  // WhatsApp & Call using agent's phone or seller's phone
+  const phone = property.sellerPhone || property.agentPhone || agentPhone || '';
   const cleanPhone = phone.replace(/\D/g, '');
   const waLink = cleanPhone
     ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi, I'm interested in ${title}`)}`
