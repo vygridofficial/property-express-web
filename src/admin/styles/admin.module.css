@@ -416,20 +416,14 @@
     padding: 0.75rem !important;
     gap: 0.75rem !important;
   }
-}
 
-max-width: 100%;
-box-sizing: border-box;
-overflow: hidden;
-}
-
-/* Stack charts vertically on mobile */
-.chartsGrid {
-  grid-template-columns: 1fr !important;
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-}
+  /* Stack charts vertically on mobile */
+  .chartsGrid {
+    grid-template-columns: 1fr !important;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
 }
 
 /* ─── Issue 9: Dark Mode — Override all hardcoded black/grey elements ─── */
