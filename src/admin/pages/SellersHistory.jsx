@@ -4,7 +4,7 @@ import {
   History, CheckCircle2, XCircle, Clock, MapPin, Building,
   Calendar, Phone, Mail, User, Image as ImageIcon,
   DollarSign, Maximize2, ChevronLeft, ArrowUpRight,
-  RefreshCw, Search, Trash2, AlertTriangle, X
+  RefreshCw, Search, Trash2, AlertTriangle, X, Download
 } from 'lucide-react';
 import { getAllSubmissions, deleteSubmission } from '../../services/submissionService';
 
@@ -155,12 +155,26 @@ export default function SellersHistory() {
               <cfg.icon size={12} /> {cfg.label}
             </span>
           </div>
-          <button
-            onClick={() => setDeleteTarget({ id: selected.id, title: selected.propertyTitle || 'Unnamed Property' })}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem', width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}
-          >
-            <Trash2 size={16} /> Delete
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', width: isMobile ? '100%' : 'auto' }}>
+            {selected.status === 'approved' && (
+              <button
+                onClick={async () => {
+                  const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
+                  await generateAgreementPDF(selected, selected.adminSignature, true);
+                }}
+                title="Download Agreement PDF"
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', background: '#3b82f6', border: 'none', color: 'white', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}
+              >
+                <Download size={16} /> <span style={{ display: isMobile ? 'none' : 'inline' }}>Download PDF</span>
+              </button>
+            )}
+            <button
+              onClick={() => setDeleteTarget({ id: selected.id, title: selected.propertyTitle || 'Unnamed Property' })}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}
+            >
+              <Trash2 size={16} /> Delete
+            </button>
+          </div>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -316,6 +330,19 @@ export default function SellersHistory() {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {sub.status === 'approved' && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
+                          await generateAgreementPDF(sub, sub.adminSignature, true);
+                        }}
+                        title="Download PDF"
+                        style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#3b82f6', borderRadius: 8, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                      >
+                        <Download size={15} />
+                      </button>
+                    )}
                     {isMobile && <button onClick={() => setSelected(sub)} style={{ height: 34, padding: '0 1rem', borderRadius: 8, background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', color: 'var(--admin-text-main)', fontSize: '0.8rem', fontWeight: 600 }}>View</button>}
                     <button
                       onClick={() => setDeleteTarget({ id: sub.id, title: sub.propertyTitle || 'Unnamed Property' })}

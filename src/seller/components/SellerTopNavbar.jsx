@@ -18,6 +18,7 @@ function useIsMobile() {
 /* ─── Portal Bottom Sheet ─── */
 function BottomSheet({ show, onClose, isDark, children }) {
   const dividerColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const themeVars = isDark ? { '--text-main': '#ffffff', '--text-muted': '#94a3b8', '--stroke': 'rgba(255, 255, 255, 0.15)', '--card-bg-light': 'rgba(30, 41, 59, 0.4)', color: '#ffffff' } : { '--text-main': '#1e293b', '--text-muted': '#64748b', '--stroke': 'rgba(0, 0, 0, 0.08)', '--card-bg-light': '#ffffff', color: '#1e293b' };
 
   if (typeof document === 'undefined') return null;
   return ReactDOM.createPortal(
@@ -32,6 +33,7 @@ function BottomSheet({ show, onClose, isDark, children }) {
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             onClick={e => e.stopPropagation()}
             style={{
+              ...themeVars,
               background: isDark ? 'rgba(14, 18, 32, 0.98)' : 'rgba(255,255,255,0.98)',
               backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)',
               borderTop: `1px solid ${dividerColor}`, borderRadius: '24px 24px 0 0',
@@ -50,6 +52,7 @@ function BottomSheet({ show, onClose, isDark, children }) {
 /* ─── Portal Desktop Dropdown ─── */
 function DesktopDropdown({ show, anchorRef, onClose, isDark, children, width }) {
   const [pos, setPos] = useState({ top: 0, right: 0 });
+  const themeVars = isDark ? { '--text-main': '#ffffff', '--text-muted': '#94a3b8', '--stroke': 'rgba(255, 255, 255, 0.15)', '--card-bg-light': 'rgba(30, 41, 59, 0.4)', color: '#ffffff' } : { '--text-main': '#1e293b', '--text-muted': '#64748b', '--stroke': 'rgba(0, 0, 0, 0.08)', '--card-bg-light': '#ffffff', color: '#1e293b' };
 
   useEffect(() => {
     if (show && anchorRef.current) {
@@ -67,6 +70,7 @@ function DesktopDropdown({ show, anchorRef, onClose, isDark, children, width }) 
           <motion.div
             initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} transition={{ duration: 0.18 }}
             style={{
+              ...themeVars,
               position: 'fixed', top: pos.top, right: pos.right, zIndex: 9999, width, maxHeight: 480, overflowY: 'auto',
               background: isDark ? 'rgba(14, 18, 32, 0.97)' : 'rgba(255,255,255,0.96)',
               backdropFilter: 'blur(40px) saturate(200%)', WebkitBackdropFilter: 'blur(40px) saturate(200%)',
