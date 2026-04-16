@@ -64,6 +64,13 @@ export const mergeTemplateData = async (templateArrayBuffer, submissionData, map
 };
 
 /**
+ * Escapes characters with special meaning in regular expressions.
+ */
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+}
+
+/**
  * Merges data directly into a pre-extracted HTML string (stored in Firestore as templateHtml).
  * This is the preferred path — no DOCX binary, no network fetch, no CORS issues.
  */
@@ -72,7 +79,10 @@ export const mergeHtmlTemplate = async (htmlString, submissionData, mapping, sig
     let html = htmlString;
 
     for (const [placeholder, fieldId] of Object.entries(mapping || {})) {
-      const regex = new RegExp(`\\{\\{\\s*${placeholder}\\s*\\}\\}`, 'g');
+      // Create a regex that strips invisible zero-width spaces/soft hyphens and exactly matches the placeholder
+      // Also handles variable internal spacing
+      const cleanPlaceholder = placeholder.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+      const regex = new RegExp(`\\{\\{\\s*${escapeRegExp(cleanPlaceholder)}\\s*\\}\\}`, 'g');
       let replacement = '';
 
       if (fieldId === 'seller_signature' && signatures.seller) {
@@ -88,13 +98,28 @@ export const mergeHtmlTemplate = async (htmlString, submissionData, mapping, sig
       } else if (fieldId === 'current_date') {
         replacement = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
       } else {
-        replacement = submissionData[fieldId] !== undefined ? String(submissionData[fieldId]) : '';
+        replacement = submissionData[fieldId] !== undefined ? String(submissionData[fieldId]) : (placeholder || '');
       }
 
       html = html.replace(regex, replacement);
     }
 
-    return `<div style="font-family: 'Times New Roman', serif; padding: 40px; color: #000; line-height: 1.6; background: #fff;">${html}</div>`;
+    // 4. Wrap in a standard A4 container for preview/print
+    return `
+      <div style="
+        font-family: 'Times New Roman', serif; 
+        padding: 40px 60px; 
+        color: #000; 
+        line-height: 1.5; 
+        background: #fff;
+        font-size: 14px;
+        text-align: justify;
+        width: 800px;
+        box-sizing: border-box;
+      ">
+        ${html}
+      </div>
+    `;
   } catch (err) {
     console.error("HTML template merging failed:", err);
     throw new Error("Unable to generate agreement from template.");

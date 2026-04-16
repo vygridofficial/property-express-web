@@ -12,55 +12,23 @@ import {
   serverTimestamp, 
   orderBy
 } from 'firebase/firestore';
+import { uploadToCloudinary, uploadPropertyImages } from '../utils/cloudinary';
 
 /**
- * Universal Cloudinary Uploader
- * By bypassing Firebase Storage, we avoid all CORS and configuration errors.
+ * Upload multiple property images to Cloudinary (Alias for consistency)
  */
-const uploadToCloudinary = async (fileOrBlob) => {
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dm9tmagpg';
-  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'property_express';
-
-  const formData = new FormData();
-  formData.append('file', fileOrBlob);
-  formData.append('upload_preset', uploadPreset);
-
-  // Using the images endpoint works for both standard images and PDFs in Cloudinary
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.error?.message || 'Cloudinary upload failed');
-  }
-
-  const data = await res.json();
-  return data.secure_url;
-};
-
-/**
- * Upload multiple property images to Cloudinary
- */
-export const uploadPropertyImages = async (sellerId, files) => {
-  const imageUrls = [];
-  for (const file of files) {
-    const url = await uploadToCloudinary(file);
-    imageUrls.push(url);
-  }
-  return imageUrls;
+export const uploadSubmissionImages = async (files) => {
+  return await uploadPropertyImages(files);
 };
 
 /**
  * Create a new property submission (Seller Flow)
  */
 export const createPropertySubmission = async (submissionData, imageFiles, sellerSignatureStr) => {
-  // 1. Upload Images to Cloudinary (No Firebase Storage involved)
+  // 1. Upload Images to Cloudinary
   let imageUrls = [];
   if (imageFiles && imageFiles.length > 0) {
-    const folderId = submissionData.sellerEmail || 'anonymous_seller'; 
-    imageUrls = await uploadPropertyImages(folderId, imageFiles);
+    imageUrls = await uploadSubmissionImages(imageFiles);
   }
 
   // 2. Add to Firestore Submissions Collection

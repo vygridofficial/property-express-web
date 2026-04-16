@@ -8,6 +8,7 @@ import { addProperty, updateProperty, deleteProperty } from '../../services/prop
 import styles from '../styles/admin.module.css';
 import { KERALA_DISTRICTS } from '../../data/districts';
 import FilterManagementModal from '../components/FilterManagementModal';
+import { uploadToCloudinary } from '../../utils/cloudinary';
 
 const PRESET_AMENITIES = [
   'Swimming Pool', '24/7 Security', 'Private Garage', 'Central AC / Heating',
@@ -247,33 +248,11 @@ export default function AdminProperties() {
   };
   const hasActiveFilters = searchTerm || statusFilter !== 'All' || priceFilter !== 'All' || locFilter !== 'All' || distFilter !== 'All' || catFilter !== 'All' || sortOrder !== 'Newest First';
 
-  // --- Image Upload Logic ---
-    const uploadToCloudinary = async (base64) => {
-      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dm9tmagpg';
-      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'property_express';
-      
-      console.log('Using Cloudinary Config:', { cloudName, uploadPreset });
-
-      const uploadData = new FormData();
-      uploadData.append('file', base64);
-      uploadData.append('upload_preset', uploadPreset);
-
-      try {
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: 'POST',
-          body: uploadData
-        });
-        const data = await res.json();
-        if (data.secure_url) {
-          return data.secure_url;
-        } else {
-          console.error('Cloudinary error response:', data);
-          throw new Error(data.error?.message || 'Cloudinary upload failed');
-        }
-      } catch (err) {
-        console.error('Cloudinary upload failed:', err);
-        throw err;
-      }
+    const handleAgentPhoto = (e) => {
+      if (!e.target.files || !e.target.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => setFormData(prev => ({ ...prev, agentPhoto: ev.target.result }));
+      reader.readAsDataURL(e.target.files[0]);
     };
 
     const handleFileChange = (e) => {
@@ -291,13 +270,6 @@ export default function AdminProperties() {
         reader.readAsDataURL(file);
       });
       if (fileInputRef.current) fileInputRef.current.value = "";
-    };
-
-    const handleAgentPhoto = (e) => {
-      if (!e.target.files || !e.target.files[0]) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => setFormData(prev => ({ ...prev, agentPhoto: ev.target.result }));
-      reader.readAsDataURL(e.target.files[0]);
     };
 
   const removeImage = (index) => setImages(prev => prev.filter((_, i) => i !== index));

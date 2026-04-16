@@ -4,9 +4,12 @@ import {
   Upload, File, CheckCircle2, RotateCw,
   Download, Eye, Save, AlertCircle, ArrowRight, HelpCircle
 } from 'lucide-react';
-import { db, storage } from '../../firebase';
+import { db } from '../../firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import mammoth from 'mammoth';
+import { generateAgreementPDF } from '../../utils/generateAgreementPDF';
+import { mergeHtmlTemplate } from '../../utils/templateProcessor';
+import AgreementPreviewModal from './AgreementPreviewModal';
 
 const AVAILABLE_FIELDS = [
   { id: 'sellerName',       label: 'Full legal name' },
@@ -50,6 +53,9 @@ export default function AgreementTemplateTab() {
   const [dragging, setDragging]   = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [templateHtml, setTemplateHtml] = useState('');
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
   const fileInputRef = useRef();
 
   useEffect(() => { fetchTemplateData(); }, []);
@@ -61,11 +67,13 @@ export default function AgreementTemplateTab() {
         const data = docSnap.data();
         setTemplate(data);
 
-        // Only load placeholders/mappings if the file content is actually stored
+        // ✅ Updated: If templateHtml exists, consider it valid even if fileBase64/fileUrl are missing
         if (data.templateHtml || data.fileBase64 || data.fileUrl) {
           setMappings(data.mappings || {});
           setPlaceholders(data.placeholders || []);
           if (data.templateHtml) setTemplateHtml(data.templateHtml);
+          // If we have HTML but it was forcing edit, let's allow it to be viewed
+          setIsEditing(false);
         } else {
           // File data is missing — force edit mode so user must re-upload
           console.warn('[AgreementTab] Template has no file data — forcing edit mode.');
@@ -185,6 +193,47 @@ export default function AgreementTemplateTab() {
 
   const unmappedCount = placeholders.filter(p => !mappings[p]).length;
 
+  const handleFullPreview = async () => {
+    setIsPreviewing(true);
+    try {
+      const mockSubmission = {};
+      Object.entries(mappings).forEach(([tag, fieldId]) => {
+        mockSubmission[fieldId] = PREVIEW_SAMPLE[fieldId] || `[${tag}]`;
+      });
+      
+      const signatures = {
+        seller: { type: 'text', value: 'RAJESH KUMAR (SELLER)' },
+        admin: { type: 'text', value: 'PROPERTY EXPRESS (ADMIN)' }
+      };
+
+      const html = await mergeHtmlTemplate(templateHtml || template?.templateHtml, mockSubmission, mappings, signatures);
+      setPreviewHtml(html);
+      setShowPreviewModal(true);
+    } catch (err) {
+      console.error('Preview failed:', err);
+      alert('Failed to generate preview. Check console for details.');
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
+  const handleDownloadPreview = async () => {
+    setIsPreviewing(true);
+    try {
+      const mockSubmission = {};
+      Object.entries(mappings).forEach(([tag, fieldId]) => {
+        mockSubmission[fieldId] = PREVIEW_SAMPLE[fieldId] || `[${tag}]`;
+      });
+      const signatures = {
+        seller: { type: 'text', value: 'RAJESH KUMAR (SELLER)' },
+        admin: { type: 'text', value: 'PROPERTY EXPRESS (ADMIN)' }
+      };
+      await generateAgreementPDF(mockSubmission, signatures.admin, true);
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
   const renderPreview = (text) =>
     text.split(/(\{\{[^{}]+\}\})/g).map((part, i) => {
       const m = part.match(/^\{\{([^{}]+)\}\}$/);
@@ -221,13 +270,13 @@ export default function AgreementTemplateTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-      {/* ── Warning banner if template has no file data ── */}
-      {template && !template.fileBase64 && !template.fileUrl && (
+      {/* ── Warning banner if template has no actual content ── */}
+      {template && !template.templateHtml && (
         <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.4)', color: '#f59e0b', padding: '1rem 1.5rem', borderRadius: '14px', fontSize: '0.875rem', lineHeight: 1.6, display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
           <AlertCircle size={18} style={{ flexShrink: 0, marginTop: 2 }} />
           <div>
             <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Template file missing — please re-upload</strong>
-            Your agreement template settings were saved, but the actual <strong>.docx file</strong> was not stored correctly (likely due to a CORS issue during a previous upload attempt). Please upload your <strong>.docx</strong> file again below and click Save to fix this.
+            Your agreement template settings were saved, but the actual <strong>.docx file</strong> structure was not stored correctly. Please upload your <strong>.docx</strong> file again below and click Save to fix this.
           </div>
         </div>
       )}
@@ -444,18 +493,20 @@ export default function AgreementTemplateTab() {
         )}
 
         <button
-          onClick={() => alert('Full agreement preview coming soon.')}
+          onClick={handleFullPreview}
+          disabled={isPreviewing || !templateHtml && !file}
           style={{
             padding: '0.9rem 2rem',
             background: 'var(--admin-glass-bg)',
             border: '1px solid var(--admin-glass-border)',
             color: 'var(--admin-text-main)',
-            borderRadius: '12px', fontWeight: 700, cursor: 'pointer',
+            borderRadius: '12px', fontWeight: 700, cursor: (isPreviewing || !templateHtml && !file) ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem',
             fontFamily: 'Outfit, sans-serif'
           }}
         >
-          <Eye size={16} /> Preview full agreement
+          {isPreviewing ? <RotateCw size={16} className="animate-spin" /> : <Eye size={16} />}
+          Preview full agreement
         </button>
       </div>
 
@@ -464,6 +515,16 @@ export default function AgreementTemplateTab() {
           Resolve <strong>{unmappedCount}</strong> unmapped field{unmappedCount > 1 ? 's' : ''} before saving.
         </p>
       )}
+
+      {/* ── Agreement Preview Modal ── */}
+      <AgreementPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        htmlContent={previewHtml}
+        title={file?.name || template?.fileName}
+        onDownload={handleDownloadPreview}
+        isDownloading={isPreviewing && showPreviewModal}
+      />
     </div>
   );
 }

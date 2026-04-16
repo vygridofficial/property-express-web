@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { mergeTemplateData } from './templateProcessor';
+import { mergeHtmlTemplate } from './templateProcessor';
 
 /**
  * Generates an agreement PDF. 
@@ -33,82 +33,53 @@ export const generateAgreementPDF = async (submissionData, adminSignatureData, d
       let populatedHtml;
 
       if (templateData.templateHtml) {
-        // ✅ Best path: HTML already extracted and stored in Firestore — no network needed
-        const { mergeHtmlTemplate } = await import('./templateProcessor');
+        // ✅ Use the exact same HTML merging as the preview modal
         populatedHtml = await mergeHtmlTemplate(templateData.templateHtml, submissionData, templateData.mappings, signatures);
       } else {
-        // ⚠️ Legacy path: fetch binary DOCX and process with mammoth
-        let arrayBuffer;
-        if (templateData.fileBase64) {
-          const base64String = templateData.fileBase64.includes(',') 
-            ? templateData.fileBase64.split(',')[1] 
-            : templateData.fileBase64;
-          const binaryString = window.atob(base64String);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
-          arrayBuffer = bytes.buffer;
-        } else if (templateData.fileUrl) {
-          try {
-            const directRes = await fetch(templateData.fileUrl);
-            arrayBuffer = directRes.ok ? await directRes.arrayBuffer() : null;
-          } catch { arrayBuffer = null; }
-          if (!arrayBuffer) {
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(templateData.fileUrl)}`;
-            const response = await fetch(proxyUrl);
-            arrayBuffer = await response.arrayBuffer();
-          }
-        } else {
-          throw new Error('No template content found. Please re-upload in Agreement Format tab.');
-        }
-        const { mergeTemplateData } = await import('./templateProcessor');
-        populatedHtml = await mergeTemplateData(arrayBuffer, submissionData, templateData.mappings, signatures);
+        throw new Error('No template content found. Please re-upload in Agreement Format tab.');
       }
 
-      // Create a hidden container for rendering
+      // Create container with visible positioning for reliable capture
       const container = document.createElement('div');
       container.style.position = 'absolute';
-      container.style.left = '0px';
-      container.style.top = '0px';
-      container.style.zIndex = '-9999';
-      // We must avoid visibility: 'hidden' or display: 'none' as html2canvas will render them blank
-      // We also avoid left: '-9999px' as modern browsers optimize it away as zero-size bounds
-      container.style.opacity = '0.01';
-      container.style.pointerEvents = 'none';
-      container.style.width = '800px'; // Standard A4-ish width
+      container.style.left = '0';
+      container.style.top = '0';
+      container.style.width = '800px';
+      container.style.backgroundColor = '#fff';
       container.innerHTML = populatedHtml;
       document.body.appendChild(container);
 
-      // Generate PDF from HTML
+      // Use jsPDF's html method which handles the layout perfectly
       const pdf = new jsPDF({
         orientation: 'p',
-        unit: 'px',
-        format: 'a4',
-        hotfixes: ['px_scaling']
+        unit: 'pt',
+        format: 'a4'
       });
 
       return new Promise((resolve, reject) => {
         pdf.html(container, {
-          callback: function (pdfInstance) {
+          callback: (pdfInstance) => {
             document.body.removeChild(container);
             if (downloadDirectly) {
-              pdfInstance.save(`Agreement_${submissionData.propertyTitle || 'Draft'}.pdf`);
+              const fileName = `Agreement_${(submissionData.propertyTitle || 'Draft').replace(/\s+/g, '_')}.pdf`;
+              pdfInstance.save(fileName);
+              resolve();
+            } else {
+              resolve(pdfInstance.output('blob'));
             }
-            resolve(downloadDirectly ? undefined : pdfInstance.output('blob'));
-          },
-          html2canvas: {
-            useCORS: true,
-            scale: 2 // Better resolution for the signatures and text
           },
           margin: [40, 40, 40, 40],
           autoPaging: 'text',
           x: 0,
           y: 0,
-          width: 800, // Target width in pixels
-          windowWidth: 800
+          width: 515, // A4 size in points (595) minus margins (40 + 40 = 80)
+          windowWidth: 800,
+          useCORS: true,
+          allowTaint: true
         }).catch(err => {
-          document.body.removeChild(container);
-          console.error("doc.html conversion failed:", err);
-          throw err;
+          if (document.body.contains(container)) document.body.removeChild(container);
+          console.error('PDF generation failed:', err);
+          reject(err);
         });
       });
     }

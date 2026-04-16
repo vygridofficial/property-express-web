@@ -8,12 +8,17 @@ import {
   Clock,
   Loader2,
   FileSignature,
-  FileText
+  FileText,
+  Eye
 } from 'lucide-react';
 import { getPendingSubmissions, rejectSubmission, approveSubmission } from '../../services/submissionService';
 import { generateAgreementPDF } from '../../utils/generateAgreementPDF';
+import { mergeHtmlTemplate } from '../../utils/templateProcessor';
+import { db } from '../../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import SignaturePad from '../../seller/components/SignaturePad';
 import AgreementTemplateTab from '../components/AgreementTemplateTab';
+import AgreementPreviewModal from '../components/AgreementPreviewModal';
 import styles from '../styles/admin.module.css';
 
 /* ── Shared card style using CSS vars ── */
@@ -41,6 +46,9 @@ export default function Approvals() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [adminSignature, setAdminSignature] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
   const [activeTab, setActiveTab] = useState('list');
 
   useEffect(() => { fetchSubmissions(); }, []);
@@ -88,6 +96,46 @@ export default function Approvals() {
     setActionType(null);
     setAdminSignature(null);
     setRejectionReason('');
+    setIsPreviewing(false);
+  };
+
+  const handleFullPreview = async () => {
+    if (!selectedSub) return;
+    setIsPreviewing(true);
+    try {
+      const docSnap = await getDoc(doc(db, 'admin_settings', 'agreement_template'));
+      if (docSnap.exists() && docSnap.data().status === 'active') {
+        const temp = docSnap.data();
+        const signatures = {
+          seller: selectedSub.sellerSignature,
+          admin: adminSignature || { type: 'text', value: 'PREVIEW ADMIN' }
+        };
+
+        const html = await mergeHtmlTemplate(temp.templateHtml, selectedSub, temp.mappings, signatures);
+        setPreviewHtml(html);
+        setShowPreviewModal(true);
+      } else {
+        alert('No active template found. Please set one up in the Agreement Format tab.');
+      }
+    } catch (err) {
+      console.error('Preview failed:', err);
+      alert('Failed to generate preview. Check console for details.');
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
+  const handleDownloadPreview = async () => {
+    setIsPreviewing(true);
+    try {
+      const signatures = {
+        seller: selectedSub.sellerSignature,
+        admin: adminSignature || { type: 'text', value: 'PREVIEW ADMIN' }
+      };
+      await generateAgreementPDF(selectedSub, signatures.admin, true);
+    } finally {
+      setIsPreviewing(false);
+    }
   };
 
   if (loading) return (
@@ -294,6 +342,27 @@ export default function Approvals() {
                         </p>
                         <p style={{ fontSize: '0.82rem', color: '#34d399', margin: 0 }}>This signature is legally binding for the seller.</p>
                       </div>
+                      
+                      {/* Full Agreement Preview Button */}
+                      <div style={{ marginLeft: 'auto' }}>
+                        <button
+                          onClick={handleFullPreview}
+                          disabled={isPreviewing}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
+                            background: 'white', color: '#1e293b',
+                            border: '1px solid #e2e8f0', borderRadius: '10px',
+                            padding: '0.75rem 1.25rem', fontWeight: 600, fontSize: '0.9rem',
+                            cursor: 'pointer', transition: 'all 0.2s',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#10b981'; e.currentTarget.style.color = '#10b981'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = '#1e293b'; }}
+                        >
+                          {isPreviewing ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
+                          {isPreviewing ? 'Generating...' : 'Full Agreement Preview'}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -375,6 +444,16 @@ export default function Approvals() {
 
         </div>
       )}
+
+      {/* ── Agreement Preview Modal ── */}
+      <AgreementPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        htmlContent={previewHtml}
+        title={`Agreement: ${selectedSub?.propertyTitle}`}
+        onDownload={handleDownloadPreview}
+        isDownloading={isPreviewing && showPreviewModal}
+      />
     </div>
   );
 }
