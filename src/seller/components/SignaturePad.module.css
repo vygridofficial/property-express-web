@@ -6,7 +6,7 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--stroke);
   padding: 0.4rem;
   border-radius: 12px;
 }
@@ -28,17 +28,15 @@
 }
 
 .methodBtn.active {
-  background: white;
+  background: var(--card-bg-light);
   color: #ed1b24;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .canvasArea {
   border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.6));
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: #ffffff; /* Force an opaque white background so black signatures always show */
   height: 250px;
   position: relative;
   margin-bottom: 2rem;
@@ -87,8 +85,9 @@
   font-size: 1.2rem;
   padding: 1rem;
   border: none;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--stroke);
   background: transparent;
+  color: var(--text-main);
   transition: all 0.3s;
   text-align: center;
 }

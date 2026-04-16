@@ -299,8 +299,8 @@
   width: 100%;
   padding: 0.9rem 1.1rem;
   border-radius: 14px;
-  border: 1.5px solid var(--glass-border);
-  background: var(--glass-bg);
+  border: 1.5px solid var(--stroke);
+  background: var(--card-bg-subtle);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--text-main);
@@ -323,6 +323,7 @@
 .glassInput::placeholder,
 .glassTextarea::placeholder {
   color: var(--text-muted);
+  opacity: 1;
 }
 
 .glassSelect {
@@ -339,17 +340,17 @@
   margin-bottom: 0.5rem;
   font-weight: 600;
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--text-body);
   letter-spacing: 0.01em;
 }
 
 .glassUploadBox {
-  background: rgba(248, 250, 252, 0.6);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 1.5rem;
   border-radius: 16px;
-  border: 1.5px dashed rgba(203, 213, 225, 0.8);
+  border: 1.5px dashed var(--stroke);
   transition: border-color 0.2s ease;
 }
 

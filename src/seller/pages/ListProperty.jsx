@@ -550,7 +550,7 @@ export default function ListProperty() {
             {/* ── STEP 2: Terms ── */}
             {step === 2 && (
               <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <div style={{ background: 'rgba(248,250,252,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', padding: '2rem', borderRadius: 18, marginBottom: '2rem', border: '1px solid rgba(226,232,240,0.8)' }}>
+                <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--stroke)', padding: '2rem', borderRadius: 18, marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.2rem', marginTop: 0, marginBottom: '1.5rem', color: 'var(--text-main)' }}>Seller Agreement Terms</h3>
 
                   {/* Term 1 */}

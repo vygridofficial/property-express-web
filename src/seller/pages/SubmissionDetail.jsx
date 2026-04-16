@@ -164,8 +164,8 @@ export default function SubmissionDetail() {
             {sub.sellerSignature && typeof sub.sellerSignature === 'string' && sub.sellerSignature.startsWith('data:') && (
               <div style={{ marginBottom: '2rem' }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Your Signature</div>
-                <div style={{ display: 'inline-block', border: '1px solid var(--stroke)', borderRadius: 16, background: 'var(--card-bg-subtle)', padding: '20px' }}>
-                  <img src={sub.sellerSignature} alt="Seller Signature" style={{ height: 80, display: 'block', filter: 'var(--theme-filter)' }} />
+                <div style={{ display: 'inline-block', border: '1px solid var(--stroke)', borderRadius: 16, background: '#ffffff', padding: '20px' }}>
+                  <img src={sub.sellerSignature} alt="Seller Signature" style={{ height: 80, display: 'block' }} />
                 </div>
               </div>
             )}
