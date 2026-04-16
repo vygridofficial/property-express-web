@@ -14,14 +14,19 @@ const STATUS = {
   pending:  { label: 'Pending',  icon: Clock,         color: '#f59e0b', badge: 'rgba(245,158,11,0.15)', text: '#f59e0b' },
 };
 
-const glassCard = {
-  background: 'var(--admin-glass-bg)',
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  border: '1px solid var(--admin-glass-border)',
-  borderRadius: 20,
   boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
 };
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isMobile;
+}
+
 
 /* ── Confirm Delete Modal ── */
 function ConfirmModal({ title, onConfirm, onCancel, isDeleting }) {
@@ -69,6 +74,7 @@ function DetailRow({ icon: Icon, label, value }) {
 }
 
 export default function SellersHistory() {
+  const isMobile = useIsMobile();
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [filter, setFilter]           = useState('all');
@@ -76,6 +82,7 @@ export default function SellersHistory() {
   const [selected, setSelected]       = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting]   = useState(false);
+
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -130,12 +137,12 @@ export default function SellersHistory() {
           {deleteTarget && <ConfirmModal title={deleteTarget.title} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} isDeleting={isDeleting} />}
         </AnimatePresence>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: isMobile ? '1.5rem' : '2rem', flexWrap: 'wrap' }}>
           <button onClick={() => setSelected(null)} style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--admin-text-main)', flexShrink: 0 }}>
             <ChevronLeft size={20} />
           </button>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--admin-text-main)', margin: 0 }}>
+          <div style={{ flex: 1, minWidth: isMobile ? '200px' : 'auto' }}>
+            <h1 style={{ fontSize: isMobile ? '1.3rem' : '1.7rem', fontWeight: 800, color: 'var(--admin-text-main)', margin: 0 }}>
               {selected.propertyTitle || 'Unnamed Property'}
             </h1>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 4, padding: '3px 12px', borderRadius: 20, background: cfg.badge, color: cfg.text, fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase' }}>
@@ -144,7 +151,7 @@ export default function SellersHistory() {
           </div>
           <button
             onClick={() => setDeleteTarget({ id: selected.id, title: selected.propertyTitle || 'Unnamed Property' })}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem', width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}
           >
             <Trash2 size={16} /> Delete
           </button>
@@ -152,9 +159,9 @@ export default function SellersHistory() {
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Property Details */}
-          <div style={{ ...glassCard, padding: '2rem' }}>
+          <div style={{ ...glassCard, padding: isMobile ? '1.25rem' : '2rem' }}>
             <h3 style={{ margin: '0 0 1.5rem', fontWeight: 700, color: 'var(--admin-text-main)', fontSize: '1.05rem' }}>🏠 Property Details</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem' }}>
               <DetailRow icon={Building}   label="Type"          value={selected.propertyType} />
               <DetailRow icon={MapPin}     label="Location"      value={selected.location} />
               <DetailRow icon={DollarSign} label="Price"         value={selected.price ? `₹ ${Number(selected.price).toLocaleString('en-IN')}` : null} />
@@ -167,10 +174,10 @@ export default function SellersHistory() {
           </div>
 
           {selected.images?.length > 0 && (
-            <div style={{ ...glassCard, padding: '2rem' }}>
+            <div style={{ ...glassCard, padding: isMobile ? '1.25rem' : '2rem' }}>
               <h3 style={{ margin: '0 0 1.25rem', fontWeight: 700, color: 'var(--admin-text-main)', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ImageIcon size={18} /> Property Images ({selected.images.length})</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem' }}>
-                {selected.images.map((url, i) => <img key={i} src={url} alt={`img-${i}`} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 12, border: '1px solid var(--admin-glass-border)' }} />)}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem' }}>
+                {selected.images.map((url, i) => <img key={i} src={url} alt={`img-${i}`} style={{ width: '100%', height: isMobile ? 100 : 140, objectFit: 'cover', borderRadius: 12, border: '1px solid var(--admin-glass-border)' }} />)}
               </div>
             </div>
           )}
@@ -208,51 +215,47 @@ export default function SellersHistory() {
       </AnimatePresence>
 
       {/* Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(237,27,36,0.12)', color: '#ed1b24', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <History size={22} />
-            </div>
-            <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--admin-text-main)', margin: 0 }}>Sellers History</h1>
+      <header style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ width: isMobile ? 40 : 44, height: isMobile ? 40 : 44, borderRadius: 14, background: 'rgba(237,27,36,0.12)', color: '#ed1b24', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <History size={isMobile ? 20 : 22} />
           </div>
-          <p style={{ color: 'var(--admin-text-muted)', margin: 0, marginLeft: 58 }}>All property submissions from the Seller Portal.</p>
+          <div>
+            <h1 style={{ fontSize: isMobile ? '1.5rem' : '2.2rem', fontWeight: 800, color: 'var(--admin-text-main)', margin: 0, letterSpacing: '-0.02em' }}>Sellers History</h1>
+            {!isMobile && <p style={{ color: 'var(--admin-text-muted)', margin: '4px 0 0', fontSize: '0.95rem' }}>All property submissions from the Seller Portal.</p>}
+          </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', gap: '0.75rem' }}>
           {/* Search bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', borderRadius: 30, padding: '0.5rem 1.2rem' }}>
-            <Search size={15} color="var(--admin-text-muted)" />
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', borderRadius: 16, padding: '0.6rem 1.2rem' }}>
+            <Search size={16} color="var(--admin-text-muted)" />
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by name, location…"
-              style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '0.85rem', color: 'var(--admin-text-main)', width: 190, fontFamily: 'Outfit, sans-serif' }}
+              style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '0.9rem', color: 'var(--admin-text-main)', width: '100%', fontFamily: 'Outfit, sans-serif' }}
             />
-            {search && (
-              <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--admin-text-muted)', display: 'flex', padding: 0 }}>
-                <X size={13} />
-              </button>
-            )}
           </div>
 
-          {/* Filter pills */}
-          <div style={{ display: 'flex', gap: '0.35rem', background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', borderRadius: 12, padding: '0.3rem' }}>
-            {[
-              { key: 'all',      label: `All (${submissions.length})` },
-              { key: 'accepted', label: `Accepted (${submissions.filter(s => s.status === 'approved').length})` },
-              { key: 'rejected', label: `Rejected (${submissions.filter(s => s.status === 'rejected').length})` },
-            ].map(f => (
-              <button key={f.key} onClick={() => setFilter(f.key)} style={{ padding: '0.42rem 1rem', borderRadius: 8, fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', border: 'none', background: filter === f.key ? '#ed1b24' : 'transparent', color: filter === f.key ? 'white' : 'var(--admin-text-muted)', boxShadow: filter === f.key ? '0 3px 10px rgba(237,27,36,0.28)' : 'none', transition: 'all 0.2s', fontFamily: 'Outfit, sans-serif' }}>
-                {f.label}
-              </button>
-            ))}
-          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: isMobile ? '2px' : 0 }}>
+            <div style={{ display: 'flex', gap: '0.35rem', background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', borderRadius: 14, padding: '0.3rem', whiteSpace: 'nowrap' }}>
+              {[
+                { key: 'all',      label: isMobile ? 'All' : `All (${submissions.length})` },
+                { key: 'accepted', label: isMobile ? 'Accepted' : `Accepted (${submissions.filter(s => s.status === 'approved').length})` },
+                { key: 'rejected', label: isMobile ? 'Rejected' : `Rejected (${submissions.filter(s => s.status === 'rejected').length})` },
+              ].map(f => (
+                <button key={f.key} onClick={() => setFilter(f.key)} style={{ padding: '0.45rem 1rem', borderRadius: 10, fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer', border: 'none', background: filter === f.key ? '#ed1b24' : 'transparent', color: filter === f.key ? 'white' : 'var(--admin-text-muted)', transition: 'all 0.2s', fontFamily: 'Outfit, sans-serif' }}>
+                  {f.label}
+                </button>
+              ))}
+            </div>
 
-          <button onClick={fetchAll} title="Refresh" style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', borderRadius: '50%', width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--admin-text-muted)' }}>
-            <RefreshCw size={16} />
-          </button>
+            <button onClick={fetchAll} title="Refresh" style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', borderRadius: 14, width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--admin-text-muted)', flexShrink: 0 }}>
+              <RefreshCw size={18} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -279,42 +282,44 @@ export default function SellersHistory() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
-                style={{ ...glassCard, padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', gap: '1rem' }}
+                style={{ ...glassCard, padding: isMobile ? '1rem' : '1.1rem 1.4rem', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', gap: isMobile ? '0.75rem' : '1rem' }}
               >
-                {/* Status icon */}
-                <div onClick={() => setSelected(sub)} style={{ width: 42, height: 42, borderRadius: 13, background: s.badge, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}>
-                  <s.icon size={19} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+                  {/* Status icon */}
+                  <div onClick={() => setSelected(sub)} style={{ width: 42, height: 42, borderRadius: 13, background: s.badge, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}>
+                    <s.icon size={19} />
+                  </div>
+
+                  {/* Info */}
+                  <div onClick={() => setSelected(sub)} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
+                    <div style={{ fontWeight: 700, color: 'var(--admin-text-main)', fontSize: '0.98rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
+                      {sub.propertyTitle || 'Unnamed Property'}
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem' }}>
+                      {sub.sellerName && <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}><User size={12} /> {sub.sellerName}</span>}
+                      {sub.location   && <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={12} /> {sub.location}</span>}
+                    </div>
+                  </div>
+                  {!isMobile && <ArrowUpRight size={15} color="var(--admin-text-muted)" style={{ flexShrink: 0, cursor: 'pointer' }} onClick={() => setSelected(sub)} />}
                 </div>
 
-                {/* Info */}
-                <div onClick={() => setSelected(sub)} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
-                  <div style={{ fontWeight: 700, color: 'var(--admin-text-main)', fontSize: '0.98rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
-                    {sub.propertyTitle || 'Unnamed Property'}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: isMobile ? '1px solid var(--admin-stroke)' : 'none', paddingTop: isMobile ? '0.75rem' : 0, paddingLeft: isMobile ? '0.25rem' : 0 }}>
+                  <div style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: isMobile ? 'center' : 'flex-end', gap: isMobile ? '0.75rem' : '2px' }}>
+                    {sub.price && <div style={{ fontWeight: 800, color: 'var(--admin-text-main)', fontSize: '0.95rem' }}>₹ {Number(sub.price).toLocaleString('en-IN')}</div>}
+                    <span style={{ padding: '3px 11px', borderRadius: 20, background: s.badge, color: s.text, fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>{s.label}</span>
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {sub.sellerName && <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}><User size={11} /> {sub.sellerName}</span>}
-                    {sub.location   && <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}><MapPin size={11} /> {sub.location}</span>}
-                    <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}><Calendar size={11} /> {sub.createdAt?.toDate?.().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) || 'Recent'}</span>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {isMobile && <button onClick={() => setSelected(sub)} style={{ height: 34, padding: '0 1rem', borderRadius: 8, background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-glass-border)', color: 'var(--admin-text-main)', fontSize: '0.8rem', fontWeight: 600 }}>View</button>}
+                    <button
+                      onClick={() => setDeleteTarget({ id: sub.id, title: sub.propertyTitle || 'Unnamed Property' })}
+                      title="Delete"
+                      style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: 8, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 </div>
-
-                {/* Price */}
-                {sub.price && <div style={{ fontWeight: 700, color: 'var(--admin-text-main)', fontSize: '0.93rem', flexShrink: 0 }}>₹ {Number(sub.price).toLocaleString('en-IN')}</div>}
-
-                {/* Status badge */}
-                <span style={{ padding: '3px 11px', borderRadius: 20, background: s.badge, color: s.text, fontSize: '0.73rem', fontWeight: 700, textTransform: 'uppercase', flexShrink: 0 }}>{s.label}</span>
-
-                {/* View arrow */}
-                <ArrowUpRight size={15} color="var(--admin-text-muted)" style={{ flexShrink: 0, cursor: 'pointer' }} onClick={() => setSelected(sub)} />
-
-                {/* Delete */}
-                <button
-                  onClick={() => setDeleteTarget({ id: sub.id, title: sub.propertyTitle || 'Unnamed Property' })}
-                  title="Delete"
-                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: 8, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
-                >
-                  <Trash2 size={15} />
-                </button>
               </motion.div>
             );
           })}

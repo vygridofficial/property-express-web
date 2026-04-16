@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
 import { formatDate } from '../utils/formatDate';
 import { submitLead } from '../services/leadService';
@@ -307,6 +307,26 @@ export default function PropertyDetail() {
                     <span>{amenity}</span>
                   </div>
                 ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Dynamic Attributes Section */}
+          {property.dynamicFilters && Object.entries(property.dynamicFilters).filter(([_, v]) => v && v.toString().trim() !== '').length > 0 && (
+            <motion.div className={styles.attributesSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <Info size={22} color="var(--color-primary)" />
+                <h3 style={{ margin: 0 }}>Additional Details</h3>
+              </div>
+              <div className={styles.attributesGrid}>
+                {Object.entries(property.dynamicFilters)
+                  .filter(([_, value]) => value && value.toString().trim() !== '')
+                  .map(([key, value], idx) => (
+                    <div key={idx} className={styles.attributeItem}>
+                      <span className={styles.attributeLabel}>{key}</span>
+                      <span className={styles.attributeValue}>{value}</span>
+                    </div>
+                  ))}
               </div>
             </motion.div>
           )}

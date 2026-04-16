@@ -265,5 +265,22 @@ export const filterProperties = (properties, query, filters, knownLocations = []
     }
   }
 
+  // 6. Dynamic Attribute Filters
+  // Iterate over all filter keys except the core reserved ones
+  const coreFilters = ['q', 'type', 'location', 'price', 'sort'];
+  Object.keys(filters).forEach(key => {
+    if (!coreFilters.includes(key)) {
+      const val = filters[key];
+      if (val && val !== 'Any' && !val.includes('All')) {
+        results = results.filter(p => {
+          const dynamicVal = p.dynamicFilters?.[key];
+          if (!dynamicVal) return false;
+          // Support both exact match and inclusion (for flexibility)
+          return dynamicVal.toString().toLowerCase() === val.toString().toLowerCase();
+        });
+      }
+    }
+  });
+
   return results;
 };

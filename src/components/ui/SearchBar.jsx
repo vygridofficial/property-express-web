@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { filterProperties, getTypeEmojiMap, isPropertyTypeKeyword, getCategoryFromKeyword } from '../../utils/searchLogic';
 import styles from './SearchBar.module.css';
 import { formatPrice } from '../../utils/formatPrice';
+import { useAdmin } from '../../admin/context/AdminContext';
 
 const DEFAULT_FILTERS = {
   sort: 'Newest First',
@@ -20,6 +21,13 @@ const DROPDOWN_OPTIONS = {
 };
 
 export default function SearchBar({ properties = [] }) {
+  const { propertyTypes } = useAdmin();
+  const activeTypes = useMemo(() => {
+    return propertyTypes
+      .filter(t => t.isActive !== false)
+      .map(t => t.name);
+  }, [propertyTypes]);
+
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -36,10 +44,13 @@ export default function SearchBar({ properties = [] }) {
     return ['All Locations', ...Array.from(locs).sort()];
   }, [properties]);
   
-  const dropdownOptions = {
-    ...DROPDOWN_OPTIONS,
-    location: locations
-  };
+  const dropdownOptions = useMemo(() => {
+    return {
+      ...DROPDOWN_OPTIONS,
+      type: ['All Types', ...activeTypes],
+      location: locations
+    };
+  }, [activeTypes, locations]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -124,7 +135,7 @@ export default function SearchBar({ properties = [] }) {
     if (locMatch && locMatch.toLowerCase() !== q) return locMatch;
 
     // 3. Property types / categories
-    const typeMatch = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().startsWith(q));
+    const typeMatch = activeTypes.find(t => t.toLowerCase().startsWith(q));
     if (typeMatch && typeMatch.toLowerCase() !== q) return typeMatch;
 
     // 4. Property titles
@@ -138,11 +149,11 @@ export default function SearchBar({ properties = [] }) {
     const locCont = locations.find(l => l !== 'All Locations' && l.toLowerCase().includes(q) && l.toLowerCase() !== q);
     if (locCont) return locCont;
 
-    const typeCont = DROPDOWN_OPTIONS.type.find(t => t !== 'All Types' && t.toLowerCase().includes(q) && t.toLowerCase() !== q);
+    const typeCont = activeTypes.find(t => t.toLowerCase().includes(q) && t.toLowerCase() !== q);
     if (typeCont) return typeCont;
 
     return '';
-  }, [query, properties, locations]);
+  }, [query, properties, locations, activeTypes]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {

@@ -16,8 +16,20 @@ export const getFeaturedProperties = async (includeInactive = false) => {
   if (!includeInactive) {
     q = query(q, where("status", "==", "Active"));
   }
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  
+  const [snapshot, typesSnapshot] = await Promise.all([
+    getDocs(q),
+    getDocs(collection(db, 'propertyTypes'))
+  ]);
+
+  let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  if (!includeInactive) {
+    const activeTypes = typesSnapshot.docs.map(d => d.data()).filter(t => t.isActive !== false).map(t => (t.name || '').toLowerCase());
+    results = results.filter(p => !p.category || activeTypes.includes(p.category.toLowerCase()) || p.category.toLowerCase() === 'uncategorized');
+  }
+
+  return results;
 };
 
 export const getSiteSettings = async () => {
@@ -33,11 +45,16 @@ export const getPropertyTypes = async () => {
 };
 
 export const getAllProperties = async (filters = {}, includeInactive = false) => {
-  const snapshot = await getDocs(collection(db, PROPERTIES_COLLECTION));
+  const [snapshot, typesSnapshot] = await Promise.all([
+    getDocs(collection(db, PROPERTIES_COLLECTION)),
+    getDocs(collection(db, 'propertyTypes'))
+  ]);
+  
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   if (!includeInactive) {
-    results = results.filter(p => p.status === "Active");
+    const activeTypes = typesSnapshot.docs.map(d => d.data()).filter(t => t.isActive !== false).map(t => (t.name || '').toLowerCase());
+    results = results.filter(p => p.status === "Active" && (!p.category || activeTypes.includes(p.category.toLowerCase()) || p.category.toLowerCase() === 'uncategorized'));
   }
 
   if (filters.location && filters.location !== "") {
@@ -60,15 +77,18 @@ export const getPropertyById = async (id) => {
 };
 
 export const addProperty = async (propertyData) => {
+  categoryCache.clear();
   return await addDoc(collection(db, PROPERTIES_COLLECTION), propertyData);
 };
 
 export const updateProperty = async (id, data) => {
+  categoryCache.clear();
   const docRef = doc(db, PROPERTIES_COLLECTION, id);
   return await updateDoc(docRef, data);
 };
 
 export const deleteProperty = async (id) => {
+  categoryCache.clear();
   const docRef = doc(db, PROPERTIES_COLLECTION, id);
   return await deleteDoc(docRef);
 };
@@ -122,6 +142,20 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
         const matchesStatus = includeInactive || p.status === "Active";
         return matchesCat && matchesStatus;
       });
+  }
+
+  // Cross-check property type visibility
+  if (!includeInactive) {
+    const typesSnapshot = await getDocs(collection(db, 'propertyTypes'));
+    const activeTypes = typesSnapshot.docs.map(d => d.data()).filter(t => t.isActive !== false).map(t => (t.name || '').toLowerCase());
+    
+    // Check if the requested category translates to an active type
+    const requestedCats = synonyms.map(s => s.toLowerCase());
+    const isCategoryActive = requestedCats.some(c => activeTypes.includes(c));
+    
+    if (!isCategoryActive) {
+       results = [];
+    }
   }
 
   // Cache the results for this session

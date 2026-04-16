@@ -122,33 +122,6 @@ export default function SellerSidebar() {
             )}
           </AnimatePresence>
         </button>
-
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          className={styles.logoutBtn}
-          title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          style={{
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            padding: collapsed ? '0.75rem' : '0.75rem 1rem',
-            color: 'var(--text-main)',
-            marginTop: '-0.5rem'
-          }}
-        >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
-              >
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
       </div>
     </aside>
   );

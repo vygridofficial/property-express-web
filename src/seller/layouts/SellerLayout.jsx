@@ -14,6 +14,7 @@ import HelpCenter from '../pages/HelpCenter';
 import styles from '../styles/seller.module.css';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import SellerTopNavbar from '../components/SellerTopNavbar';
 
 export default function SellerLayout() {
   const { isAuthenticated, loading, theme } = useSeller();
@@ -31,6 +32,7 @@ export default function SellerLayout() {
           </div>
         </div>
         <div className={styles.mainContent}>
+          <header style={{ height: 72, background: 'rgba(255,255,255,0.2)', borderBottom: '1px solid rgba(255,255,255,0.1)' }} />
           <main className={styles.pageContainer}>
             <div style={{ padding: '2rem' }}>
               <Skeleton height={40} width={250} style={{ marginBottom: '2rem' }} />
@@ -71,21 +73,26 @@ export default function SellerLayout() {
             {/* Desktop sidebar — hidden on mobile via CSS */}
             <SellerSidebar />
 
-            {/* Main content */}
-            <main className={styles.mainContent}>
-              <Routes>
-                <Route index element={<SellerDashboard />} />
-                <Route path="sign/:id" element={<SignAgreement />} />
-                <Route path="list" element={<ListProperty />} />
-                <Route path="signed" element={<SigningHistory />} />
-                <Route path="signed/:id" element={<SubmissionDetail />} />
-                <Route path="help" element={<HelpCenter />} />
-                <Route path="*" element={<SellerDashboard />} />
-              </Routes>
-            </main>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+              {/* Added Top Navbar */}
+              <SellerTopNavbar />
 
-            {/* Mobile bottom nav — shown only on mobile via CSS */}
-            <SellerMobileBottomNav />
+              {/* Main content */}
+              <main className={styles.mainContent}>
+                <Routes>
+                  <Route index element={<SellerDashboard />} />
+                  <Route path="sign/:id" element={<SignAgreement />} />
+                  <Route path="list" element={<ListProperty />} />
+                  <Route path="signed" element={<SigningHistory />} />
+                  <Route path="signed/:id" element={<SubmissionDetail />} />
+                  <Route path="help" element={<HelpCenter />} />
+                  <Route path="*" element={<SellerDashboard />} />
+                </Routes>
+              </main>
+
+              {/* Mobile bottom nav — shown only on mobile via CSS */}
+              <SellerMobileBottomNav />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

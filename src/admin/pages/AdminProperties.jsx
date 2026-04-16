@@ -9,6 +9,7 @@ import styles from '../styles/admin.module.css';
 import { KERALA_DISTRICTS } from '../../data/districts';
 import FilterManagementModal from '../components/FilterManagementModal';
 import { uploadToCloudinary } from '../../utils/cloudinary';
+import { FILTER_TAXONOMY } from '../../data/filterTaxonomy';
 
 export default function AdminProperties() {
   const { siteSettings, properties, setProperties, propertyTypes, addPropertyType, loading: contextLoading } = useAdmin();
@@ -235,11 +236,16 @@ export default function AdminProperties() {
       if (sortOrder === 'Price: High to Low') return b.numericPrice - a.numericPrice;
       return 0; 
     });
-  }, [properties, activeCategory, searchTerm, statusFilter, locFilter, catFilter, priceFilter, sortOrder]);
+  }, [properties, activeCategory, searchTerm, statusFilter, locFilter, catFilter, priceFilter, distFilter, sortOrder]);
 
   const clearFilters = () => {
     setSearchTerm(''); setStatusFilter('All'); setPriceFilter('All'); setLocFilter('All'); setDistFilter('All'); setCatFilter('All'); setSortOrder('Newest First');
   };
+
+  useEffect(() => {
+    clearFilters();
+  }, [activeCategory]);
+
   const hasActiveFilters = searchTerm || statusFilter !== 'All' || priceFilter !== 'All' || locFilter !== 'All' || distFilter !== 'All' || catFilter !== 'All' || sortOrder !== 'Newest First';
 
     const handleAgentPhoto = (e) => {
@@ -965,22 +971,74 @@ export default function AdminProperties() {
                 {/* Section 6.5 - Dynamic Filters */}
                 <SectionHeading>Section 6.5 — Dynamic Attributes (Optional)</SectionHeading>
                 <div>
-                  <Label>Custom Property Attributes</Label>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '1rem' }}>Add custom metrics like "Furnishing: Fully Furnished" which will automatically build out new filtering dropdowns on the frontend.</p>
+                  <Label>Category-Specific Attributes</Label>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '1.25rem' }}>
+                    These attributes are defined for the <strong>{formData.category || 'selected'}</strong> category.
+                  </p>
+                  
+                  {(() => {
+                    const dbTaxonomy = siteSettings.taxonomy?.[formData.category]?.subFilters;
+                    const staticTaxonomy = FILTER_TAXONOMY[formData.category]?.subFilters || [];
+                    const categoryFilters = dbTaxonomy || staticTaxonomy;
+
+                    if (!categoryFilters || categoryFilters.length === 0) {
+                      return <p style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontStyle: 'italic', marginBottom: '2rem' }}>No specific attributes defined for this category.</p>;
+                    }
+
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                        {categoryFilters.map(filter => (
+                          <div key={filter.key}>
+                            <Label>{filter.label}</Label>
+                            {filter.type === 'dropdown' ? (
+                              <select 
+                                value={formData.dynamicFilters?.[filter.key] || ''} 
+                                onChange={e => handleFormChange('dynamicFilters', { ...formData.dynamicFilters, [filter.key]: e.target.value })}
+                                style={getInputStyle(filter.key)}
+                              >
+                                <option value="">Select {filter.label}...</option>
+                                {filter.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                              </select>
+                            ) : (
+                              <input 
+                                type="text" 
+                                placeholder={`Enter ${filter.label.toLowerCase()}...`}
+                                value={formData.dynamicFilters?.[filter.key] || ''}
+                                onChange={e => handleFormChange('dynamicFilters', { ...formData.dynamicFilters, [filter.key]: e.target.value })}
+                                style={getInputStyle(filter.key)}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+
+                  <Label>Other Manual Attributes</Label>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '1rem' }}>Add extra characteristics not covered by the category defaults.</p>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.5rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
-                    <input type="text" placeholder="e.g. Furnishing" value={dynKey} onChange={e => setDynKey(e.target.value)} style={getInputStyle('dynKey')} />
-                    <input type="text" placeholder="e.g. Fully Furnished" value={dynVal} onChange={e => setDynVal(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter'){ e.preventDefault(); addDynamicFilter(); } }} style={getInputStyle('dynVal')} />
+                    <input type="text" placeholder="e.g. Construction Year" value={dynKey} onChange={e => setDynKey(e.target.value)} style={getInputStyle('dynKey')} />
+                    <input type="text" placeholder="e.g. 2024" value={dynVal} onChange={e => setDynVal(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter'){ e.preventDefault(); addDynamicFilter(); } }} style={getInputStyle('dynVal')} />
                     <button className="btn" onClick={(e) => { e.preventDefault(); addDynamicFilter(); }} style={{ height: 43, background: '#18181a', color: 'white', borderRadius: 12, padding: '0 1.5rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}>Add</button>
                   </div>
                   
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {Object.entries(formData.dynamicFilters || {}).map(([k, v]) => (
-                       <span key={k} style={{ padding: '0.4rem 0.8rem', borderRadius: 8, background: 'rgba(0,0,0,0.05)', border: '1px solid var(--admin-stroke)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
-                         <strong style={{ color: 'var(--admin-text-muted)' }}>{k}:</strong> {v} 
-                         <X size={14} style={{ cursor: 'pointer', color: '#ed1b24', marginLeft: '0.25rem' }} onClick={() => removeDynamicFilter(k)} />
-                       </span>
-                    ))}
+                    {Object.entries(formData.dynamicFilters || {}).map(([k, v]) => {
+                      // Check if this key is part of category filters to avoid duplicate showing (optional, but cleaner)
+                      const dbTaxonomy = siteSettings.taxonomy?.[formData.category]?.subFilters;
+                      const staticTaxonomy = FILTER_TAXONOMY[formData.category]?.subFilters || [];
+                      const isCategoryFilter = (dbTaxonomy || staticTaxonomy).some(f => f.key === k);
+                      
+                      if (isCategoryFilter) return null;
+
+                      return (
+                        <span key={k} style={{ padding: '0.4rem 0.8rem', borderRadius: 8, background: 'rgba(0,0,0,0.05)', border: '1px solid var(--admin-stroke)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
+                          <strong style={{ color: 'var(--admin-text-muted)' }}>{k}:</strong> {v} 
+                          <X size={14} style={{ cursor: 'pointer', color: '#ed1b24', marginLeft: '0.25rem' }} onClick={() => removeDynamicFilter(k)} />
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
 

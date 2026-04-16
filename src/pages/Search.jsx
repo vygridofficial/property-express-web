@@ -6,7 +6,11 @@ import { getAllProperties } from '../services/propertyService';
 import { filterProperties, parsePhraseQuery } from '../utils/searchLogic';
 import PropertyCard from '../components/ui/PropertyCard';
 import SEO from '../components/common/SEO';
+import { useAdmin } from '../admin/context/AdminContext';
+import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
 import styles from './Search.module.css';
+
+const CORE_FILTER_KEYS = ['sort', 'type', 'location', 'price'];
 
 const DROPDOWN_OPTIONS = {
   sort: ['Newest First', 'Oldest First', 'Price Low to High', 'Price High to Low'],
@@ -47,6 +51,13 @@ export default function Search() {
     price: priceFilter,
     sort: sortFilter
   };
+
+  // Extract all other dynamic filters from searchParams
+  searchParams.forEach((val, key) => {
+    if (!CORE_FILTER_KEYS.includes(key) && key !== 'q') {
+      filters[key] = val;
+    }
+  });
 
   const locations = useMemo(() => [
     'All Locations',
@@ -152,10 +163,35 @@ export default function Search() {
     setSuggestion('');
   }, [localQuery, allProps]);
 
-  const dropdownOptions = {
-    ...DROPDOWN_OPTIONS,
-    location: locations
-  };
+  const { siteSettings, propertyTypes } = useAdmin();
+
+  // Determine dynamic filters for the currently selected type
+  const dynamicSubFilters = useMemo(() => {
+    if (!typeFilter || typeFilter === 'All Types') return [];
+    const dbTaxonomy = siteSettings.taxonomy?.[typeFilter]?.subFilters;
+    const staticTaxonomy = FILTER_TAXONOMY[typeFilter]?.subFilters || [];
+    return dbTaxonomy || staticTaxonomy;
+  }, [typeFilter, siteSettings.taxonomy]);
+  const dropdownOptions = useMemo(() => {
+    const activeTypes = propertyTypes
+      .filter(t => t.isActive !== false)
+      .map(t => t.name);
+
+    const opts = {
+      ...DROPDOWN_OPTIONS,
+      type: ['All Types', ...activeTypes],
+      location: locations
+    };
+
+    // Add options for dynamic filters
+    dynamicSubFilters.forEach(f => {
+      if (f.type === 'dropdown') {
+        opts[f.key] = ['Any ' + f.label, ...f.options];
+      }
+    });
+
+    return opts;
+  }, [dynamicSubFilters, locations, propertyTypes]);
 
   // Perform search locally to stay fast when params change
   const filteredResults = useMemo(() => {
@@ -165,14 +201,35 @@ export default function Search() {
   const setFilterParam = (key, value) => {
     setOpenDropdown(null);
     const newParams = new URLSearchParams(searchParams);
-    const defaults = { sort: 'Newest First', type: 'All Types', location: 'All Locations', price: 'Any Price' };
-    if (value === defaults[key]) {
+    const defaults = { 
+      sort: 'Newest First', 
+      type: 'All Types', 
+      location: 'All Locations', 
+      price: 'Any Price' 
+    };
+
+    // Handle dynamic defaults (e.g. Any Furnishing)
+    const isDynamic = !CORE_FILTER_KEYS.includes(key);
+    const isDefaultValue = value === defaults[key] || (isDynamic && (value === 'Any' || value.includes('Any')));
+
+    if (isDefaultValue) {
       newParams.delete(key);
     } else {
       newParams.set(key, value);
     }
+
+    // If type is changed, clear dynamic filters as they are type-specific
+    if (key === 'type') {
+      searchParams.forEach((_, k) => {
+        if (!CORE_FILTER_KEYS.includes(k) && k !== 'q') {
+          newParams.delete(k);
+        }
+      });
+    }
+
     setSearchParams(newParams, { replace: true });
   };
+ bitumen
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -241,7 +298,8 @@ export default function Search() {
       <div className={styles.filterBar} ref={filterRef}>
         <div className="container">
           <div className={styles.filtersContainer}>
-            {['sort', 'type', 'location', 'price'].map(key => {
+            {/* Core Filters */}
+            {CORE_FILTER_KEYS.map(key => {
               if (key === 'type' && isTypeDisabled) return null;
               if (key === 'location' && isLocationDisabled) return null;
               
@@ -265,11 +323,51 @@ export default function Search() {
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.15 }}
                       >
-                        {dropdownOptions[key].map(opt => (
+                        {dropdownOptions[key]?.map(opt => (
                           <div
                             key={opt}
                             className={`${styles.dropdownOption} ${filters[key] === opt ? styles.dropdownOptionSelected : ''}`}
                             onClick={() => setFilterParam(key, opt)}
+                          >
+                            {opt}
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+
+            {/* Dynamic Attributes Filters */}
+            {dynamicSubFilters.map(f => {
+              const currentVal = filters[f.key];
+              const isActive = currentVal && currentVal !== 'Any' && !currentVal.includes('Any');
+              
+              return (
+                <div key={f.key} className={styles.filterGroup}>
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${isActive ? styles.filterPillActive : ''}`}
+                    onClick={() => setOpenDropdown(prev => prev === f.key ? null : f.key)}
+                  >
+                    {isActive ? currentVal : f.label} <ChevronDown size={14} />
+                  </button>
+                  
+                  <AnimatePresence>
+                    {openDropdown === f.key && (
+                      <motion.div
+                        className={styles.dropdownBox}
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        {dropdownOptions[f.key]?.map(opt => (
+                          <div
+                            key={opt}
+                            className={`${styles.dropdownOption} ${currentVal === opt ? styles.dropdownOptionSelected : ''}`}
+                            onClick={() => setFilterParam(f.key, opt)}
                           >
                             {opt}
                           </div>

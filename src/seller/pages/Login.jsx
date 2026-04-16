@@ -33,8 +33,9 @@ export default function SellerLogin() {
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      padding: '2rem'
+      background: 'var(--canvas-bg, linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%))',
+      padding: '2rem',
+      transition: 'background 0.4s ease'
     }}>
       {isSubmitting ? (
         <Skeleton height={40} width={200} />
@@ -43,34 +44,39 @@ export default function SellerLogin() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
-            background: 'rgba(255, 255, 255, 0.85)',
+            background: 'var(--glass-bg, rgba(255, 255, 255, 0.85))',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            padding: '3rem',
+            padding: 'calc(2rem + 2vw)',
             borderRadius: '32px',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.1)',
+            boxShadow: 'var(--glass-shadow, 0 25px 60px rgba(0,0,0,0.1))',
             maxWidth: '430px',
             width: '100%',
             textAlign: 'center',
-            border: '1px solid rgba(255,255,255,0.5)'
+            border: '1px solid var(--glass-border, rgba(255,255,255,0.5))',
+            color: 'var(--text-main)'
           }}
         >
-          <img src={logo} alt="Property Express" style={{ height: '42px', marginBottom: '1.5rem' }} />
-          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.75rem' }}>Seller Portal Access</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', lineHeight: '1.6' }}>Securely log in to review, manage, and sign your property agreements.</p>
+          <img src={logo} alt="Property Express" style={{ height: '42px', marginBottom: '1.5rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.75rem', fontFamily: 'Outfit, sans-serif' }}>Seller Portal Access</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', lineHeight: '1.6', fontSize: '0.95rem' }}>Securely log in to review, manage, and sign your property agreements.</p>
 
           <button 
             type="button"
             onClick={safeGoogleLogin}
             disabled={isSubmitting}
             style={{ 
-              width: '100%', padding: '1.2rem', borderRadius: '16px', background: 'white', 
-              border: '2px solid #e2e8f0', color: 'var(--text-main)', fontWeight: 700, fontSize: '1.1rem',
+              width: '100%', padding: '1.1rem', borderRadius: '16px', 
+              background: 'var(--glass-solid, white)', 
+              border: '1px solid var(--glass-border, #e2e8f0)', 
+              color: 'var(--text-main)', fontWeight: 700, fontSize: '1.05rem',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', cursor: 'pointer',
-              transition: 'all 0.2s', opacity: isSubmitting ? 0.7 : 1
+              transition: 'all 0.2s', opacity: isSubmitting ? 0.7 : 1,
+              fontFamily: 'Outfit, sans-serif',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
             }}
-            onMouseOver={(e) => !isSubmitting && (e.currentTarget.style.borderColor = '#cbd5e1')}
-            onMouseOut={(e) => !isSubmitting && (e.currentTarget.style.borderColor = '#e2e8f0')}
+            onMouseOver={(e) => !isSubmitting && (e.currentTarget.style.borderColor = '#ed1b24')}
+            onMouseOut={(e) => !isSubmitting && (e.currentTarget.style.borderColor = 'var(--glass-border)')}
           >
             {isSubmitting ? (
               <Loader2 className="animate-spin" />
@@ -86,10 +92,10 @@ export default function SellerLogin() {
               </>
             )}
           </button>
-          <p style={{ margin: '1.5rem 0 0.5rem', color: '#94a3b8', fontSize: '0.85rem' }}>Only authorized sellers can access this portal.</p>
+          <p style={{ margin: '1.5rem 0 0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Only authorized sellers can access this portal.</p>
 
           {(localError || authError) && (
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.9rem', marginTop: '1.5rem', background: '#fef2f2', padding: '1rem', borderRadius: '12px', border: '1px solid #fee2e2' }}>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.875rem', marginTop: '1.5rem', background: 'rgba(239,68,68,0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>
               {localError || authError}
             </motion.p>
           )}

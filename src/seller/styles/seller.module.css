@@ -2,7 +2,7 @@
 .sellerApp {
   min-height: 100vh;
   color: #1e293b;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
   overflow: hidden;
 
   --glass-bg: rgba(255, 255, 255, 0.45);
@@ -214,7 +214,7 @@
   cursor: pointer;
   border-radius: 12px;
   transition: background 0.2s;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 .logoutBtn:hover {
@@ -253,7 +253,7 @@
   border: none;
   cursor: pointer;
   color: #94a3b8;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-size: 10px;
   font-weight: 600;
   min-width: 44px;
@@ -306,7 +306,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
   width: 100%;
   text-align: left;
 }
@@ -339,10 +339,152 @@
   }
 
   .mainContent {
-    padding: 1.25rem 1rem;
+    padding: 1rem;
     padding-bottom: 84px;
     box-sizing: border-box;
     max-width: 100vw;
     overflow-x: hidden;
   }
+}
+
+/* ─── Top Navbar ─── */
+.topNavbar {
+  height: 72px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  gap: 1rem;
+}
+
+.navActionBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+.navActionBtn:hover {
+  background: var(--stroke);
+  transform: translateY(-2px);
+}
+
+.profileTrigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem;
+  padding-right: 1rem;
+  border-radius: 30px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profileTrigger:hover {
+  background: var(--stroke);
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.profileName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* ─── Profile Panel (Google Style) ─── */
+.profilePanel {
+  position: absolute;
+  top: 80px;
+  right: 2rem;
+  width: 320px;
+  background: var(--glass-solid);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+  padding: 1.5rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.panelAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 4px solid var(--stroke);
+}
+
+.panelName {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.panelEmail {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.panelDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--stroke);
+  margin: 1rem 0;
+}
+
+.panelInfoGrid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.infoLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.infoValue {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
 }

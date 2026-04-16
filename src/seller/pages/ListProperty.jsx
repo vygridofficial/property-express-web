@@ -200,12 +200,12 @@ export default function ListProperty() {
     padding: '0.9rem 1.1rem',
     borderRadius: 14,
     border: '1.5px solid rgba(200,210,230,0.7)',
-    background: 'rgba(255,255,255,0.55)',
+    background: 'var(--glass-bg, rgba(255,255,255,0.55))',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
     color: 'var(--text-main)',
     fontSize: '0.95rem',
-    fontFamily: 'Inter, sans-serif',
+    fontFamily: 'Outfit, sans-serif',
     boxSizing: 'border-box',
     transition: 'border-color 0.2s, box-shadow 0.2s',
     outline: 'none',
@@ -223,13 +223,13 @@ export default function ListProperty() {
   };
 
   const formCard = {
-    background: 'rgba(255,255,255,0.42)',
+    background: 'var(--glass-bg, rgba(255,255,255,0.42))',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderRadius: 24,
-    padding: '2.5rem',
-    boxShadow: '0 12px 40px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
-    border: '1px solid rgba(255,255,255,0.65)',
+    padding: 'min(2.5rem, 5vw)',
+    boxShadow: 'var(--glass-shadow, 0 12px 40px rgba(0,0,0,0.06))',
+    border: '1px solid var(--glass-border, rgba(255,255,255,0.65))',
   };
 
   const label = {
@@ -275,9 +275,9 @@ export default function ListProperty() {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               style={{
-                background: isBlockedErr ? '#fffbeb' : '#fef2f2',
-                border: `1px solid ${isBlockedErr ? '#fcd34d' : '#fca5a5'}`,
-                color: isBlockedErr ? '#92400e' : '#b91c1c',
+                background: isBlockedErr ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                border: `1px solid ${isBlockedErr ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                color: isBlockedErr ? '#f59e0b' : '#ef4444',
                 padding: '1rem 1.25rem',
                 borderRadius: 14,
                 marginBottom: '1.5rem',
@@ -394,9 +394,9 @@ export default function ListProperty() {
                             style={{
                               padding: '0.4rem 0.8rem',
                               borderRadius: 20,
-                              background: isActive ? '#ed1b24' : 'rgba(255,255,255,0.6)',
+                              background: isActive ? '#ed1b24' : 'var(--glass-bg)',
                               color: isActive ? 'white' : 'var(--text-main)',
-                              border: isActive ? '1px solid transparent' : '1px solid rgba(200,210,230,0.7)',
+                              border: isActive ? '1px solid transparent' : '1px solid var(--glass-border)',
                               fontSize: '0.85rem',
                               cursor: 'pointer',
                               outline: 'none',
@@ -517,11 +517,11 @@ export default function ListProperty() {
                   />
                 </div>
 
-                <div style={{ marginTop: '1.25rem', background: 'rgba(248,250,252,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', padding: '1.5rem', borderRadius: 16, border: '1.5px dashed rgba(203,213,225,0.8)' }}>
+                <div style={{ marginTop: '1.25rem', background: 'var(--glass-bg)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', padding: '1.5rem', borderRadius: 16, border: '1.5px dashed var(--glass-border)' }}>
                   <label style={{ ...label, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <ImageIcon size={18} /> Property Photos (Max 5)
                   </label>
-                  <input type="file" multiple accept="image/*" onChange={handleImageChange} style={{ marginTop: '0.5rem' }} />
+                  <input type="file" multiple accept="image/*" onChange={handleImageChange} style={{ marginTop: '0.5rem', color: 'var(--text-main)' }} />
                   {images.length > 0 && (
                     <p style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem', fontWeight: 600 }}>
                       ✓ {images.length} file{images.length > 1 ? 's' : ''} selected
@@ -556,7 +556,7 @@ export default function ListProperty() {
                   {/* Term 1 */}
                   <div id="accuracy" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', scrollMarginTop: '1rem' }}>
                     <input type="checkbox" id="t1" checked={terms.accuracy} onChange={e => setTerms({...terms, accuracy: e.target.checked})} style={{ width: 20, height: 20, marginTop: 4, accentColor: '#ed1b24', flexShrink: 0 }} />
-                    <label htmlFor="t1" style={{ color: 'var(--text-body)', lineHeight: 1.6 }}>
+                    <label htmlFor="t1" style={{ color: 'var(--text-main)', lineHeight: 1.6 }}>
                       <a href="#accuracy" style={{ color: '#ed1b24', textDecoration: 'none', fontWeight: 700 }} onClick={e => e.preventDefault()}>Accuracy of Information</a>
                       <span>: I declare that all info, metrics, and photos provided for <em>{details.propertyTitle || 'this property'}</em> are fully accurate and truthful.</span>
                     </label>
@@ -609,7 +609,7 @@ export default function ListProperty() {
                 <SignaturePad onSave={(data) => setSignature(data)} />
 
                 {signature && (
-                  <div style={{ marginTop: '2rem', textAlign: 'center', background: '#ecfdf5', padding: '1rem', borderRadius: 12, color: '#10b981', fontWeight: 600, border: '1px solid #a7f3d0' }}>
+                  <div style={{ marginTop: '2rem', textAlign: 'center', background: 'rgba(16, 185, 129, 0.1)', padding: '1rem', borderRadius: 12, color: '#10b981', fontWeight: 600, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
                     <CheckCircle2 style={{ display: 'inline', verticalAlign: 'middle', marginRight: 8 }} />
                     Signature Captured Successfully
                   </div>

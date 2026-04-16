@@ -36,7 +36,18 @@ const DEFAULT_IMAGES = {
   Plot: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
 };
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isMobile;
+}
+
 export default function Settings() {
+  const isMobile = useIsMobile();
   const { siteSettings, updateSiteSettings, properties, propertyTypes = [], removePropertyType, updatePropertyType, reorderPropertyTypes } = useAdmin();
   
   // Local drafted state for dirty checking
@@ -107,6 +118,18 @@ export default function Settings() {
   const handleSave = async () => {
     try {
       await updateSiteSettings(draft);
+
+      // Sync visibility back to propertyTypes isActive field
+      for (const cat of propertyTypes) {
+        const newVis = draft.visibility?.[cat.name];
+        const isCurrentlyActive = cat.isActive !== false;
+        const shouldBeActive = newVis !== false;
+        
+        if (isCurrentlyActive !== shouldBeActive) {
+          await updatePropertyType(cat.id, { isActive: shouldBeActive });
+        }
+      }
+
       triggerToast('Settings saved successfully', 'success');
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -190,15 +213,31 @@ export default function Settings() {
         <div>
           {/* Property Types mapped from database */}
           {propertyTypes.map((cat, index) => (
-            <div key={cat.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
+            <div key={cat.id} style={{ 
+              display: 'flex', 
+              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: 'space-between', 
+              alignItems: isMobile ? 'flex-start' : 'center', 
+              padding: '1.25rem 0', 
+              borderBottom: '1px solid var(--admin-stroke)',
+              gap: isMobile ? '1rem' : '0'
+            }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ fontWeight: 500, fontSize: '1.05rem', color: 'var(--admin-text-main)' }}>{cat.name}</span>
+                <span style={{ fontWeight: 600, fontSize: isMobile ? '1rem' : '1.05rem', color: 'var(--admin-text-main)' }}>{cat.name}</span>
                 {cat.isDefault && (
-                  <span style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--admin-text-muted)', fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: 12, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Default</span>
+                  <span style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--admin-text-muted)', fontSize: '0.65rem', padding: '0.2rem 0.5rem', borderRadius: 12, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Default</span>
                 )}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: isMobile ? '0.75rem' : '1.5rem',
+                width: isMobile ? '100%' : 'auto',
+                justifyContent: isMobile ? 'space-between' : 'flex-end',
+                flexWrap: isMobile ? 'wrap' : 'nowrap'
+              }}>
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)' }}>Visible</span>
                   <label style={{ position: 'relative', display: 'inline-block', width: 44, height: 24 }}>

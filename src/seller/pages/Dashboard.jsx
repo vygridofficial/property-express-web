@@ -115,21 +115,21 @@ export default function SellerDashboard() {
         {/* ── Stats row ── */}
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}><Home size={20} /></div>
+            <div className={styles.statIcon} style={{ background: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b' }}><Home size={20} /></div>
             <div className={styles.statInfo}>
               <label>Properties Submitted</label>
               {loading ? <Skeleton width={40} /> : <span>{submissions.length}</span>}
             </div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}><Clock size={20} /></div>
+            <div className={styles.statIcon} style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6' }}><Clock size={20} /></div>
             <div className={styles.statInfo}>
               <label>Pending Approval</label>
               {loading ? <Skeleton width={40} /> : <span>{submissions.filter(s => s.status === 'pending').length}</span>}
             </div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}><CheckCircle2 size={20} /></div>
+            <div className={styles.statIcon} style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}><CheckCircle2 size={20} /></div>
             <div className={styles.statInfo}>
               <label>Approved Listings</label>
               {loading ? <Skeleton width={40} /> : <span>{submissions.filter(s => s.status === 'approved').length}</span>}
@@ -212,7 +212,7 @@ export default function SellerDashboard() {
                     <motion.div key={sub.id} variants={itemVariants} layout className={styles.agreementCard}>
                       <div className={styles.cardHeader}>
                         <div className={styles.iconWrapper} style={{
-                          background: sub.status === 'approved' ? 'rgba(16, 185, 129, 0.15)' : sub.status === 'rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                          background: sub.status === 'approved' ? 'rgba(16, 185, 129, 0.12)' : sub.status === 'rejected' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
                           color:      sub.status === 'approved' ? '#10b981' : sub.status === 'rejected' ? '#ef4444' : '#f59e0b'
                         }}>
                           {sub.status === 'approved' ? <CheckCircle2 /> : <Clock />}
@@ -226,7 +226,7 @@ export default function SellerDashboard() {
                         </div>
                         <span style={{
                           padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0,
-                          background: sub.status === 'approved' ? 'rgba(16, 185, 129, 0.15)' : sub.status === 'rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                          background: sub.status === 'approved' ? 'rgba(16, 185, 129, 0.12)' : sub.status === 'rejected' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
                           color:      sub.status === 'approved' ? '#10b981' : sub.status === 'rejected' ? '#ef4444' : '#f59e0b',
                           textTransform: 'uppercase'
                         }}>
@@ -250,7 +250,7 @@ export default function SellerDashboard() {
 
                         <button
                           onClick={() => setDeleteTarget({ id: sub.id, title: sub.propertyTitle || 'Unnamed Property' })}
-                          style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#ef4444', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '0.35rem 0.85rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem' }}
+                          style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, padding: '0.35rem 0.85rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', fontFamily: 'Outfit, sans-serif' }}
                         >
                           <Trash2 size={14} /> Delete
                         </button>

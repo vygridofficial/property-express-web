@@ -33,7 +33,8 @@ export default function MobileBottomNav() {
   ];
 
   const drawerItems = [
-    { to: '/admin/sellers-history', icon: History,   label: 'Sellers History'   },
+    { to: '/admin/submissions',     icon: FileSignature, label: 'Pending Approvals' },
+    { to: '/admin/sellers-history', icon: History,       label: 'Sellers History'   },
     { to: '/admin/settings',        icon: Settings,  label: 'Site Settings'     },
     { to: '/admin/contact-social',  icon: LinkIcon,  label: 'Contact & Social'  },
   ];

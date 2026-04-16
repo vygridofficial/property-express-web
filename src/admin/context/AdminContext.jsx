@@ -160,7 +160,9 @@ export function AdminProvider({ children }) {
           id: d.id,
           type: 'New Enquiry',
           message: `New enquiry from ${d.data().name || 'Someone'}`,
-          time: 'Just now',
+          time: d.data().createdAt?.toDate 
+            ? d.data().createdAt.toDate().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+            : (d.data().createdAt ? new Date(d.data().createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently'),
           read: false,
           link: '/admin/inquiries'
         }));
