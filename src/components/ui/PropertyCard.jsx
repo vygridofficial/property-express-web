@@ -114,7 +114,7 @@ export default function PropertyCard({ property }) {
           <h3 className={styles.title}>{title}</h3>
         </div>
         <div className={styles.location}>
-          <MapPin size={16} /> {displayLocation}
+          <MapPin size={16} /> {displayLocation}{property.district ? `, ${property.district}` : ''}
         </div>
         <div className={styles.features}>
           {displayBeds > 0 && (

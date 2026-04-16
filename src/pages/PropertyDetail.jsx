@@ -212,7 +212,7 @@ export default function PropertyDetail() {
               </div>
             </div>
             <div className={styles.location}>
-              <MapPin size={18} /> {property.location}
+              <MapPin size={18} /> {property.location}{property.district ? `, ${property.district}` : ''}
             </div>
           </motion.div>
 

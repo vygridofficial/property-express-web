@@ -95,6 +95,7 @@ export const approveSubmission = async (submissionId, adminSignature) => {
     price: submissionData.price || 0,
     numericPrice: Number(submissionData.price),
     location: submissionData.location || '',
+    district: submissionData.district || '',
     address: submissionData.address || '',
     description: submissionData.description || '',
     area: submissionData.area || '',

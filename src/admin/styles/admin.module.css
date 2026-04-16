@@ -398,6 +398,19 @@
 
   .glassCard {
     border-radius: 16px;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* ─── Admin Properties Grid Overrides ─── */
+@media (max-width: 767px) {
+  .adminReviewGrid {
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
+  }
+}
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;

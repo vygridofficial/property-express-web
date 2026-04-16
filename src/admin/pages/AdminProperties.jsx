@@ -470,39 +470,38 @@ export default function AdminProperties() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', fontFamily: 'Outfit' }}>
       
       {/* Header Area */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '1rem' : '0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {pageHeader.icon}
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.04em', margin: 0 }}>{pageHeader.title}</h2>
+          <h2 style={{ fontSize: isMobile ? '1.5rem' : '1.75rem', fontWeight: 800, letterSpacing: '-0.04em', margin: 0 }}>{pageHeader.title}</h2>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
           {activeCategory === 'properties' && (
             <button 
               className="btn" 
-              style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer' }}
+              style={{ flex: isMobile ? 1 : 'none', background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '0.6rem 0.8rem', fontWeight: 600, cursor: 'pointer', fontSize: isMobile ? '0.8rem' : '0.9rem' }}
               onClick={() => setIsCatModalOpen(true)}
             >
-              + Custom Type
+              + Type
             </button>
           )}
           {activeCategory !== 'properties' && (
             <button 
               className="btn" 
-              style={{ background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              style={{ flex: isMobile ? 1 : 'none', background: 'var(--admin-glass-bg)', border: '1px solid var(--admin-stroke)', padding: '0.6rem 0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontSize: isMobile ? '0.8rem' : '0.9rem' }}
               onClick={() => setIsFiltersModalOpen(true)}
             >
-              <Edit2 size={16} /> Edit Filters
+              <Edit2 size={14} /> Filters
             </button>
           )}
           <button 
             className="btn" 
-            style={{ background: '#ed1b24', color: 'white', border: 'none', padding: '0.75rem 1.5rem', fontWeight: 700, cursor: 'pointer' }}
+            style={{ flex: isMobile ? 1.5 : 'none', background: '#ed1b24', color: 'white', border: 'none', padding: '0.6rem 1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: isMobile ? '0.8rem' : '0.9rem' }}
             onClick={() => { 
               setIsDrawerOpen(true); 
               setEditingId(null); 
               setImages([]); 
               
-              // Issue: Auto-fill category based on active tab
               let prefilledCat = '';
               if (activeCategory !== 'properties') {
                 const low = activeCategory.toLowerCase();
@@ -512,10 +511,8 @@ export default function AdminProperties() {
                 else if (low === 'plots') prefilledCat = 'Plot';
                 else if (low === 'uncategorized') prefilledCat = 'Uncategorized';
                 else {
-                  // Check if it's a custom category
-                const custom = propertyTypes.find(c => c.name.toLowerCase() === low);
-                if (custom && custom.filters?.length) return custom.filters;
-                  else prefilledCat = activeCategory; // Fallback to raw string
+                  const custom = propertyTypes.find(c => c.name.toLowerCase() === low);
+                  prefilledCat = custom ? custom.name : activeCategory;
                 }
               }
 
@@ -523,7 +520,7 @@ export default function AdminProperties() {
               setFormErrors([]); 
             }}
           >
-            <Plus size={18} style={{ marginRight: '0.5rem' }} /> Add Property
+            <Plus size={16} /> Add Property
           </button>
         </div>
       </div>
@@ -774,17 +771,17 @@ export default function AdminProperties() {
               }}
             >
               {/* Drawer Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2rem 2.5rem 1rem', borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.04em', margin: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: isMobile ? '1.25rem 1.5rem' : '2rem 2.5rem 1rem', borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
+                <h2 style={{ fontSize: isMobile ? '1.25rem' : '1.5rem', fontWeight: 800, letterSpacing: '-0.04em', margin: 0 }}>
                   {editingId ? 'Edit Property' : 'Add New Property'}
                 </h2>
-                <button onClick={() => setIsDrawerOpen(false)} className={styles.iconBtn} style={{ background: 'rgba(0,0,0,0.05)', borderRadius: '50%', padding: '0.5rem' }}><X size={20} /></button>
+                <button onClick={() => setIsDrawerOpen(false)} className={styles.iconBtn} style={{ background: 'rgba(0,0,0,0.05)', borderRadius: '50%', padding: '0.5rem', minWidth: 36, minHeight: 36 }}><X size={18} /></button>
               </div>
 
               {/* Scrollable Form Content */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '0 2.5rem 2.5rem' }}>
+              <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '0 1.5rem 2rem' : '0 2.5rem 2.5rem' }}>
                 
-                {formErrors.length > 0 && <p style={{ color: '#ed1b24', fontSize: '0.8rem', marginTop: '1rem', fontWeight: 600 }}>Please fill out all required fields marked in red.</p>}
+                {formErrors.length > 0 && <p style={{ color: '#ed1b24', fontSize: '0.8rem', marginTop: '1rem', fontWeight: 600 }}>Please fill out all required fields.</p>}
 
                 {/* Section 1 */}
                 <SectionHeading>Section 1 — Basic Information</SectionHeading>

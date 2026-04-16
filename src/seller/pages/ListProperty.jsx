@@ -22,6 +22,7 @@ const PRESET_AMENITIES = [
   'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
   'CCTV', 'Power Backup'
 ];
+import { KERALA_DISTRICTS } from '../../data/districts';
 import { db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useSeller } from '../context/SellerContext';
@@ -88,6 +89,7 @@ export default function ListProperty() {
     area: '',
     price: '',
     location: '',
+    district: '',
     address: '',
     phone: '',
     description: '',
@@ -180,7 +182,7 @@ export default function ListProperty() {
     }
   };
 
-  const isStep1Valid = details.propertyTitle && details.price && details.location;
+  const isStep1Valid = details.propertyTitle && details.price && details.location && details.district;
   const isStep2Valid = terms.accuracy && terms.exclusivity && terms.commission;
 
   // Glassmorphic input style (inline for elements that can't use CSS modules easily)
@@ -432,9 +434,25 @@ export default function ListProperty() {
                     <label style={label}>Location Area *</label>
                     <input
                       type="text" value={details.location}
+                      placeholder="e.g. Aluva, Kochi"
                       onChange={e => setDetails({...details, location: e.target.value})}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
+                  </div>
+
+                  <div>
+                    <label style={label}>District *</label>
+                    <select
+                      value={details.district}
+                      onChange={e => setDetails({...details, district: e.target.value})}
+                      style={{ ...inp, appearance: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '16px', paddingRight: '2.5rem' }}
+                      onFocus={onFocus} onBlur={onBlur}
+                    >
+                      <option value="">Select District</option>
+                      {KERALA_DISTRICTS.map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
