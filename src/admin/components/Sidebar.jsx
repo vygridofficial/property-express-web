@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Users, MessageSquare, Star, Settings, Link as LinkIcon, ChevronLeft, ChevronRight, LogOut, Building2, Trash2, FileSignature, History } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, Star, Settings, Link as LinkIcon, ChevronLeft, ChevronRight, LogOut, Building2, Trash2, FileSignature, History, FileText } from 'lucide-react';
 import { FlatIcon, VillaIcon, PlotIcon, WarehouseIcon } from './icons/PropertyIcons';
 import { useAdmin } from '../context/AdminContext';
 import styles from '../styles/admin.module.css';
@@ -86,6 +86,7 @@ export default function Sidebar() {
         <div className={styles.navGroup}>
           {!collapsed && <div className={styles.navLabel}>Management</div>}
           <NavItem to="/admin/submissions" icon={FileSignature} label="Pending Approvals" />
+          <NavItem to="/admin/agreement-format" icon={FileText} label="Agreement Format" />
           <NavItem to="/admin/sellers-history" icon={History} label="Sellers History" />
           <NavItem to="/admin/inquiries" icon={MessageSquare} label="Enquiries" />
           <AnimatePresence mode="popLayout">

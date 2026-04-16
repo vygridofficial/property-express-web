@@ -11,7 +11,7 @@ import logo from '../../assets/logo.png';
 
 export default function Login() {
   const { login } = useAdmin();
-  const [email, setEmail] = useState('admin@propertyexpress.com'); // Default admin email
+  const email = 'admin@propertyexpress.com'; // Hardcoded admin email
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -56,7 +56,7 @@ export default function Login() {
           background: 'var(--admin-glass-bg)',
           border: '1px solid var(--admin-glass-border)',
           borderRadius: 24,
-          boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
+          boxShadow: 'none',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center'
@@ -71,28 +71,6 @@ export default function Login() {
 
         <form onSubmit={handleLogin} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           
-          <div style={{ position: 'relative' }}>
-            <input 
-              type="email" 
-              placeholder="Admin Email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              readOnly
-              style={{
-                width: '100%',
-                padding: '1rem 1.25rem',
-                fontSize: '1rem',
-                fontWeight: 300,
-                background: 'rgba(0,0,0,0.05)',
-                border: '1px solid var(--admin-glass-border)',
-                borderRadius: 12,
-                outline: 'none',
-                color: 'var(--admin-text-muted)',
-                cursor: 'not-allowed'
-              }}
-            />
-          </div>
 
           <div style={{ position: 'relative' }}>
             <input 
@@ -147,7 +125,7 @@ export default function Login() {
               cursor: isLoading ? 'wait' : 'pointer',
               marginTop: '1rem',
               transition: 'all 0.2s ease',
-              boxShadow: isLoading ? 'none' : '0 8px 24px rgba(237, 27, 36, 0.2)'
+              boxShadow: 'none'
             }}
           >
             {isLoading ? 'Authenticating...' : 'Enter Dashboard'}

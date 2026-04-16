@@ -28,6 +28,7 @@ import ContactSocial from './admin/pages/ContactSocial';
 import Agreements from './admin/pages/Agreements';
 import Approvals from './admin/pages/Approvals';
 import SellersHistory from './admin/pages/SellersHistory';
+import AgreementFormat from './admin/pages/AgreementFormat';
 
 // Seller Portal (Isolated)
 import { SellerProvider } from './seller/context/SellerContext';
@@ -125,8 +126,15 @@ function AppContent() {
   }
   return (
     <>
-      <AnimatePresence>
-        <Routes location={location} key={location.pathname.startsWith('/admin') ? 'admin' : location.pathname}>
+      <AnimatePresence mode="wait">
+        <Routes 
+          location={location} 
+          key={
+            location.pathname.startsWith('/admin') ? 'admin' : 
+            location.pathname.startsWith('/agreements') ? 'seller' : 
+            location.pathname
+          }
+        >
 
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
@@ -159,6 +167,7 @@ function AppContent() {
             <Route path="properties" element={<AdminProperties />} />
             <Route path="properties/:category" element={<AdminProperties />} />
             <Route path="submissions" element={<Approvals />} />
+            <Route path="agreement-format" element={<AgreementFormat />} />
             <Route path="sellers-history" element={<SellersHistory />} />
             <Route path="agreements" element={<Agreements />} />
             <Route path="inquiries" element={<Inquiries />} />

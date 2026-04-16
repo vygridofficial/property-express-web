@@ -434,22 +434,6 @@ export default function AgreementTemplateTab() {
         </div>
       </div>
 
-      {/* ── Preview section ── */}
-      {placeholders.length > 0 && (
-        <div style={{ ...panel, padding: '1.5rem' }}>
-          <div style={{ ...sectionLabel, marginBottom: '1rem' }}>Preview — How Placeholders Resolve</div>
-          <div style={{
-            background: 'var(--admin-glass-bg)',
-            border: '1px solid var(--admin-glass-border)',
-            borderRadius: '12px', padding: '1.25rem 1.5rem',
-            color: 'var(--admin-text-body)', fontSize: '0.9rem', lineHeight: 1.8
-          }}>
-            {renderPreview(
-              `This Sale Agreement is entered into on {{current_date}} between {{sellerName}} ( {{sellerName}} ) and the buyer, concerning the property located at {{address}} ( {{address}} ). The agreed sale price is {{price}} ( {{price}} ). Government ID: {{id}} ( {{id}} ).`
-            )}
-          </div>
-        </div>
-      )}
 
       {/* ── Feedback banners ── */}
       {error   && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', padding: '1rem 1.25rem', borderRadius: '12px', fontSize: '1rem', fontWeight: 600 }}>{error}</div>}

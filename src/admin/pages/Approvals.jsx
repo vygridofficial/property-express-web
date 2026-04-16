@@ -17,7 +17,6 @@ import { mergeHtmlTemplate } from '../../utils/templateProcessor';
 import { db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import SignaturePad from '../../seller/components/SignaturePad';
-import AgreementTemplateTab from '../components/AgreementTemplateTab';
 import AgreementPreviewModal from '../components/AgreementPreviewModal';
 import styles from '../styles/admin.module.css';
 
@@ -171,31 +170,17 @@ export default function Approvals() {
           borderRadius: '12px',
           gap: '0.3rem'
         }}>
-          {[{ key: 'list', label: 'Submissions' }, { key: 'format', label: 'Agreement Format' }].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              style={{
-                padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none',
-                background: activeTab === tab.key ? '#ed1b24' : 'transparent',
-                color:      activeTab === tab.key ? 'white' : 'var(--admin-text-muted)',
-                fontWeight: 600, cursor: 'pointer',
-                boxShadow:  activeTab === tab.key ? '0 4px 12px rgba(237,27,36,0.3)' : 'none',
-                transition: 'all 0.2s',
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: '0.9rem'
-              }}
-            >
-              {tab.label}
-            </button>
+        {/* Single header — tab switcher removed */}
+        <div style={{ display: 'none' }}>
+          {[{ key: 'list', label: 'Submissions' }].map(tab => (
+            <button key={tab.key} />
           ))}
+        </div>
         </div>
       </header>
 
       {/* ── Content ── */}
-      {activeTab === 'format' ? (
-        <AgreementTemplateTab />
-      ) : submissions.length === 0 ? (
+      {submissions.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem', ...glassCard, border: '1px dashed var(--admin-glass-border)' }}>
           <CheckCircle2 size={48} color="#10b981" style={{ marginBottom: '1rem', margin: '0 auto' }} />
           <h3 style={{ fontSize: '1.2rem', color: 'var(--admin-text-main)', marginTop: '1rem' }}>All caught up!</h3>

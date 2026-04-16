@@ -32,7 +32,10 @@ export const SellerProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
+      // Only auto-login if the user is signed in via Google
+      const isGoogleUser = firebaseUser?.providerData.some(p => p.providerId === 'google.com');
+
+      if (firebaseUser && isGoogleUser) {
         setUser(firebaseUser);
         try {
           // Fetch agreements based on Email OR Phone
@@ -45,6 +48,7 @@ export const SellerProvider = ({ children }) => {
           console.error("Error fetching seller agreements:", err);
         }
       } else {
+        // If it's the admin (password provider) or no user, clear the state
         setUser(null);
         setAgreements([]);
       }

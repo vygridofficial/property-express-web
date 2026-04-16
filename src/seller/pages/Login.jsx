@@ -73,7 +73,7 @@ export default function SellerLogin() {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', cursor: 'pointer',
               transition: 'all 0.2s', opacity: isSubmitting ? 0.7 : 1,
               fontFamily: 'Outfit, sans-serif',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+              boxShadow: 'none'
             }}
             onMouseOver={(e) => !isSubmitting && (e.currentTarget.style.borderColor = '#ed1b24')}
             onMouseOut={(e) => !isSubmitting && (e.currentTarget.style.borderColor = 'var(--glass-border)')}
