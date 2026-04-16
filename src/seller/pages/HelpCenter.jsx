@@ -8,7 +8,8 @@ import {
   FileText,
   Shield,
   Mail,
-  PhoneCall
+  PhoneCall,
+  DollarSign
 } from 'lucide-react';
 import { useSeller } from '../context/SellerContext';
 import styles from '../styles/Dashboard.module.css';
@@ -216,6 +217,9 @@ export default function HelpCenter() {
                   </div>
                 </motion.button>
               ))}
+            </div>
+          </div>
+
           <div>
             <h2 style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.15rem', marginBottom: '1rem' }}>Frequently Asked Questions</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
