@@ -5,24 +5,12 @@ import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Ph
 import { getPropertyById } from '../services/propertyService';
 import { submitLead } from '../services/leadService';
 import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
-import { MOCK_AGENTS } from '../data/mockProperties';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './PropertyDetail.module.css';
 import brandLogo from '../assets/logo.png';
 import { formatPrice } from '../utils/formatPrice';
 import { getPropertyCoordinates } from '../utils/geo';
 import SEO from '../components/common/SEO';
-
-const DEFAULT_AMENITIES = [
-  "Swimming Pool",
-  "24/7 Security",
-  "Private Garage (3 Cars)",
-  "Central AC / Heating",
-  "Smart Home System",
-  "Outdoor BBQ Area",
-  "City Water Supply",
-  "High-Speed Internet"
-];
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -49,8 +37,6 @@ export default function PropertyDetail() {
           role: property.sellerName ? 'Property Owner' : 'Property Agent',
           phone: property.sellerPhone || property.agentPhone || '+91 98765 43210'
         });
-      } else {
-        setAgent(MOCK_AGENTS.find(a => a.id === property.agentId) || MOCK_AGENTS[0]);
       }
     }
 
@@ -65,8 +51,6 @@ export default function PropertyDetail() {
             role: data.sellerName ? 'Property Owner' : 'Property Agent',
             phone: data.sellerPhone || data.agentPhone || '+91 98765 43210'
           });
-        } else {
-          setAgent(MOCK_AGENTS.find(a => a.id === data.agentId) || MOCK_AGENTS[0]);
         }
       }
     });
@@ -251,17 +235,19 @@ export default function PropertyDetail() {
           </motion.div>
 
           {/* Amenities Section */}
-          <motion.div className={styles.amenitiesSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
-            <h3>Amenities</h3>
-            <div className={styles.amenitiesGrid}>
-              {((property.features && property.features.length) ? property.features : DEFAULT_AMENITIES).map((amenity, idx) => (
-                <div key={idx} className={styles.amenityItem}>
-                  <Check size={18} color="#c53030" />
-                  <span>{amenity}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          {property.features && property.features.length > 0 && (
+            <motion.div className={styles.amenitiesSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
+              <h3>Amenities</h3>
+              <div className={styles.amenitiesGrid}>
+                {property.features.map((amenity, idx) => (
+                  <div key={idx} className={styles.amenityItem}>
+                    <Check size={18} color="#c53030" />
+                    <span>{amenity}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Location Map Section */}
           <motion.div className={styles.mapSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
