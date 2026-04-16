@@ -541,32 +541,32 @@ export default function AdminProperties() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
           {activeCategory === 'properties' && (
-            <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+            <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ flex: '1 1 120px', minWidth: 0, height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
                <option value="All">All Categories</option>
                 {propertyTypes.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
           )}
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ flex: '1 1 120px', minWidth: 0, height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
             <option value="All">Status: All</option>
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
           </select>
-          <select value={priceFilter} onChange={e => setPriceFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+          <select value={priceFilter} onChange={e => setPriceFilter(e.target.value)} style={{ flex: '1 1 120px', minWidth: 0, height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
             <option value="All">Price: All</option>
             <option value="Under ₹50L">Under ₹50L</option>
             <option value="₹50L–₹1Cr">₹50L–₹1Cr</option>
             <option value="₹1Cr–₹5Cr">₹1Cr–₹5Cr</option>
             <option value="Above ₹5Cr">Above ₹5Cr</option>
           </select>
-          <select value={locFilter} onChange={e => setLocFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+          <select value={locFilter} onChange={e => setLocFilter(e.target.value)} style={{ flex: '1 1 120px', minWidth: 0, height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
             <option value="All">Location: All</option>
             {uniqueLocations.map(loc => <option key={loc} value={loc.toLowerCase()}>{loc}</option>)}
           </select>
-          <select value={distFilter} onChange={e => setDistFilter(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+          <select value={distFilter} onChange={e => setDistFilter(e.target.value)} style={{ flex: '1 1 120px', minWidth: 0, height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
             <option value="All">District: All</option>
             {KERALA_DISTRICTS.map(dist => <option key={dist} value={dist}>{dist}</option>)}
           </select>
-          <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: '1 1 120px', height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
+          <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: '1 1 120px', minWidth: 0, height: 40, padding: '0 0.6rem', borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', fontWeight: 600 }}>
             <option value="Newest First">Newest First</option>
             <option value="Price: Low to High">Price: Low to High</option>
             <option value="Price: High to Low">Price: High to Low</option>

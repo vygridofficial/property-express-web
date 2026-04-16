@@ -70,6 +70,11 @@ export default function SellerTopNavbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               className={styles.profilePanel}
+              style={{
+                maxWidth: 'calc(100vw - 2rem)',
+                right: '0rem', // Keeps it aligned to parent and inside viewport
+                wordBreak: 'break-word',
+              }}
             >
               <div 
                 className={styles.panelAvatar} 
@@ -83,7 +88,7 @@ export default function SellerTopNavbar() {
               </div>
               
               <h3 className={styles.panelName}>{user?.displayName || 'Seller Account'}</h3>
-              <p className={styles.panelEmail}>{user?.email}</p>
+              <p className={styles.panelEmail} style={{ wordBreak: 'break-all' }}>{user?.email}</p>
 
               <div className={styles.panelDivider} />
 
@@ -98,7 +103,7 @@ export default function SellerTopNavbar() {
                 
                 <div className={styles.infoItem}>
                   <label className={styles.infoLabel}>Email Address</label>
-                  <span className={styles.infoValue}>{user?.email}</span>
+                  <span className={styles.infoValue} style={{ wordBreak: 'break-all' }}>{user?.email}</span>
                 </div>
 
                 <div className={styles.infoItem}>

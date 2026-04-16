@@ -309,10 +309,10 @@ export default function SellersHistory() {
                   {!isMobile && <ArrowUpRight size={15} color="var(--admin-text-muted)" style={{ flexShrink: 0, cursor: 'pointer' }} onClick={() => setSelected(sub)} />}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: isMobile ? '1px solid var(--admin-stroke)' : 'none', paddingTop: isMobile ? '0.75rem' : 0, paddingLeft: isMobile ? '0.25rem' : 0 }}>
-                  <div style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: isMobile ? 'center' : 'flex-end', gap: isMobile ? '0.75rem' : '2px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', justifyContent: 'space-between', borderTop: isMobile ? '1px solid var(--admin-stroke)' : 'none', paddingTop: isMobile ? '0.75rem' : 0, paddingLeft: isMobile ? '0.25rem' : 0 }}>
+                  <div style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: isMobile ? 'center' : 'flex-end', gap: isMobile ? '0.5rem' : '2px', flexWrap: 'wrap' }}>
                     {sub.price && <div style={{ fontWeight: 800, color: 'var(--admin-text-main)', fontSize: '0.95rem' }}>₹ {Number(sub.price).toLocaleString('en-IN')}</div>}
-                    <span style={{ padding: '3px 11px', borderRadius: 20, background: s.badge, color: s.text, fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>{s.label}</span>
+                    <span style={{ padding: '3px 11px', borderRadius: 20, background: s.badge, color: s.text, fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', flexShrink: 0 }}>{s.label}</span>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

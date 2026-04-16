@@ -42,6 +42,7 @@ const PREVIEW_SAMPLE = {
 };
 
 export default function AgreementTemplateTab() {
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
   const [loading, setLoading]     = useState(true);
   const [uploading, setUploading] = useState(false);
   const [template, setTemplate]   = useState(null);
@@ -58,7 +59,14 @@ export default function AgreementTemplateTab() {
   const [previewHtml, setPreviewHtml] = useState('');
   const fileInputRef = useRef();
 
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => { fetchTemplateData(); }, []);
+
 
   const fetchTemplateData = async () => {
     try {
@@ -282,7 +290,7 @@ export default function AgreementTemplateTab() {
       )}
 
       {/* ── Two-column layout ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '1.5rem', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.3fr', gap: '1.5rem', alignItems: 'start' }}>
 
         {/* LEFT — Upload zone & Active Template */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -382,34 +390,39 @@ export default function AgreementTemplateTab() {
           ) : (
             <div style={{ ...panel, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {/* Column headers */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 22px 1fr', gap: '0.5rem', padding: '0 0.25rem', marginBottom: '0.25rem' }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Template placeholder</div>
-                <div />
-                <div style={{ fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Seller portal field</div>
-              </div>
+              {!isMobile && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 22px 1fr', gap: '0.5rem', padding: '0 0.25rem', marginBottom: '0.25rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Template placeholder</div>
+                  <div />
+                  <div style={{ fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Seller portal field</div>
+                </div>
+              )}
 
               {placeholders.map(ph => {
                 const isMapped = !!mappings[ph];
                 return (
-                  <div key={ph} style={{ display: 'grid', gridTemplateColumns: '1fr 22px 1fr', gap: '0.5rem', alignItems: 'center' }}>
+                  <div key={ph} style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '0.5rem', alignItems: isMobile ? 'stretch' : 'center', background: isMobile ? 'rgba(0,0,0,0.02)' : 'transparent', padding: isMobile ? '0.75rem' : '0', borderRadius: isMobile ? '12px' : '0', border: isMobile ? '1px solid var(--admin-stroke)' : 'none' }}>
                     {/* Placeholder pill */}
                     <div style={{
+                      flex: 1, minWidth: 0,
                       background: 'rgba(165,180,252,0.12)',
                       border: '1px solid rgba(165,180,252,0.25)',
                       padding: '0.5rem 0.85rem', borderRadius: '8px',
                       color: '#a5b4fc', fontWeight: 700, fontSize: '0.82rem', fontFamily: 'monospace',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                       {`{{${ph}}}`}
                     </div>
 
-                    <ArrowRight size={13} color="var(--admin-text-muted)" style={{ justifySelf: 'center' }} />
+                    {!isMobile && <ArrowRight size={13} color="var(--admin-text-muted)" style={{ flexShrink: 0 }} />}
 
                     {/* Field selector */}
                     <select
                       value={mappings[ph] || ''}
                       onChange={(e) => updateMapping(ph, e.target.value)}
                       style={{
+                        flex: 1, minWidth: 0,
                         padding: '0.52rem 0.85rem',
                         borderRadius: '8px',
                         border: isMapped

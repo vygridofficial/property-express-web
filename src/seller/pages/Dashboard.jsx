@@ -235,7 +235,7 @@ export default function SellerDashboard() {
                       </div>
 
                       {/* Footer: download + delete */}
-                      <div className={styles.cardFooter} style={{ borderTop: '1px solid var(--stroke)', paddingTop: '0.85rem', marginTop: '0.85rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className={styles.cardFooter} style={{ borderTop: '1px solid var(--stroke)', paddingTop: '0.85rem', marginTop: '0.85rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
                         {sub.status === 'approved' ? (
                           <button
                             onClick={async () => {

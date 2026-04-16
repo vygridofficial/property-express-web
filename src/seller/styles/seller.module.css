@@ -4,6 +4,7 @@
   color: #1e293b;
   font-family: 'Outfit', sans-serif;
   overflow: hidden;
+  background-color: #f8fafc;
 
   --glass-bg: rgba(255, 255, 255, 0.45);
   --glass-solid: rgba(255, 255, 255, 0.92);
@@ -26,6 +27,7 @@
 }
 
 .sellerApp[data-theme='dark'] {
+  background-color: #0f172a;
   --glass-bg: rgba(15, 20, 35, 0.85);
   --glass-solid: rgba(10, 14, 25, 0.98);
   --glass-border: rgba(255, 255, 255, 0.15);
