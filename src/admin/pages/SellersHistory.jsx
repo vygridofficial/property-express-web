@@ -14,6 +14,12 @@ const STATUS = {
   pending:  { label: 'Pending',  icon: Clock,         color: '#f59e0b', badge: 'rgba(245,158,11,0.15)', text: '#f59e0b' },
 };
 
+const glassCard = {
+  background: 'var(--admin-glass-bg)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: '1px solid var(--admin-glass-border)',
+  borderRadius: 16,
   boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
 };
 
