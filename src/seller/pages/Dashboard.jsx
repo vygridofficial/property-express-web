@@ -141,12 +141,12 @@ export default function SellerDashboard() {
         <div className={styles.mainCard}>
 
           {/* Tab header + filters */}
-          <div className={styles.tabsRow} style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
-            <div style={{ padding: '0.5rem 1rem', fontWeight: 700, color: 'var(--text-main)', fontSize: '1rem' }}>
+          <div className={styles.tabsRow} style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.05rem', minWidth: 'max-content' }}>
               My Properties
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginLeft: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-end' }}>
               {/* Search bar */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--glass-bg)', border: '1px solid var(--stroke)', borderRadius: 30, padding: '0.5rem 1.2rem' }}>
                 <Search size={15} color="var(--text-muted)" />

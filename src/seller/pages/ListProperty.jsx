@@ -581,21 +581,36 @@ export default function ListProperty() {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleNext}
-                  disabled={!isStep2Valid}
-                  style={{
-                    width: '100%', padding: '1.1rem',
-                    background: isStep2Valid ? 'linear-gradient(135deg, #ed1b24, #c41219)' : '#cbd5e1',
-                    color: 'white', borderRadius: 16, fontSize: '1rem', fontWeight: 700, border: 'none',
-                    cursor: isStep2Valid ? 'pointer' : 'not-allowed',
-                    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem',
-                    boxShadow: isStep2Valid ? '0 8px 20px rgba(237,27,36,0.3)' : 'none',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  Sign Document <ChevronRight size={20} />
-                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button
+                    onClick={handlePrev}
+                    style={{
+                      flex: 1, padding: '1.1rem',
+                      background: 'var(--glass-bg)', border: '1px solid var(--stroke)',
+                      color: 'var(--text-main)', borderRadius: 16, fontSize: '1rem', fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <ChevronLeft size={20} /> Back
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    disabled={!isStep2Valid}
+                    style={{
+                      flex: 2, padding: '1.1rem',
+                      background: isStep2Valid ? 'linear-gradient(135deg, #ed1b24, #c41219)' : '#cbd5e1',
+                      color: 'white', borderRadius: 16, fontSize: '1rem', fontWeight: 700, border: 'none',
+                      cursor: isStep2Valid ? 'pointer' : 'not-allowed',
+                      display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem',
+                      boxShadow: isStep2Valid ? '0 8px 20px rgba(237,27,36,0.3)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Sign Document <ChevronRight size={20} />
+                  </button>
+                </div>
               </motion.div>
             )}
 
@@ -615,24 +630,40 @@ export default function ListProperty() {
                   </div>
                 )}
 
-                <button
-                  onClick={submitListing}
-                  disabled={isSubmitting || !signature}
-                  style={{
-                    width: '100%', padding: '1.1rem', marginTop: '2rem',
-                    background: (!isSubmitting && signature) ? 'linear-gradient(135deg, #10b981, #059669)' : '#cbd5e1',
-                    color: 'white', borderRadius: 16, fontSize: '1rem', fontWeight: 700, border: 'none',
-                    cursor: (!isSubmitting && signature) ? 'pointer' : 'not-allowed',
-                    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem',
-                    boxShadow: (!isSubmitting && signature) ? '0 8px 24px rgba(16,185,129,0.3)' : 'none',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  {isSubmitting
-                    ? <><Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} /> Submitting securely...</>
-                    : <><FileSignature size={20} /> Finalize &amp; Submit Listing</>
-                  }
-                </button>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                  <button
+                    onClick={handlePrev}
+                    disabled={isSubmitting}
+                    style={{
+                      flex: 1, padding: '1.1rem',
+                      background: 'var(--glass-bg)', border: '1px solid var(--stroke)',
+                      color: 'var(--text-main)', borderRadius: 16, fontSize: '1rem', fontWeight: 700,
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <ChevronLeft size={20} /> Back
+                  </button>
+                  <button
+                    onClick={submitListing}
+                    disabled={isSubmitting || !signature}
+                    style={{
+                      flex: 2, padding: '1.1rem',
+                      background: (!isSubmitting && signature) ? 'linear-gradient(135deg, #10b981, #059669)' : '#cbd5e1',
+                      color: 'white', borderRadius: 16, fontSize: '1rem', fontWeight: 700, border: 'none',
+                      cursor: (!isSubmitting && signature) ? 'pointer' : 'not-allowed',
+                      display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem',
+                      boxShadow: (!isSubmitting && signature) ? '0 8px 24px rgba(16,185,129,0.3)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {isSubmitting
+                      ? <><Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} /> Submitting securely...</>
+                      : <><FileSignature size={20} /> Finalize &amp; Submit Listing</>
+                    }
+                  </button>
+                </div>
               </motion.div>
             )}
 

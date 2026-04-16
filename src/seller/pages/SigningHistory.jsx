@@ -94,6 +94,7 @@ export default function SigningHistory() {
                         padding: '1.25rem 1.5rem',
                         cursor: 'pointer',
                         display: 'flex',
+                        flexWrap: 'wrap',
                         alignItems: 'center',
                         gap: '1rem',
                         transition: 'all 0.25s ease',
@@ -107,7 +108,7 @@ export default function SigningHistory() {
                       </div>
 
                       {/* Info */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ flex: 1, minWidth: '150px' }}>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {sub.propertyTitle || 'Unnamed Property'}
                         </h3>
@@ -128,15 +129,16 @@ export default function SigningHistory() {
                         </div>
                       </div>
 
-                      {/* Status badge */}
-                      <span style={{
-                        padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 800,
-                        background: cfg.badge, color: cfg.text, textTransform: 'uppercase', flexShrink: 0
-                      }}>
-                        {sub.status}
-                      </span>
-
-                      <ChevronRight size={18} color="#cbd5e1" />
+                      {/* Status badge + Chevron */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                        <span style={{
+                          padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 800,
+                          background: cfg.badge, color: cfg.text, textTransform: 'uppercase'
+                        }}>
+                          {sub.status}
+                        </span>
+                        <ChevronRight size={18} color="#cbd5e1" />
+                      </div>
                     </motion.div>
                   );
                 })}
