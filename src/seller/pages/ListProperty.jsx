@@ -24,7 +24,7 @@ const DEFAULT_AMENITIES = [
 ];
 import { KERALA_DISTRICTS } from '../../data/districts';
 import { db } from '../../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { useSeller } from '../context/SellerContext';
 import { createPropertySubmission } from '../../services/submissionService';
 import SignaturePad from '../components/SignaturePad';
@@ -56,27 +56,33 @@ export default function ListProperty() {
   const [propertyTypes, setPropertyTypes] = useState(BASE_PROPERTY_TYPES);
   const [dynamicAmenities, setDynamicAmenities] = useState(DEFAULT_AMENITIES);
 
-  // Fetch admin-configured custom categories from Firestore
+  // Fetch admin-configured property types from the 'propertyTypes' Firestore collection
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        const snap = await getDoc(doc(db, 'settings', 'global'));
-        if (snap.exists()) {
-          const data = snap.data();
-          if (Array.isArray(data.customCategories) && data.customCategories.length > 0) {
-            const custom = data.customCategories.map(c => c.name || c).filter(Boolean);
-            // Merge base + custom, deduplicate (case-insensitive)
-            const merged = [...BASE_PROPERTY_TYPES];
-            custom.forEach(t => {
-              if (!merged.some(b => b.toLowerCase() === t.toLowerCase())) {
-                merged.push(t);
-              }
-            });
-            setPropertyTypes(merged);
-          }
-          if (Array.isArray(data.amenities) && data.amenities.length > 0) {
-            setDynamicAmenities(data.amenities);
-          }
+        // Primary source: 'propertyTypes' collection (created by Admin Portal)
+        const snapshot = await getDocs(collection(db, 'propertyTypes'));
+        if (!snapshot.empty) {
+          const fromFirestore = snapshot.docs
+            .map(d => ({ name: d.data().name || d.id, order: d.data().order ?? 999, isActive: d.data().isActive !== false }))
+            .filter(t => t.isActive)
+            .sort((a, b) => a.order - b.order)
+            .map(t => t.name);
+
+          // Merge with BASE, deduplicate case-insensitively, Firestore types come first
+          const merged = [...fromFirestore];
+          BASE_PROPERTY_TYPES.forEach(base => {
+            if (!merged.some(m => m.toLowerCase() === base.toLowerCase())) {
+              merged.push(base);
+            }
+          });
+          setPropertyTypes(merged);
+        }
+
+        // Also fetch amenities from settings/global if present
+        const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
+        if (settingsSnap.exists() && Array.isArray(settingsSnap.data().amenities)) {
+          setDynamicAmenities(settingsSnap.data().amenities);
         }
       } catch {
         // Non-critical — silently fall back to base types
