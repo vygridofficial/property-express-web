@@ -10,19 +10,13 @@ import { KERALA_DISTRICTS } from '../../data/districts';
 import FilterManagementModal from '../components/FilterManagementModal';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 
-const PRESET_AMENITIES = [
-  'Swimming Pool', '24/7 Security', 'Private Garage', 'Central AC / Heating',
-  'Smart Home System', 'Outdoor BBQ Area', 'City Water Supply', 'High-Speed Internet',
-  'Gym', 'Elevator', 'CCTV', 'Power Backup'
-];
-
 export default function AdminProperties() {
+  const { siteSettings, properties, setProperties, propertyTypes, addPropertyType, loading: contextLoading } = useAdmin();
+  const PRESET_AMENITIES = siteSettings.amenities || [];
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-
-  const { properties, setProperties, propertyTypes, addPropertyType, loading: contextLoading } = useAdmin();
 
   // Filters State
   const [searchTerm, setSearchTerm] = useState('');

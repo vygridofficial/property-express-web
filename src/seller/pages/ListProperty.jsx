@@ -16,7 +16,7 @@ import {
   X
 } from 'lucide-react';
 
-const PRESET_AMENITIES = [
+const DEFAULT_AMENITIES = [
   'Swimming Pool', '24/7 Security', 'Private Garage', 
   'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',
   'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
@@ -54,6 +54,7 @@ export default function ListProperty() {
   const [error, setError] = useState('');
   const [isBlockedErr, setIsBlockedErr] = useState(false);
   const [propertyTypes, setPropertyTypes] = useState(BASE_PROPERTY_TYPES);
+  const [dynamicAmenities, setDynamicAmenities] = useState(DEFAULT_AMENITIES);
 
   // Fetch admin-configured custom categories from Firestore
   useEffect(() => {
@@ -72,6 +73,9 @@ export default function ListProperty() {
               }
             });
             setPropertyTypes(merged);
+          }
+          if (Array.isArray(data.amenities) && data.amenities.length > 0) {
+            setDynamicAmenities(data.amenities);
           }
         }
       } catch {
@@ -94,7 +98,7 @@ export default function ListProperty() {
     address: '',
     phone: '',
     description: '',
-    features: [], // Array for chip-based selection
+    amenities: [], // Array for chip-based selection
     bedrooms: '',
     bathrooms: ''
   });
@@ -113,11 +117,11 @@ export default function ListProperty() {
 
   const toggleAmenity = (name) => {
     setDetails(prev => {
-      const current = Array.isArray(prev.features) ? prev.features : [];
+      const current = Array.isArray(prev.amenities) ? prev.amenities : [];
       if (current.includes(name)) {
-        return { ...prev, features: current.filter(a => a !== name) };
+        return { ...prev, amenities: current.filter(a => a !== name) };
       } else {
-        return { ...prev, features: [...current, name] };
+        return { ...prev, amenities: [...current, name] };
       }
     });
   };
@@ -160,7 +164,7 @@ export default function ListProperty() {
         sellerName: details.sellerName || user?.displayName || 'Unknown Seller',
         sellerEmail: user?.email || '',
         sellerPhone: details.phone || user?.phoneNumber || '',
-        features: Array.isArray(details.features) ? details.features : [],
+        amenities: Array.isArray(details.amenities) ? details.amenities : [],
         termsAccepted: terms
       };
 
@@ -380,8 +384,8 @@ export default function ListProperty() {
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={label}>Amenities / Features</label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '0.5rem' }}>
-                      {PRESET_AMENITIES.map(amenity => {
-                        const isActive = Array.isArray(details.features) && details.features.includes(amenity);
+                      {dynamicAmenities.map(amenity => {
+                        const isActive = Array.isArray(details.amenities) && details.amenities.includes(amenity);
                         return (
                           <button
                             key={amenity}
@@ -404,7 +408,7 @@ export default function ListProperty() {
                           </button>
                         );
                       })}
-                      {Array.isArray(details.features) && details.features.filter(a => !PRESET_AMENITIES.includes(a)).map(amenity => (
+                      {Array.isArray(details.amenities) && details.amenities.filter(a => !dynamicAmenities.includes(a)).map(amenity => (
                         <span
                           key={amenity}
                           style={{

@@ -67,6 +67,20 @@ export default function PropertyCard({ property }) {
           {status}
         </span>
 
+        {property.isFeatured && (
+          <span
+            className={styles.badge}
+            style={{
+              top: '4.5rem',
+              backgroundColor: '#f5ebd9',
+              color: '#9c6b24',
+              border: '1px solid #dcb57e'
+            }}
+          >
+            Featured
+          </span>
+        )}
+
         {/* Contact quick-buttons */}
         <div className={styles.cardActions}>
           {callLink && (
@@ -129,9 +143,9 @@ export default function PropertyCard({ property }) {
         <div className={styles.location}>
           <MapPin size={16} /> {displayLocation}{property.district ? `, ${property.district}` : ''}
         </div>
-        {formatDate(property.createdAt) && (
+        {(property.createdAt || property.addedOn) && (
           <div className={styles.addedDate}>
-            Added on: {formatDate(property.createdAt)}
+            Added on: {formatDate(property.createdAt || property.addedOn)}
           </div>
         )}
         <div className={styles.features}>

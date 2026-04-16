@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
-import { Check, Trash2, X, AlertCircle, Edit2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Check, Trash2, X, AlertCircle, Edit2, ArrowUp, ArrowDown, Save } from 'lucide-react';
 import styles from '../styles/admin.module.css';
 
 const ToggleRow = ({ label, checked, onToggle }) => (
@@ -280,6 +280,78 @@ export default function Settings() {
           {propertyTypes.length === 0 && (
             <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '2rem 0' }}>Syncing property types from database...</p>
           )}
+        </div>
+      </div>
+
+      <div className={styles.glassCard} style={{ marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>Amenities Management</h3>
+        <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Add or remove standard property amenities that appear in listing forms.</p>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+            {draft.amenities?.map((amenity, idx) => (
+              <motion.div 
+                key={`${amenity}-${idx}`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                style={{ 
+                  background: 'var(--admin-glass-bg)', 
+                  border: '1px solid var(--admin-stroke)',
+                  padding: '0.5rem 1rem', 
+                  borderRadius: 20, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.5rem',
+                  fontSize: '0.9rem',
+                  fontWeight: 500
+                }}
+              >
+                {amenity}
+                <X 
+                  size={14} 
+                  style={{ cursor: 'pointer', opacity: 0.6 }} 
+                  onClick={() => {
+                    const newAm = draft.amenities.filter((_, i) => i !== idx);
+                    handleInputChange('amenities', newAm);
+                  }}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', maxWidth: 400 }}>
+            <input 
+              type="text" 
+              id="newAmenityInput"
+              placeholder="e.g. Roof Top Deck"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.target.value.trim()) {
+                  const val = e.target.value.trim();
+                  if (!draft.amenities?.includes(val)) {
+                    handleInputChange('amenities', [...(draft.amenities || []), val]);
+                    e.target.value = '';
+                  }
+                }
+              }}
+              style={{ flex: 1 }}
+            />
+            <button 
+              className="btn" 
+              style={{ background: '#18181a', color: 'white', padding: '0.5rem 1.25rem', borderRadius: 8, border: 'none', cursor: 'pointer' }}
+              onClick={() => {
+                const input = document.getElementById('newAmenityInput');
+                if (input.value.trim()) {
+                  const val = input.value.trim();
+                  if (!draft.amenities?.includes(val)) {
+                    handleInputChange('amenities', [...(draft.amenities || []), val]);
+                    input.value = '';
+                  }
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
         </div>
       </div>
 

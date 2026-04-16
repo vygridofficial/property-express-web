@@ -294,11 +294,14 @@ export default function PropertyDetail() {
           </motion.div>
 
           {/* Amenities Section */}
-          {property.features && property.features.length > 0 && (
+          {(property.amenities || property.features) && (property.amenities?.length > 0 || property.features?.length > 0) && (
             <motion.div className={styles.amenitiesSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
               <h3>Amenities</h3>
               <div className={styles.amenitiesGrid}>
-                {property.features.map((amenity, idx) => (
+                {([...(property.amenities || []), ...(property.features || [])]).reduce((acc, current) => {
+                  if (!acc.includes(current)) acc.push(current);
+                  return acc;
+                }, []).map((amenity, idx) => (
                   <div key={idx} className={styles.amenityItem}>
                     <Check size={18} color="#c53030" />
                     <span>{amenity}</span>
