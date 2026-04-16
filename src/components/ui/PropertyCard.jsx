@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, BedDouble, Bath, Scaling, Phone } from 'lucide-react';
 import { formatPrice } from '../../utils/formatPrice';
+import { formatDate } from '../../utils/formatDate';
 import { useAdmin } from '../../admin/context/AdminContext';
 import styles from './PropertyCard.module.css';
 
@@ -128,6 +129,11 @@ export default function PropertyCard({ property }) {
         <div className={styles.location}>
           <MapPin size={16} /> {displayLocation}{property.district ? `, ${property.district}` : ''}
         </div>
+        {formatDate(property.createdAt) && (
+          <div className={styles.addedDate}>
+            Added on: {formatDate(property.createdAt)}
+          </div>
+        )}
         <div className={styles.features}>
           {displayBeds > 0 && (
             <span className={styles.featureItem}><BedDouble size={16} /> {displayBeds} Beds</span>

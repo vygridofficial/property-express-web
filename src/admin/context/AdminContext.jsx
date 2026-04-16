@@ -208,6 +208,12 @@ export function AdminProvider({ children }) {
     showReviews: true,
     showContactForm: true,
     taxonomy: {},
+    amenities: [
+      'Swimming Pool', '24/7 Security', 'Private Garage', 
+      'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',
+      'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
+      'CCTV', 'Power Backup'
+    ],
   });
 
   useEffect(() => {
@@ -220,8 +226,19 @@ export function AdminProvider({ children }) {
           setSections(prev => ({ ...prev, ...data.visibility }));
         }
         // Sync custom categories
-        if (Array.isArray(data.customCategories)) {
+        if (data.customCategories) {
           setCustomCategories(data.customCategories);
+        }
+        // If settings doc exists but has no amenities array, add it
+        if (!data.amenities) {
+          updateDoc(doc(db, 'settings', 'global'), {
+            amenities: [
+              'Swimming Pool', '24/7 Security', 'Private Garage', 
+              'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',
+              'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
+              'CCTV', 'Power Backup'
+            ]
+          });
         }
         setSettingsLoading(false);
       } else {

@@ -387,7 +387,14 @@
 .listingLocation {
   font-size: 0.85rem;
   color: #888;
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.listingAddedDate {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
 }
 
 .listingFeatures {

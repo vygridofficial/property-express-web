@@ -125,7 +125,17 @@
   gap: 0.5rem;
   color: var(--color-text-light);
   font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.listingAddedDate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-light);
+  font-size: 0.95rem;
   margin-bottom: 2.5rem;
+  opacity: 0.8;
 }
 
 .featuresStrip {

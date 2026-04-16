@@ -188,9 +188,16 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.25rem;
   font-size: 0.95rem;
   font-weight: 300;
+}
+
+.addedDate {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
 }
 
 .features {

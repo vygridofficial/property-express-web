@@ -7,6 +7,7 @@ import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
 import { KERALA_DISTRICTS, DISTRICT_COORDINATES } from '../data/districts';
 import { getPropertyCoordinates, getDistanceFromLatLonInKm } from '../utils/geo';
 import { formatPrice } from '../utils/formatPrice';
+import { formatDate } from '../utils/formatDate';
 import styles from './CategoryHero.module.css';
 
 const WhatsAppIcon = ({ size = 18 }) => (
@@ -132,6 +133,11 @@ function PropertyListingCard({ property, index }) {
           <h3 className={styles.listingTitle}>{property.title}</h3>
         </div>
         <p className={styles.listingLocation}>📍 {property.location}</p>
+        {formatDate(property.createdAt) && (
+          <div className={styles.listingAddedDate}>
+            Added on: {formatDate(property.createdAt)}
+          </div>
+        )}
         <div className={styles.listingFeatures}>
           {(property.beds > 0 || property.bedrooms > 0) && (
             <span>🛏 {property.beds || property.bedrooms} Beds</span>

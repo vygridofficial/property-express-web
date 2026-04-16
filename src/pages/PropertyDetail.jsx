@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
+import { formatDate } from '../utils/formatDate';
 import { submitLead } from '../services/leadService';
 import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
@@ -267,6 +268,11 @@ export default function PropertyDetail() {
             <div className={styles.location}>
               <MapPin size={18} /> {property.location}{property.district ? `, ${property.district}` : ''}
             </div>
+            {formatDate(property.createdAt) && (
+              <div className={styles.listingAddedDate}>
+                <Calendar size={16} /> Added on: {formatDate(property.createdAt)}
+              </div>
+            )}
           </motion.div>
 
           <motion.div className={styles.featuresStrip} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
