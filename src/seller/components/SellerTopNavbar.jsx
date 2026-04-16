@@ -48,14 +48,14 @@ export default function SellerTopNavbar() {
         <div 
           className={styles.profileTrigger} 
           onClick={() => setShowProfile(!showProfile)}
-          style={{ cursor: 'pointer' }}
         >
           {/* Always use initials as per user request to replace broken images */}
           <div style={{ 
             width: 36, height: 36, borderRadius: '50%', 
-            background: '#1e293b', color: 'white', 
+            background: 'var(--text-main)', color: 'var(--card-bg-light)', 
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: '0.85rem', flexShrink: 0
+            fontWeight: 800, fontSize: '0.85rem', flexShrink: 0,
+            border: '2px solid white'
           }}>
             {initials}
           </div>
@@ -74,9 +74,9 @@ export default function SellerTopNavbar() {
               <div 
                 className={styles.panelAvatar} 
                 style={{ 
-                  background: '#1e293b', color: 'white', 
+                  background: 'var(--text-main)', color: 'var(--card-bg-light)', 
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '1.5rem', fontWeight: 800
+                  fontSize: '1.75rem', fontWeight: 800, border: '4px solid var(--stroke)'
                 }}
               >
                 {initials}
@@ -90,8 +90,8 @@ export default function SellerTopNavbar() {
               <div className={styles.panelInfoGrid}>
                 <div className={styles.infoItem}>
                   <label className={styles.infoLabel}>Account Status</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#10b981', fontWeight: 700 }}>
-                    <ShieldCheck size={16} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontWeight: 800, fontSize: '0.9rem' }}>
+                    <ShieldCheck size={18} />
                     <span>Verified Seller</span>
                   </div>
                 </div>

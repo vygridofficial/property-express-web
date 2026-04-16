@@ -17,9 +17,9 @@ import styles from '../styles/Dashboard.module.css';
 import Skeleton from 'react-loading-skeleton';
 
 const statusConfig = {
-  pending:  { icon: Clock,         bg: '#fff7ed', color: '#f59e0b', badge: '#fef3c7', text: '#92400e' },
-  approved: { icon: CheckCircle2,  bg: '#ecfdf5', color: '#10b981', badge: '#d1fae5', text: '#065f46' },
-  rejected: { icon: XCircle,       bg: '#fef2f2', color: '#ef4444', badge: '#fee2e2', text: '#b91c1c' },
+  pending:  { icon: Clock,         bg: 'var(--badge-pending-bg)', color: 'var(--badge-pending)', badge: 'var(--badge-pending-bg)', text: 'var(--badge-pending)' },
+  approved: { icon: CheckCircle2,  bg: 'var(--badge-approved-bg)', color: 'var(--badge-approved)', badge: 'var(--badge-approved-bg)', text: 'var(--badge-approved)' },
+  rejected: { icon: XCircle,       bg: 'var(--badge-rejected-bg)', color: 'var(--badge-rejected)', badge: 'var(--badge-rejected-bg)', text: 'var(--badge-rejected)' },
 };
 
 export default function SigningHistory() {
@@ -130,8 +130,8 @@ export default function SigningHistory() {
 
                       {/* Status badge */}
                       <span style={{
-                        padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700,
-                        background: cfg.badge, color: cfg.text, textTransform: 'capitalize', flexShrink: 0
+                        padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 800,
+                        background: cfg.badge, color: cfg.text, textTransform: 'uppercase', flexShrink: 0
                       }}>
                         {sub.status}
                       </span>

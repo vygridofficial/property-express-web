@@ -144,7 +144,7 @@ function TermsModal({ term, onClose }) {
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.93, y: 20 }}
         onClick={e => e.stopPropagation()}
-        style={{ background: 'white', borderRadius: 24, padding: '2.5rem', maxWidth: 560, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}
+        style={{ background: 'var(--glass-solid)', backgroundBlendMode: 'overlay', borderRadius: 24, padding: '2.5rem', maxWidth: 560, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: term.bg, color: term.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -152,7 +152,7 @@ function TermsModal({ term, onClose }) {
           </div>
           <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)' }}>{term.title}</h2>
         </div>
-        <div style={{ background: '#f8fafc', borderRadius: 12, padding: '1.5rem', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
+        <div style={{ background: 'var(--card-bg-subtle)', borderRadius: 12, padding: '1.5rem', marginBottom: '1.5rem', border: '1px solid var(--stroke)' }}>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.7 }}>
             📋 Full terms content will be provided soon. This section will contain the detailed legal text for the <strong>{term.title}</strong> clause.
           </p>
@@ -235,18 +235,18 @@ export default function HelpCenter() {
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1rem' }}>Our support team is available 24/7 to assist you with your property listings.</p>
             
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.5rem', background: '#f8fafc', borderRadius: 16, border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.5rem', background: 'var(--card-bg-subtle)', borderRadius: 16, border: '1px solid var(--stroke)' }}>
                 <Mail size={20} color="#ed1b24" />
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Email Us</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Email Us</div>
                   <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>support@propertyexpress.com</div>
                 </div>
               </div>
               
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.5rem', background: '#f8fafc', borderRadius: 16, border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.5rem', background: 'var(--card-bg-subtle)', borderRadius: 16, border: '1px solid var(--stroke)' }}>
                 <PhoneCall size={20} color="#ed1b24" />
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Call Us</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Call Us</div>
                   <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>+91 98765 43210</div>
                 </div>
               </div>

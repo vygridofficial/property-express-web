@@ -31,7 +31,7 @@ export default function MobileBottomNav() {
     { to: '/admin/properties/plots',      icon: MapPin,    label: 'Plots'      },
     { to: '/admin/properties/warehouses', icon: Warehouse, label: 'Warehouses' },
   ];
-
+  const drawerItems = [
     { to: '/admin/submissions',     icon: FileSignature, label: 'Pending Approvals' },
     { to: '/admin/agreement-format',icon: FileText,      label: 'Agreement Format'  },
     { to: '/admin/sellers-history', icon: History,       label: 'Sellers History'   },

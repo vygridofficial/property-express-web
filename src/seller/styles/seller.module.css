@@ -13,6 +13,16 @@
   --text-muted: #64748b;
   --text-body: #475569;
   --stroke: rgba(0, 0, 0, 0.08);
+  
+  --badge-pending: #f59e0b;
+  --badge-pending-bg: rgba(245, 158, 11, 0.12);
+  --badge-approved: #10b981;
+  --badge-approved-bg: rgba(16, 185, 129, 0.12);
+  --badge-rejected: #ef4444;
+  --badge-rejected-bg: rgba(239, 68, 68, 0.12);
+  
+  --card-bg-light: #ffffff;
+  --card-bg-subtle: #f8fafc;
 }
 
 .sellerApp[data-theme='dark'] {
@@ -24,6 +34,16 @@
   --text-muted: #94a3b8;
   --text-body: #f1f5f9;
   --stroke: rgba(255, 255, 255, 0.15);
+  
+  --badge-pending: #fbbf24;
+  --badge-pending-bg: rgba(251, 191, 36, 0.15);
+  --badge-approved: #34d399;
+  --badge-approved-bg: rgba(52, 211, 153, 0.15);
+  --badge-rejected: #f87171;
+  --badge-rejected-bg: rgba(248, 113, 113, 0.15);
+  
+  --card-bg-light: rgba(30, 41, 59, 0.4);
+  --card-bg-subtle: rgba(15, 23, 42, 0.6);
 }
 
 .sellerApp * {
@@ -430,6 +450,15 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+@media (max-width: 767px) {
+  .profilePanel {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    top: 76px;
+  }
 }
 
 .panelAvatar {

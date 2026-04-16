@@ -115,21 +115,21 @@ export default function SellerDashboard() {
         {/* ── Stats row ── */}
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b' }}><Home size={20} /></div>
+            <div className={styles.statIcon} style={{ background: 'var(--badge-approved-bg)', color: 'var(--badge-approved)' }}><Home size={20} /></div>
             <div className={styles.statInfo}>
               <label>Properties Submitted</label>
               {loading ? <Skeleton width={40} /> : <span>{submissions.length}</span>}
             </div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6' }}><Clock size={20} /></div>
+            <div className={styles.statIcon} style={{ background: 'var(--badge-pending-bg)', color: 'var(--badge-pending)' }}><Clock size={20} /></div>
             <div className={styles.statInfo}>
               <label>Pending Approval</label>
               {loading ? <Skeleton width={40} /> : <span>{submissions.filter(s => s.status === 'pending').length}</span>}
             </div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}><CheckCircle2 size={20} /></div>
+            <div className={styles.statIcon} style={{ background: 'var(--badge-approved-bg)', color: 'var(--badge-approved)' }}><CheckCircle2 size={20} /></div>
             <div className={styles.statInfo}>
               <label>Approved Listings</label>
               {loading ? <Skeleton width={40} /> : <span>{submissions.filter(s => s.status === 'approved').length}</span>}
@@ -212,22 +212,22 @@ export default function SellerDashboard() {
                     <motion.div key={sub.id} variants={itemVariants} layout className={styles.agreementCard}>
                       <div className={styles.cardHeader}>
                         <div className={styles.iconWrapper} style={{
-                          background: sub.status === 'approved' ? 'rgba(16, 185, 129, 0.12)' : sub.status === 'rejected' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                          color:      sub.status === 'approved' ? '#10b981' : sub.status === 'rejected' ? '#ef4444' : '#f59e0b'
+                          background: sub.status === 'approved' ? 'var(--badge-approved-bg)' : sub.status === 'rejected' ? 'var(--badge-rejected-bg)' : 'var(--badge-pending-bg)',
+                          color:      sub.status === 'approved' ? 'var(--badge-approved)' : sub.status === 'rejected' ? 'var(--badge-rejected)' : 'var(--badge-pending)'
                         }}>
                           {sub.status === 'approved' ? <CheckCircle2 /> : <Clock />}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub.propertyTitle || 'Unnamed Property'}</h3>
+                          <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '1.05rem' }}>{sub.propertyTitle || 'Unnamed Property'}</h3>
                           <span className={styles.dateLabel}>
                             <Calendar size={13} style={{ marginRight: 4 }} />
                             {sub.createdAt?.toDate().toLocaleDateString() || 'Recently'}
                           </span>
                         </div>
                         <span style={{
-                          padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0,
-                          background: sub.status === 'approved' ? 'rgba(16, 185, 129, 0.12)' : sub.status === 'rejected' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                          color:      sub.status === 'approved' ? '#10b981' : sub.status === 'rejected' ? '#ef4444' : '#f59e0b',
+                          padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, flexShrink: 0,
+                          background: sub.status === 'approved' ? 'var(--badge-approved-bg)' : sub.status === 'rejected' ? 'var(--badge-rejected-bg)' : 'var(--badge-pending-bg)',
+                          color:      sub.status === 'approved' ? 'var(--badge-approved)' : sub.status === 'rejected' ? 'var(--badge-rejected)' : 'var(--badge-pending)',
                           textTransform: 'uppercase'
                         }}>
                           {sub.status}
