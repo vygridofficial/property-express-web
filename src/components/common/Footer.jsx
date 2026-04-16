@@ -126,7 +126,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.footerBottom}>
-          <p>&copy; {new Date().getFullYear()} {settings?.siteName || "Property Express"}. All Rights Reserved. | Designed and Developed by <a href="https://vygrid.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', fontWeight: 'bold', textDecoration: 'underline' }}>Vygrid</a></p>
+          <p>&copy; {new Date().getFullYear()} {settings?.siteName || "Property Express"}. All Rights Reserved.</p>
         </div>
       </div>
     </footer>

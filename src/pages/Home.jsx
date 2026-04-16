@@ -456,7 +456,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="section">
+      <section className="section" style={{ paddingBottom: '2rem' }}>
         <div className="container">
           <motion.div
             className="section-header" style={{ textAlign: 'center' }}
@@ -517,7 +517,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Review Submission Modal */}
+      {/* Seller Portal CTA */}
+      <section className="section" style={{ background: 'var(--color-bg)', padding: '2rem 0 4rem 0' }}>
+        <div className="container">
+          <motion.div 
+            className={styles.sellerPortalCta}
+            variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
+          >
+            <div className={styles.sellerPortalContent}>
+              <div className={styles.sellerPortalText}>
+                <h2 className={styles.sellerPortalTitle}>Are You a Property Owner?</h2>
+                <p className={styles.sellerPortalSubtitle}>List your properties with us and reach thousands of potential buyers. Experience a seamless selling journey.</p>
+              </div>
+              <Link to="/agreements" className={`btn ${styles.btnSellerPortal}`}>
+                <Handshake size={20} /> Seller Portal
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Review Submission ModalStatus */}
       {showReviewModal && createPortal(
         <div
           onClick={() => { setShowReviewModal(false); setReviewSubmitted(false); }}
