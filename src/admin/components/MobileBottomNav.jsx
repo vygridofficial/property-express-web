@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Building2, MessageSquare, Star, Menu, X, Users, Settings, Link as LinkIcon, LogOut, Home, Store, Warehouse, MapPin, ChevronDown, ChevronUp, Trash2, History } from 'lucide-react';
+import { LayoutDashboard, Building2, MessageSquare, Star, Menu, X, Users, Settings, Link as LinkIcon, LogOut, Home, Store, Warehouse, MapPin, ChevronDown, ChevronUp, Trash2, History, FileSignature } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import styles from '../styles/admin.module.css';
