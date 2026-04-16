@@ -7,8 +7,10 @@ import {
   ExternalLink,
   FileText,
   Shield,
-  DollarSign
+  Mail,
+  PhoneCall
 } from 'lucide-react';
+import { useSeller } from '../context/SellerContext';
 import styles from '../styles/Dashboard.module.css';
 import Skeleton from 'react-loading-skeleton';
 
@@ -166,6 +168,7 @@ function TermsModal({ term, onClose }) {
 }
 
 export default function HelpCenter() {
+  const { loading } = useSeller();
   const [activeTerm, setActiveTerm] = useState(null);
 
   return (
@@ -213,15 +216,36 @@ export default function HelpCenter() {
                   </div>
                 </motion.button>
               ))}
-            </div>
-          </div>
-
           <div>
             <h2 style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.15rem', marginBottom: '1rem' }}>Frequently Asked Questions</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {faqs.map((faq, i) => (
                 <FAQItem key={i} q={faq.q} a={faq.a} index={i} />
               ))}
+            </div>
+          </div>
+
+          {/* Contact Support Section */}
+          <div style={{ marginTop: '3rem', padding: '2.5rem', background: 'var(--glass-solid, white)', borderRadius: 24, border: '1px solid var(--glass-border)', textAlign: 'center' }}>
+            <h2 style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '1.4rem', marginBottom: '0.5rem' }}>Still need help?</h2>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1rem' }}>Our support team is available 24/7 to assist you with your property listings.</p>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.5rem', background: '#f8fafc', borderRadius: 16, border: '1px solid #e2e8f0' }}>
+                <Mail size={20} color="#ed1b24" />
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Email Us</div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>support@propertyexpress.com</div>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.5rem', background: '#f8fafc', borderRadius: 16, border: '1px solid #e2e8f0' }}>
+                <PhoneCall size={20} color="#ed1b24" />
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Call Us</div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>+91 98765 43210</div>
+                </div>
+              </div>
             </div>
           </div>
 

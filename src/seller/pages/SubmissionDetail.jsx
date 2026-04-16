@@ -46,11 +46,11 @@ function DetailRow({ icon: Icon, label, value }) {
 export default function SubmissionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { submissions } = useSeller();
+  const { submissions, loading } = useSeller();
 
   const sub = submissions.find(s => s.id === id);
 
-  if (!sub) {
+  if (!loading && !sub) {
     return (
       <div className={styles.dashboardWrapper}>
         <div className={styles.empty} style={{ paddingTop: '4rem' }}>
@@ -63,23 +63,52 @@ export default function SubmissionDetail() {
     );
   }
 
-  const cfg = statusConfig[sub.status] || statusConfig.pending;
+  const cfg = statusConfig[sub?.status] || statusConfig.pending;
   const StatusIcon = cfg.icon;
 
   return (
     <div className={styles.dashboardWrapper}>
       <header className={styles.header}>
-        {loading ? <Skeleton height={40} width={200} /> : <h1>Submission Detail</h1>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+          <button 
+            onClick={() => navigate('/agreements/signed')} 
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', 
+              background: 'white', border: '1px solid #e2e8f0', 
+              padding: '8px 16px', borderRadius: '12px', cursor: 'pointer',
+              color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            }}
+          >
+            <ChevronLeft size={18} />
+            Back to History
+          </button>
+        </div>
+        {loading ? <Skeleton height={40} width={250} /> : <h1>Submission Detail</h1>}
       </header>
+
       {loading ? (
-        <Skeleton count={5} height={30} style={{ marginBottom: '1rem' }} />
+        <div style={{ background: 'white', borderRadius: 20, padding: '2rem' }}>
+          <Skeleton count={8} height={25} style={{ marginBottom: '1rem' }} />
+        </div>
       ) : (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
           {/* Property Details Card */}
-          <div style={{ background: 'var(--glass-bg, rgba(255,255,255,0.45))', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border, rgba(255,255,255,0.6))', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ margin: '0 0 1.5rem', fontWeight: 700, color: 'var(--text-main)', fontSize: '1.1rem' }}>Property Details</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0, fontWeight: 800, color: 'var(--text-main)', fontSize: '1.25rem' }}>Property Details</h3>
+              <span style={{ 
+                display: 'inline-flex', alignItems: 'center', gap: 6, 
+                padding: '6px 14px', borderRadius: 20, 
+                background: cfg.badge, color: cfg.text, 
+                fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase' 
+              }}>
+                <StatusIcon size={14} /> {cfg.label}
+              </span>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
               <DetailRow icon={Building} label="Property Type" value={sub.propertyType} />
               <DetailRow icon={MapPin} label="Location" value={sub.location} />
               <DetailRow icon={DollarSign} label="Expected Price" value={sub.price ? `₹ ${Number(sub.price).toLocaleString('en-IN')}` : null} />
@@ -89,24 +118,24 @@ export default function SubmissionDetail() {
             </div>
 
             {sub.address && (
-              <div style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--stroke)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Full Address</div>
-                <p style={{ margin: 0, color: 'var(--text-body)', lineHeight: 1.6 }}>{sub.address}</p>
+              <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Full Address</div>
+                <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: 1.6, fontSize: '1rem' }}>{sub.address}</p>
               </div>
             )}
 
             {sub.description && (
-              <div style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--stroke)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Description</div>
-                <p style={{ margin: 0, color: 'var(--text-body)', lineHeight: 1.7 }}>{sub.description}</p>
+              <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Description</div>
+                <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: 1.7, fontSize: '1rem' }}>{sub.description}</p>
               </div>
             )}
           </div>
 
           {/* Seller Info Card */}
-          <div style={{ background: 'var(--glass-bg, rgba(255,255,255,0.45))', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border, rgba(255,255,255,0.6))', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ margin: '0 0 1.5rem', fontWeight: 700, color: 'var(--text-main)', fontSize: '1.1rem' }}>Seller Information</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+            <h3 style={{ margin: '0 0 1.5rem', fontWeight: 800, color: 'var(--text-main)', fontSize: '1.25rem' }}>Seller Information</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
               <DetailRow icon={User} label="Name" value={sub.sellerName} />
               <DetailRow icon={Mail} label="Email" value={sub.sellerEmail} />
               <DetailRow icon={Phone} label="Phone" value={sub.sellerPhone || sub.phone} />
@@ -115,46 +144,54 @@ export default function SubmissionDetail() {
 
           {/* Images Card */}
           {sub.images && sub.images.length > 0 && (
-            <div style={{ background: 'var(--glass-bg, rgba(255,255,255,0.45))', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border, rgba(255,255,255,0.6))', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ margin: '0 0 1.5rem', fontWeight: 700, color: 'var(--text-main)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ImageIcon size={18} /> Property Photos
+            <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+              <h3 style={{ margin: '0 0 1.5rem', fontWeight: 800, color: 'var(--text-main)', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ImageIcon size={20} /> Property Photos
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
                 {sub.images.map((url, i) => (
-                  <img key={i} src={url} alt={`Property ${i + 1}`} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 12, border: '1px solid #e2e8f0' }} />
+                  <img key={i} src={url} alt={`Property ${i + 1}`} style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 12, border: '1px solid #e2e8f0' }} />
                 ))}
               </div>
             </div>
           )}
 
           {/* Signature + Actions */}
-          <div style={{ background: 'var(--glass-bg, rgba(255,255,255,0.45))', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid var(--glass-border, rgba(255,255,255,0.6))', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ margin: '0 0 1.25rem', fontWeight: 700, color: 'var(--text-main)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <FileSignature size={18} /> Signature & Actions
+          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+            <h3 style={{ margin: '0 0 1.5rem', fontWeight: 800, color: 'var(--text-main)', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FileSignature size={20} /> Signature & Actions
             </h3>
             {sub.sellerSignature && typeof sub.sellerSignature === 'string' && sub.sellerSignature.startsWith('data:') && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Your Signature</div>
-                <img src={sub.sellerSignature} alt="Seller Signature" style={{ height: 80, border: '1px solid #e2e8f0', borderRadius: 10, background: 'white', padding: 8 }} />
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Your Signature</div>
+                <div style={{ display: 'inline-block', border: '1px solid #e2e8f0', borderRadius: 12, background: '#f8fafc', padding: '16px' }}>
+                  <img src={sub.sellerSignature} alt="Seller Signature" style={{ height: 80, display: 'block' }} />
+                </div>
               </div>
             )}
-            {sub.status === 'approved' && (
-              <button
-                onClick={async () => {
-                  const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
-                  await generateAgreementPDF(sub, sub.adminSignature, true);
-                }}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#3b82f6', color: 'white', padding: '0.8rem 1.5rem', borderRadius: 12, border: 'none', cursor: 'pointer', fontWeight: 600, boxShadow: '0 4px 12px rgba(59,130,246,0.25)' }}
-              >
-                <Download size={18} /> Download Agreement PDF
-              </button>
-            )}
-            {sub.status === 'rejected' && sub.rejectionReason && (
-              <div style={{ padding: '1rem', background: '#fef2f2', borderRadius: 12, border: '1px solid #fecaca' }}>
-                <div style={{ fontWeight: 700, color: '#b91c1c', marginBottom: 4 }}>Rejection Reason</div>
-                <p style={{ margin: 0, color: '#7f1d1d', lineHeight: 1.6 }}>{sub.rejectionReason}</p>
-              </div>
-            )}
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+              {sub.status === 'approved' && (
+                <button
+                  onClick={async () => {
+                    const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
+                    await generateAgreementPDF(sub, sub.adminSignature, true);
+                  }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', background: '#3b82f6', color: 'white', padding: '1rem 2rem', borderRadius: 12, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '1rem', boxShadow: '0 8px 24px rgba(59,130,246,0.25)' }}
+                >
+                  <Download size={20} /> Download Agreement PDF
+                </button>
+              )}
+              
+              {sub.status === 'rejected' && sub.rejectionReason && (
+                <div style={{ flex: 1, padding: '1.5rem', background: '#fef2f2', borderRadius: 16, border: '1px solid #fecaca' }}>
+                  <div style={{ fontWeight: 800, color: '#b91c1c', marginBottom: 8, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <XCircle size={20} /> Rejection Reason
+                  </div>
+                  <p style={{ margin: 0, color: '#7f1d1d', lineHeight: 1.6, fontSize: '1rem', fontWeight: 500 }}>{sub.rejectionReason}</p>
+                </div>
+              )}
+            </div>
           </div>
         </motion.div>
       )}

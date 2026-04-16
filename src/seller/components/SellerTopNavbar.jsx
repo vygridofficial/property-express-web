@@ -9,6 +9,18 @@ export default function SellerTopNavbar() {
   const [showProfile, setShowProfile] = useState(false);
   const panelRef = useRef(null);
 
+  // Get initials from display name
+  const getInitials = (name) => {
+    if (!name) return 'S';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name[0].toUpperCase();
+  };
+
+  const initials = getInitials(user?.displayName);
+
   // Close panel when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -36,14 +48,17 @@ export default function SellerTopNavbar() {
         <div 
           className={styles.profileTrigger} 
           onClick={() => setShowProfile(!showProfile)}
+          style={{ cursor: 'pointer' }}
         >
-          {user?.photoURL ? (
-            <img src={user.photoURL} alt="Avatar" className={styles.avatar} />
-          ) : (
-            <div className={styles.navActionBtn} style={{ width: 34, height: 34, borderRadius: '50%' }}>
-              <User size={18} />
-            </div>
-          )}
+          {/* Always use initials as per user request to replace broken images */}
+          <div style={{ 
+            width: 36, height: 36, borderRadius: '50%', 
+            background: '#1e293b', color: 'white', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 700, fontSize: '0.85rem', flexShrink: 0
+          }}>
+            {initials}
+          </div>
           <span className={styles.profileName}>{user?.displayName?.split(' ')[0] || 'Account'}</span>
         </div>
 
@@ -56,13 +71,16 @@ export default function SellerTopNavbar() {
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               className={styles.profilePanel}
             >
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt="Avatar" className={styles.panelAvatar} />
-              ) : (
-                <div className={styles.panelAvatar} style={{ background: 'var(--stroke)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <User size={40} color="var(--text-muted)" />
-                </div>
-              )}
+              <div 
+                className={styles.panelAvatar} 
+                style={{ 
+                  background: '#1e293b', color: 'white', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1.5rem', fontWeight: 800
+                }}
+              >
+                {initials}
+              </div>
               
               <h3 className={styles.panelName}>{user?.displayName || 'Seller Account'}</h3>
               <p className={styles.panelEmail}>{user?.email}</p>

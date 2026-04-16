@@ -49,7 +49,7 @@ export default function SellerLogin() {
             WebkitBackdropFilter: 'blur(20px)',
             padding: 'calc(2rem + 2vw)',
             borderRadius: '32px',
-            boxShadow: 'var(--glass-shadow, 0 25px 60px rgba(0,0,0,0.1))',
+            boxShadow: 'none',
             maxWidth: '430px',
             width: '100%',
             textAlign: 'center',
