@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
+import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
 import { submitLead } from '../services/leadService';
 import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
@@ -11,6 +11,7 @@ import brandLogo from '../assets/logo.png';
 import { formatPrice } from '../utils/formatPrice';
 import { getPropertyCoordinates } from '../utils/geo';
 import SEO from '../components/common/SEO';
+import { isValidEmail, isValidPhone } from '../utils/validation';
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function PropertyDetail() {
     email: '',
     message: 'I am interested in Property Express listing...'
   });
+  const [errors, setErrors] = useState({});
   const [currentMainIndex, setCurrentMainIndex] = useState(0);
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function PropertyDetail() {
   // Auto-slide logic for main image
   const cycleIndices = useMemo(() => {
     if (allImages.length <= 3) return [0];
-    // Main slot cycles through 0 and any images from index 3 onwards
+    // Main slot cycles through 0 and any images from index 3 onwards (skipping 1 & 2)
     return [0, ...allImages.map((_, i) => i).filter(i => i > 2)];
   }, [allImages]);
 
@@ -86,8 +88,39 @@ export default function PropertyDetail() {
 
   const activeMainImage = allImages[cycleIndices[currentMainIndex]] || safeImg;
 
+  const handlePrev = (e) => {
+    e.stopPropagation();
+    setCurrentMainIndex(prev => (prev - 1 + cycleIndices.length) % cycleIndices.length);
+  };
+
+  const handleNext = (e) => {
+    e.stopPropagation();
+    setCurrentMainIndex(prev => (prev + 1) % cycleIndices.length);
+  };
+
+  const validate = () => {
+    let newErrors = {};
+    if (!inquiryForm.name.trim()) newErrors.name = 'Full name is required';
+    if (!inquiryForm.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!isValidEmail(inquiryForm.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    if (!inquiryForm.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!isValidPhone(inquiryForm.phone)) {
+      newErrors.phone = 'Please enter a valid phone number (min 10 digits)';
+    }
+    if (!inquiryForm.message.trim()) newErrors.message = 'Message is required';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
+    
     setFormStatus('submitting');
     try {
       await submitLead({
@@ -102,6 +135,7 @@ export default function PropertyDetail() {
       });
       setFormStatus('success');
       setInquiryForm({ name: '', phone: '', email: '', message: 'I am interested in Property Express listing...' });
+      setErrors({});
       setTimeout(() => setFormStatus('idle'), 5000);
     } catch (error) {
       console.error('Inquiry submission failed:', error);
@@ -163,6 +197,25 @@ export default function PropertyDetail() {
                 transition={{ duration: 0.8, ease: "easeInOut" }}
               />
             </AnimatePresence>
+            
+            {cycleIndices.length > 1 && (
+              <>
+                <button 
+                  className={`${styles.navArrow} ${styles.navArrowLeft}`} 
+                  onClick={handlePrev}
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button 
+                  className={`${styles.navArrow} ${styles.navArrowRight}`} 
+                  onClick={handleNext}
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </>
+            )}
           </div>
 
           {/* Side Images (Static) */}
@@ -328,28 +381,36 @@ export default function PropertyDetail() {
                       placeholder="Your Full Name"
                       value={inquiryForm.name}
                       onChange={e => setInquiryForm(f => ({ ...f, name: e.target.value }))}
+                      className={errors.name ? 'field-error' : ''}
                     />
+                    {errors.name && <span className="error-message">{errors.name}</span>}
                     <input
                       type="tel"
                       required
                       placeholder="Your Phone Number"
                       value={inquiryForm.phone}
                       onChange={e => setInquiryForm(f => ({ ...f, phone: e.target.value }))}
+                      className={errors.phone ? 'field-error' : ''}
                     />
+                    {errors.phone && <span className="error-message">{errors.phone}</span>}
                     <input
                       type="email"
                       required
                       placeholder="Your Email Address"
                       value={inquiryForm.email}
                       onChange={e => setInquiryForm(f => ({ ...f, email: e.target.value }))}
+                      className={errors.email ? 'field-error' : ''}
                     />
+                    {errors.email && <span className="error-message">{errors.email}</span>}
                     <textarea
                       rows="2"
                       required
                       placeholder="Your message or any specific requirements..."
                       value={inquiryForm.message}
                       onChange={e => setInquiryForm(f => ({ ...f, message: e.target.value }))}
+                      className={errors.message ? 'field-error' : ''}
                     ></textarea>
+                    {errors.message && <span className="error-message">{errors.message}</span>}
 
                   <div className={styles.actionButtons}>
                     <button

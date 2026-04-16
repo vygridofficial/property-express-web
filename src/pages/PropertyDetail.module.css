@@ -390,3 +390,51 @@
     height: 300px;
   }
 }
+
+.navArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #111;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 12;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navArrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.navArrowLeft {
+  left: 1.5rem;
+}
+
+.navArrowRight {
+  right: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .navArrow {
+    width: 40px;
+    height: 40px;
+  }
+  .navArrowLeft {
+    left: 0.75rem;
+  }
+  .navArrowRight {
+    right: 0.75rem;
+  }
+}

@@ -8,6 +8,7 @@ import SEO from '../components/common/SEO';
 import { formatSocialUrl, formatSocialDisplay } from '../utils/social';
 import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
 import styles from './Contact.module.css';
+import { isValidEmail, isValidPhone } from '../utils/validation';
 
 const InstagramIcon = ({ size = 24, color = "currentColor" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -32,6 +33,7 @@ const WhatsAppIcon = ({ size = 24, color = "currentColor" }) => (
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [status, setStatus] = useState('idle');
+  const [errors, setErrors] = useState({});
 
   // ── Fetch live contact & social data from Firebase ──
   const [settings, setSettings] = useState(null);
@@ -42,13 +44,33 @@ export default function Contact() {
     });
   }, []);
 
+  const validate = () => {
+    let newErrors = {};
+    if (!formData.name.trim()) newErrors.name = 'Full name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!isValidEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    if (formData.phone && !isValidPhone(formData.phone)) {
+      newErrors.phone = 'Please enter a valid phone number (min 10 digits)';
+    }
+    if (!formData.message.trim()) newErrors.message = 'Message is required';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
+    
     setStatus('submitting');
     try {
       await submitLead(formData);
       setStatus('success');
       setFormData({ name: '', email: '', phone: '', message: '' });
+      setErrors({});
       setTimeout(() => setStatus('idle'), 3000);
     } catch {
       setStatus('error');
@@ -211,19 +233,46 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className={styles.contactForm}>
                 <div className={styles.formGroup}>
                   <label>Full Name</label>
-                  <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
+                  <input 
+                    type="text" 
+                    value={formData.name} 
+                    onChange={e => setFormData({ ...formData, name: e.target.value })} 
+                    className={errors.name ? 'field-error' : ''}
+                    required 
+                  />
+                  {errors.name && <span className="error-message">{errors.name}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Phone Number</label>
-                  <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                  <input 
+                    type="tel" 
+                    value={formData.phone} 
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })} 
+                    className={errors.phone ? 'field-error' : ''}
+                  />
+                  {errors.phone && <span className="error-message">{errors.phone}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Email Address</label>
-                  <input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
+                  <input 
+                    type="email" 
+                    value={formData.email} 
+                    onChange={e => setFormData({ ...formData, email: e.target.value })} 
+                    className={errors.email ? 'field-error' : ''}
+                    required 
+                  />
+                  {errors.email && <span className="error-message">{errors.email}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Message</label>
-                  <textarea rows={5} value={formData.message} onChange={e => setFormData({ ...formData, message: e.target.value })} required></textarea>
+                  <textarea 
+                    rows={5} 
+                    value={formData.message} 
+                    onChange={e => setFormData({ ...formData, message: e.target.value })} 
+                    className={errors.message ? 'field-error' : ''}
+                    required
+                  ></textarea>
+                  {errors.message && <span className="error-message">{errors.message}</span>}
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={status === 'submitting'}>
                   {status === 'submitting' ? 'Sending…' : 'Submit Enquiry'}

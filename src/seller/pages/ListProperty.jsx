@@ -30,6 +30,7 @@ import { createPropertySubmission } from '../../services/submissionService';
 import SignaturePad from '../components/SignaturePad';
 import dashStyles from '../styles/Dashboard.module.css';
 import Skeleton from 'react-loading-skeleton';
+import { isValidPhone } from '../../utils/validation';
 
 const BASE_PROPERTY_TYPES = ['Apartment', 'Villa', 'Plot', 'Commercial'];
 
@@ -182,7 +183,11 @@ export default function ListProperty() {
     }
   };
 
-  const isStep1Valid = details.propertyTitle && details.price && details.location && details.district;
+  const isStep1Valid = details.propertyTitle && 
+                       details.price && 
+                       details.location && 
+                       details.district && 
+                       (!details.phone || isValidPhone(details.phone));
   const isStep2Valid = terms.accuracy && terms.exclusivity && terms.commission;
 
   // Glassmorphic input style (inline for elements that can't use CSS modules easily)
@@ -474,14 +479,17 @@ export default function ListProperty() {
                   <div>
                     <label style={label}>Phone Number</label>
                     <div style={{ position: 'relative' }}>
-                      <Phone size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                      <Phone size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: details.phone && !isValidPhone(details.phone) ? '#ed1b24' : '#94a3b8' }} />
                       <input
                         type="tel" value={details.phone}
                         onChange={e => setDetails({...details, phone: e.target.value})}
-                        style={{ ...inp, paddingLeft: '2.6rem' }}
+                        style={{ ...inp, paddingLeft: '2.6rem', borderColor: details.phone && !isValidPhone(details.phone) ? '#ed1b24' : 'rgba(200,210,230,0.7)' }}
                         onFocus={onFocus} onBlur={onBlur}
                       />
                     </div>
+                    {details.phone && !isValidPhone(details.phone) && (
+                      <span className="error-message" style={{ fontSize: '0.7rem' }}>Please enter a valid phone number</span>
+                    )}
                   </div>
 
                 </div>
