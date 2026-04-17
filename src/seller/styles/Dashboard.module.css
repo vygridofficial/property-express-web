@@ -263,7 +263,43 @@
     width: 100%;
     padding: 0.5rem 0 !important;
   }
+
+  /* ── Card grid: single column on phone ── */
+  .agreementsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* ── Reduce content padding so cards don't overflow ── */
+  .content {
+    padding: 1rem;
+  }
+
+  /* ── Tighter card padding on mobile ── */
+  .agreementCard {
+    padding: 1.1rem;
+  }
+
+  /* ── Smaller icon, tighter gap ── */
+  .iconWrapper {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  /* ── Title slightly smaller ── */
+  .cardHeader h3 {
+    font-size: 0.95rem;
+  }
+
+  /* ── Footer stacks on very narrow screens ── */
+  .cardFooter {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
 }
+
 
 /* ─── Filter Pills (Dashboard Properties Tab) ─── */
 .filterRow {
