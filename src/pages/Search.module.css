@@ -141,6 +141,22 @@
   font-weight: 500;
 }
 
+@media (max-width: 768px) {
+  .dropdownBox {
+    position: fixed;
+    top: 115px; /* Directly below the sticky header */
+    left: 0;
+    right: 0;
+    width: 100vw;
+    border-radius: 0 0 24px 24px;
+    border: none;
+    border-top: 1px solid #eee;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    padding: 1rem;
+    max-height: 50vh;
+  }
+}
+
 /* Results Grid */
 .resultsSection {
   padding: 3rem 0;
@@ -274,6 +290,7 @@
 
 .inlineSearchInput {
   flex: 1;
+  min-width: 0;
   padding: 0.7rem 1.1rem;
   background: transparent;
   border: none;
