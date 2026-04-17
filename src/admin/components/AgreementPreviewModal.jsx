@@ -114,60 +114,36 @@ const AgreementPreviewModal = ({ isOpen, onClose, htmlContent, title, onDownload
             </div>
           </div>
 
-          {/* Content Area (Mobile Viewport Simulation) */}
+          {/* Content Area */}
           <div style={{ 
             flex: 1, overflow: 'hidden', padding: '2rem', 
-            background: '#0f172a', display: 'flex', justifyContent: 'center',
-            alignItems: 'center', position: 'relative'
+            background: 'var(--admin-bg, #f3f4f6)', display: 'flex', justifyContent: 'center',
+            alignItems: 'flex-start', position: 'relative'
           }}>
             
-            {/* The Smartphone Frame */}
-            <div style={{
-              width: '380px', height: '100%',
-              maxHeight: '800px',
-              border: '14px solid #1e293b',
-              borderRadius: '56px',
-              background: 'white',
-              boxShadow: '0 50px 100px rgba(0,0,0,0.5)',
-              position: 'relative',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              {/* Camera Notch Area */}
-              <div style={{ 
-                height: '30px', width: '100%', 
-                display: 'flex', justifyContent: 'center', alignItems: 'center' 
-              }}>
-                <div style={{ width: '100px', height: '20px', background: '#1e293b', borderRadius: '0 0 15px 15px' }} />
-              </div>
-
-              {/* Scrollable Document Content inside Phone */}
+            <div 
+              ref={scrollRef}
+              style={{ 
+                width: '100%', maxWidth: '800px', height: '100%',
+                background: 'white', borderRadius: '8px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                overflowY: 'auto', overflowX: 'auto',
+                padding: '2rem 3rem'
+              }}
+            >
               <div 
-                ref={scrollRef}
-                style={{ 
-                  flex: 1, overflowY: 'auto', overflowX: 'auto',
-                  background: 'white', padding: '10px'
+                style={{
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top center',
+                  width: '100%',
+                  minHeight: '100%',
+                  transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                  background: 'white',
+                  color: '#334155',
+                  fontFamily: 'serif'
                 }}
-              >
-                <div 
-                  style={{
-                    transform: `scale(${scale})`,
-                    transformOrigin: 'top center',
-                    width: '100%',
-                    transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    background: 'white',
-                    color: '#334155',
-                    fontFamily: 'serif'
-                  }}
-                  dangerouslySetInnerHTML={{ __html: htmlContent }}
-                />
-              </div>
-
-              {/* Home Indicator */}
-              <div style={{ height: '24px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ width: '120px', height: '5px', background: '#e2e8f0', borderRadius: '100px' }} />
-              </div>
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              />
             </div>
           </div>
         </motion.div>
