@@ -103,6 +103,7 @@ export default function ListProperty() {
     location: '',
     district: '',
     address: '',
+    googleMapLink: '',
     phone: '',
     phoneCode: '+91',
     description: '',
@@ -508,6 +509,17 @@ export default function ListProperty() {
                   <input
                     type="text" value={details.address}
                     onChange={e => setDetails({...details, address: e.target.value})}
+                    style={inp} onFocus={onFocus} onBlur={onBlur}
+                  />
+                </div>
+
+                <div style={{ marginTop: '1.25rem' }}>
+                  <label style={label}>Google Map Link</label>
+                  <input
+                    type="url"
+                    placeholder="https://maps.google.com/..."
+                    value={details.googleMapLink}
+                    onChange={e => setDetails({...details, googleMapLink: e.target.value})}
                     style={inp} onFocus={onFocus} onBlur={onBlur}
                   />
                 </div>
