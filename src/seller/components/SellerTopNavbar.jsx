@@ -88,7 +88,7 @@ function DesktopDropdown({ show, anchorRef, onClose, isDark, children, width }) 
 }
 
 export default function SellerTopNavbar() {
-  const { user, theme, toggleTheme } = useSeller();
+  const { user, theme, toggleTheme, logout } = useSeller();
   const [showProfile, setShowProfile] = useState(false);
   const panelRef = useRef(null);
   const isMobile = useIsMobile();
@@ -174,6 +174,17 @@ export default function SellerTopNavbar() {
                       <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Last Signed In</span>
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 600 }}>{user?.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleDateString() : 'N/A'}</span>
                     </div>
+                    <div style={{ padding: '1rem 0 0.5rem', marginTop: '0.5rem', borderTop: `1px solid ${dividerColor}` }}>
+                      <button 
+                        onClick={logout} 
+                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', fontFamily: 'Outfit, sans-serif' }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Sign Out
+                      </button>
+                    </div>
                 </div>
               </div>
             </BottomSheet>
@@ -197,6 +208,17 @@ export default function SellerTopNavbar() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 0' }}>
                       <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Last Signed In</span>
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 600 }}>{user?.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleDateString() : 'N/A'}</span>
+                    </div>
+                    <div style={{ padding: '1rem 0 0.5rem', marginTop: '0.5rem', borderTop: `1px solid ${dividerColor}` }}>
+                      <button 
+                        onClick={logout} 
+                        style={{ width: '100%', padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', fontFamily: 'Outfit, sans-serif' }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Sign Out
+                      </button>
                     </div>
                 </div>
               </div>
