@@ -212,31 +212,35 @@ export default function SellerDashboard() {
                   {filtered.length > 0 && filtered.map(sub => (
                     <motion.div key={sub.id} variants={itemVariants} layout className={styles.agreementCard}>
                       <div className={styles.cardHeader}>
-                        <div className={styles.iconWrapper} style={{
-                          background: sub.status === 'approved' ? 'var(--badge-approved-bg)' : sub.status === 'rejected' ? 'var(--badge-rejected-bg)' : 'var(--badge-pending-bg)',
-                          color:      sub.status === 'approved' ? 'var(--badge-approved)' : sub.status === 'rejected' ? 'var(--badge-rejected)' : 'var(--badge-pending)'
-                        }}>
-                          {sub.status === 'approved' ? <CheckCircle2 /> : <Clock />}
+                        {/* Left: icon + title + date */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1, minWidth: 0 }}>
+                          <div className={styles.iconWrapper} style={{
+                            background: sub.status === 'approved' ? 'var(--badge-approved-bg)' : sub.status === 'rejected' ? 'var(--badge-rejected-bg)' : 'var(--badge-pending-bg)',
+                            color:      sub.status === 'approved' ? 'var(--badge-approved)' : sub.status === 'rejected' ? 'var(--badge-rejected)' : 'var(--badge-pending)'
+                          }}>
+                            {sub.status === 'approved' ? <CheckCircle2 /> : <Clock />}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '1.05rem', margin: 0 }}>{sub.propertyTitle || 'Unnamed Property'}</h3>
+                            <span className={styles.dateLabel}>
+                              <Calendar size={13} style={{ marginRight: 4 }} />
+                              {sub.createdAt?.toDate().toLocaleDateString() || 'Recently'}
+                            </span>
+                          </div>
                         </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '1.05rem' }}>{sub.propertyTitle || 'Unnamed Property'}</h3>
-                          <span className={styles.dateLabel}>
-                            <Calendar size={13} style={{ marginRight: 4 }} />
-                            {sub.createdAt?.toDate().toLocaleDateString() || 'Recently'}
-                          </span>
-                        </div>
+                        {/* Right: status badge — always top-aligned */}
                         <span style={{
                           padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, flexShrink: 0,
                           background: sub.status === 'approved' ? 'var(--badge-approved-bg)' : sub.status === 'rejected' ? 'var(--badge-rejected-bg)' : 'var(--badge-pending-bg)',
                           color:      sub.status === 'approved' ? 'var(--badge-approved)' : sub.status === 'rejected' ? 'var(--badge-rejected)' : 'var(--badge-pending)',
-                          textTransform: 'uppercase'
+                          textTransform: 'uppercase', marginLeft: '0.5rem', lineHeight: '1.6'
                         }}>
                           {sub.status}
                         </span>
                       </div>
 
                       {/* Footer: download + delete */}
-                      <div className={styles.cardFooter} style={{ borderTop: '1px solid var(--stroke)', paddingTop: '0.85rem', marginTop: '0.85rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className={styles.cardFooter}>
                         {sub.status === 'approved' ? (
                           <button
                             disabled={downloadingId === sub.id}
@@ -250,15 +254,30 @@ export default function SellerDashboard() {
                                 setDownloadingId(null);
                               }
                             }}
-                            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: downloadingId === sub.id ? 'var(--text-muted)' : '#3b82f6', background: 'transparent', border: 'none', cursor: downloadingId === sub.id ? 'not-allowed' : 'pointer', fontWeight: 600, padding: 0, fontSize: '0.85rem', opacity: downloadingId === sub.id ? 0.6 : 1, minHeight: 44 }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '0.4rem',
+                              color: downloadingId === sub.id ? 'var(--text-muted)' : '#3b82f6',
+                              background: 'transparent', border: 'none',
+                              cursor: downloadingId === sub.id ? 'not-allowed' : 'pointer',
+                              fontWeight: 600, padding: '0.35rem 0', fontSize: '0.85rem',
+                              opacity: downloadingId === sub.id ? 0.6 : 1,
+                              height: 34, fontFamily: 'Outfit, sans-serif'
+                            }}
                           >
                             <Download size={15} /> {downloadingId === sub.id ? 'Generating…' : 'Download Agreement'}
                           </button>
-                        ) : <div />}
+                        ) : <span />}
 
                         <button
                           onClick={() => setDeleteTarget({ id: sub.id, title: sub.propertyTitle || 'Unnamed Property' })}
-                          style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, padding: '0.35rem 0.85rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', fontFamily: 'Outfit, sans-serif' }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '0.35rem',
+                            color: '#ef4444', background: 'rgba(239,68,68,0.08)',
+                            border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8,
+                            padding: '0.35rem 0.85rem', cursor: 'pointer',
+                            fontWeight: 600, fontSize: '0.82rem', fontFamily: 'Outfit, sans-serif',
+                            height: 34
+                          }}
                         >
                           <Trash2 size={14} /> Delete
                         </button>
