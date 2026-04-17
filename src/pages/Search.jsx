@@ -229,7 +229,6 @@ export default function Search() {
 
     setSearchParams(newParams, { replace: true });
   };
- bitumen
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

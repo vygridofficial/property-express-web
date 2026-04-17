@@ -127,6 +127,7 @@ export default function Footer() {
 
         <div className={styles.footerBottom}>
           <p>&copy; {new Date().getFullYear()} {settings?.siteName || "Property Express"}. All Rights Reserved.</p>
+          <p className={styles.devCredit}>Designed and Developed by <span>Vygrid</span></p>
         </div>
       </div>
     </footer>
