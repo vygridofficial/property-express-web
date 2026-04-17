@@ -213,27 +213,27 @@ export default function SellerDashboard() {
                     <motion.div key={sub.id} variants={itemVariants} layout className={styles.agreementCard}>
                       <div className={styles.cardHeader}>
                         {/* Left: icon + title + date */}
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
                           <div className={styles.iconWrapper} style={{
                             background: sub.status === 'approved' ? 'var(--badge-approved-bg)' : sub.status === 'rejected' ? 'var(--badge-rejected-bg)' : 'var(--badge-pending-bg)',
                             color:      sub.status === 'approved' ? 'var(--badge-approved)' : sub.status === 'rejected' ? 'var(--badge-rejected)' : 'var(--badge-pending)'
                           }}>
-                            {sub.status === 'approved' ? <CheckCircle2 /> : <Clock />}
+                            {sub.status === 'approved' ? <CheckCircle2 size={20} /> : <Clock size={20} />}
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '1.05rem', margin: 0 }}>{sub.propertyTitle || 'Unnamed Property'}</h3>
+                            <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '1rem', margin: 0, fontWeight: 700 }}>{sub.propertyTitle || 'Unnamed Property'}</h3>
                             <span className={styles.dateLabel}>
-                              <Calendar size={13} style={{ marginRight: 4 }} />
+                              <Calendar size={12} />
                               {sub.createdAt?.toDate().toLocaleDateString() || 'Recently'}
                             </span>
                           </div>
                         </div>
-                        {/* Right: status badge — always top-aligned */}
+                        {/* Right: status badge — always vertically centered */}
                         <span style={{
-                          padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, flexShrink: 0,
+                          padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800, flexShrink: 0,
                           background: sub.status === 'approved' ? 'var(--badge-approved-bg)' : sub.status === 'rejected' ? 'var(--badge-rejected-bg)' : 'var(--badge-pending-bg)',
                           color:      sub.status === 'approved' ? 'var(--badge-approved)' : sub.status === 'rejected' ? 'var(--badge-rejected)' : 'var(--badge-pending)',
-                          textTransform: 'uppercase', marginLeft: '0.5rem', lineHeight: '1.6'
+                          textTransform: 'uppercase', alignSelf: 'center', lineHeight: '1.6', whiteSpace: 'nowrap'
                         }}>
                           {sub.status}
                         </span>
