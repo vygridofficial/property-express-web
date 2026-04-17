@@ -7,6 +7,7 @@ import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import SEO from '../components/common/SEO';
 import { formatSocialUrl, formatSocialDisplay } from '../utils/social';
 import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
+import PhoneInput from '../components/common/PhoneInput';
 import styles from './Contact.module.css';
 import { isValidEmail, isValidPhone } from '../utils/validation';
 
@@ -31,7 +32,7 @@ const WhatsAppIcon = ({ size = 24, color = "currentColor" }) => (
 );
 
 export default function Contact() {
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', phoneCountryCode: '+91', message: '' });
   const [status, setStatus] = useState('idle');
   const [errors, setErrors] = useState({});
 
@@ -52,8 +53,8 @@ export default function Contact() {
     } else if (!isValidEmail(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
-    if (formData.phone && !isValidPhone(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number (min 10 digits)';
+    if (formData.phone && !isValidPhone(formData.phone, formData.phoneCountryCode)) {
+      newErrors.phone = 'Please enter a valid phone number';
     }
     if (!formData.message.trim()) newErrors.message = 'Message is required';
     
@@ -67,9 +68,13 @@ export default function Contact() {
     
     setStatus('submitting');
     try {
-      await submitLead(formData);
+      const submitData = {
+        ...formData,
+        phone: formData.phone ? formData.phoneCountryCode + formData.phone : '',
+      };
+      await submitLead(submitData);
       setStatus('success');
-      setFormData({ name: '', email: '', phone: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', phoneCountryCode: '+91', message: '' });
       setErrors({});
       setTimeout(() => setStatus('idle'), 3000);
     } catch {
@@ -243,14 +248,16 @@ export default function Contact() {
                   {errors.name && <span className="error-message">{errors.name}</span>}
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Phone Number</label>
-                  <input 
-                    type="tel" 
-                    value={formData.phone} 
-                    onChange={e => setFormData({ ...formData, phone: e.target.value })} 
-                    className={errors.phone ? 'field-error' : ''}
+                  <label htmlFor="contact-phone">Phone Number</label>
+                  <PhoneInput
+                    id="contact-phone"
+                    value={formData.phone}
+                    countryCode={formData.phoneCountryCode}
+                    onChange={(phone, code) => setFormData({ ...formData, phone, phoneCountryCode: code })}
+                    placeholder="Enter phone number"
+                    error={errors.phone}
+                    theme="light"
                   />
-                  {errors.phone && <span className="error-message">{errors.phone}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Email Address</label>

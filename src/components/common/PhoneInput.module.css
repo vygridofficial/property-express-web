@@ -1,0 +1,297 @@
+/* ─── PhoneInput.module.css ─────────────────────────────────────── */
+
+/* ── Outer wrapper ── */
+.wrapper {
+  width: 100%;
+  position: relative;
+}
+
+/* ── Input row (selector + divider + number field) ── */
+.inputRow {
+  display: flex;
+  align-items: center;
+  border-radius: 14px;
+  border: 1.5px solid rgba(200, 210, 230, 0.7);
+  background: var(--glass-bg, rgba(255, 255, 255, 0.55));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible;
+  height: 50px;
+}
+
+.inputRow:focus-within {
+  border-color: #ed1b24;
+  box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.1);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.inputRowError {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.inputRowDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Dark theme overrides (Admin/Global) ── */
+:global([data-theme="dark"]) .inputRow {
+  background: var(--admin-glass-bg, rgba(30, 30, 35, 0.6));
+  border-color: var(--admin-stroke, rgba(255, 255, 255, 0.1));
+}
+
+:global([data-theme="dark"]) .inputRow:focus-within {
+  border-color: #ed1b24;
+  background: var(--admin-glass-bg);
+}
+
+/* ── Country selector button ── */
+.selectorBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 0.75rem 0 0.9rem;
+  height: 46px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 12px 0 0 12px;
+  font-family: 'Outfit', sans-serif;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.selectorBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+:global([data-theme="dark"]) .selectorBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.selectorBtn:disabled {
+  cursor: not-allowed;
+}
+
+.flag {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.dialCode {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-main, #1a1a2e);
+  letter-spacing: 0.01em;
+}
+
+:global([data-theme="dark"]) .dialCode {
+  color: var(--admin-text-main, #f1f5f9);
+}
+
+.chevron {
+  color: var(--text-muted, #94a3b8);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ── Divider ── */
+.divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(200, 210, 230, 0.6);
+  flex-shrink: 0;
+}
+
+:global([data-theme="dark"]) .divider {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Number input ── */
+.numberInput {
+  flex: 1;
+  height: 46px;
+  padding: 0 1rem;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-main, #1a1a2e);
+  min-width: 0;
+}
+
+:global([data-theme="dark"]) .numberInput {
+  color: var(--admin-text-main, #f1f5f9);
+}
+
+.numberInput::placeholder {
+  color: var(--text-muted, #94a3b8);
+  opacity: 1;
+}
+
+/* ── Dropdown panel — position is injected inline by the portal ── */
+.dropdown {
+  max-height: 280px;
+  background: #ffffff;
+  border: 1px solid rgba(200, 210, 230, 0.5);
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: dropIn 0.15s ease;
+}
+
+:global([data-theme="dark"]) .dropdown {
+  background: #000000;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Search bar ── */
+.searchWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid rgba(200, 210, 230, 0.4);
+  flex-shrink: 0;
+}
+
+:global([data-theme="dark"]) .searchWrap {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.searchIcon {
+  color: var(--text-muted, #94a3b8);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.82rem;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-main, #1a1a2e);
+  min-width: 0;
+}
+
+:global([data-theme="dark"]) .searchInput {
+  color: var(--admin-text-main, #f1f5f9);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted, #94a3b8);
+}
+
+.searchClear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, #94a3b8);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Country list ── */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.list::-webkit-scrollbar { width: 4px; }
+.list::-webkit-scrollbar-track { background: transparent; }
+.list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+:global([data-theme="dark"]) .list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); }
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  font-size: 0.85rem;
+}
+
+.listItem:hover {
+  background: rgba(237, 27, 36, 0.06);
+}
+
+:global([data-theme="dark"]) .listItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.listItemActive {
+  background: rgba(237, 27, 36, 0.08);
+  font-weight: 600;
+}
+
+:global([data-theme="dark"]) .listItemActive {
+  background: rgba(237, 27, 36, 0.15);
+}
+
+.itemFlag {
+  font-size: 1.05rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.itemName {
+  flex: 1;
+  color: var(--text-main, #1a1a2e);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global([data-theme="dark"]) .itemName {
+  color: var(--admin-text-main, #f1f5f9);
+}
+
+.itemDial {
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+.noResult {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.85rem;
+}
+
+/* ── Error message ── */
+.errorMsg {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ── Mobile: no special overrides needed — portal uses position:fixed ── */
+@media (max-width: 480px) {
+  .dropdown {
+    border-radius: 14px;
+  }
+}

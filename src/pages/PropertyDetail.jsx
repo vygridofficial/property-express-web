@@ -13,6 +13,7 @@ import { formatPrice } from '../utils/formatPrice';
 import { getPropertyCoordinates } from '../utils/geo';
 import SEO from '../components/common/SEO';
 import { isValidEmail, isValidPhone } from '../utils/validation';
+import PhoneInput from '../components/common/PhoneInput';
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -24,6 +25,7 @@ export default function PropertyDetail() {
   const [inquiryForm, setInquiryForm] = useState({
     name: '',
     phone: '',
+    phoneCode: '+91',
     email: '',
     message: 'I am interested in Property Express listing...'
   });
@@ -109,8 +111,8 @@ export default function PropertyDetail() {
     }
     if (!inquiryForm.phone.trim()) {
       newErrors.phone = 'Phone number is required';
-    } else if (!isValidPhone(inquiryForm.phone)) {
-      newErrors.phone = 'Please enter a valid phone number (min 10 digits)';
+    } else if (!isValidPhone(inquiryForm.phone, inquiryForm.phoneCode)) {
+      newErrors.phone = 'Please enter a valid phone number';
     }
     if (!inquiryForm.message.trim()) newErrors.message = 'Message is required';
     
@@ -126,7 +128,8 @@ export default function PropertyDetail() {
     try {
       await submitLead({
         name: inquiryForm.name,
-        phone: inquiryForm.phone,
+        phone: inquiryForm.phoneCode + inquiryForm.phone,
+        phoneCountryCode: inquiryForm.phoneCode,
         email: inquiryForm.email,
         message: inquiryForm.message,
         propertyId: property.id,
@@ -135,7 +138,7 @@ export default function PropertyDetail() {
         status: 'new'
       });
       setFormStatus('success');
-      setInquiryForm({ name: '', phone: '', email: '', message: 'I am interested in Property Express listing...' });
+      setInquiryForm({ name: '', phone: '', phoneCode: '+91', email: '', message: 'I am interested in Property Express listing...' });
       setErrors({});
       setTimeout(() => setFormStatus('idle'), 5000);
     } catch (error) {
@@ -413,15 +416,16 @@ export default function PropertyDetail() {
                       className={errors.name ? 'field-error' : ''}
                     />
                     {errors.name && <span className="error-message">{errors.name}</span>}
-                    <input
-                      type="tel"
-                      required
-                      placeholder="Your Phone Number"
+                    <PhoneInput
                       value={inquiryForm.phone}
-                      onChange={e => setInquiryForm(f => ({ ...f, phone: e.target.value }))}
-                      className={errors.phone ? 'field-error' : ''}
+                      countryCode={inquiryForm.phoneCode}
+                      onChange={(phone, code) => setInquiryForm(f => ({ ...f, phone, phoneCode: code }))}
+                      placeholder="Your Phone Number"
+                      error={errors.phone}
+                      theme="light"
+                      wrapperStyle={{ marginBottom: errors.phone ? '0' : '0.75rem' }}
                     />
-                    {errors.phone && <span className="error-message">{errors.phone}</span>}
+                    {errors.phone && <span className="error-message" style={{ display: 'block', marginBottom: '0.75rem' }}>{errors.phone}</span>}
                     <input
                       type="email"
                       required

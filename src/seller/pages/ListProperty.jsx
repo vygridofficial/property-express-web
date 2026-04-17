@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   Loader2,
   FileSignature,
-  Phone,
   AlertTriangle,
   RefreshCw,
   X
@@ -31,6 +30,7 @@ import SignaturePad from '../components/SignaturePad';
 import dashStyles from '../styles/Dashboard.module.css';
 import Skeleton from 'react-loading-skeleton';
 import { isValidPhone } from '../../utils/validation';
+import PhoneInput from '../../components/common/PhoneInput';
 
 function isBlockedByClientError(err) {
   const msg = (err?.message || err?.toString() || '').toLowerCase();
@@ -104,6 +104,7 @@ export default function ListProperty() {
     district: '',
     address: '',
     phone: '',
+    phoneCode: '+91',
     description: '',
     amenities: [], // Array for chip-based selection
     bedrooms: '',
@@ -170,7 +171,7 @@ export default function ListProperty() {
         ...details,
         sellerName: details.sellerName || user?.displayName || 'Unknown Seller',
         sellerEmail: user?.email || '',
-        sellerPhone: details.phone || user?.phoneNumber || '',
+        sellerPhone: details.phoneCode + (details.phone || '') || user?.phoneNumber || '',
         amenities: Array.isArray(details.amenities) ? details.amenities : [],
         termsAccepted: terms
       };
@@ -194,11 +195,11 @@ export default function ListProperty() {
     }
   };
 
-  const isStep1Valid = details.propertyTitle && 
-                       details.price && 
-                       details.location && 
-                       details.district && 
-                       (!details.phone || isValidPhone(details.phone));
+  const isStep1Valid = details.propertyTitle &&
+                       details.price &&
+                       details.location &&
+                       details.district &&
+                       (!details.phone || isValidPhone(details.phone, details.phoneCode));
   const isStep2Valid = terms.accuracy && terms.exclusivity && terms.commission;
 
   // Glassmorphic input style (inline for elements that can't use CSS modules easily)
@@ -489,18 +490,15 @@ export default function ListProperty() {
 
                   <div>
                     <label style={label}>Phone Number</label>
-                    <div style={{ position: 'relative' }}>
-                      <Phone size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: details.phone && !isValidPhone(details.phone) ? '#ed1b24' : '#94a3b8' }} />
-                      <input
-                        type="tel" value={details.phone}
-                        onChange={e => setDetails({...details, phone: e.target.value})}
-                        style={{ ...inp, paddingLeft: '2.6rem', borderColor: details.phone && !isValidPhone(details.phone) ? '#ed1b24' : 'rgba(200,210,230,0.7)' }}
-                        onFocus={onFocus} onBlur={onBlur}
-                      />
-                    </div>
-                    {details.phone && !isValidPhone(details.phone) && (
-                      <span className="error-message" style={{ fontSize: '0.7rem' }}>Please enter a valid phone number</span>
-                    )}
+                    <PhoneInput
+                      value={details.phone}
+                      countryCode={details.phoneCode}
+                      onChange={(phone, code) => setDetails({ ...details, phone, phoneCode: code })}
+                      placeholder="Enter phone number"
+                      error={details.phone && !isValidPhone(details.phone, details.phoneCode) ? 'Please enter a valid phone number' : ''}
+                      theme="light"
+                      wrapperStyle={{ width: '100%' }}
+                    />
                   </div>
 
                 </div>

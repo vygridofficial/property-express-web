@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, MapPin, Link, Check } from 'lucide-react';
+import { Mail, MapPin, Link, Check } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
+import PhoneInput from '../../components/common/PhoneInput';
 import styles from '../styles/admin.module.css';
 
 const InputGroup = ({ icon: Icon, label, placeholder, stateKey, value, onChange }) => (
@@ -30,6 +31,10 @@ export default function ContactSocial() {
     setDraft(siteSettings);
   }, [siteSettings]);
 
+  // Derive phone code fields with fallback
+  const primaryPhoneCode = draft.primaryPhoneCode || '+91';
+  const whatsappCode     = draft.whatsappCode     || '+91';
+
   useEffect(() => {
     const dirty = Object.keys(siteSettings).some(k => siteSettings[k] !== draft[k]);
     setIsDirty(dirty);
@@ -55,8 +60,27 @@ export default function ContactSocial() {
         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '2rem' }}>Contact & Social Information</h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <InputGroup icon={Phone} label="Primary Phone" placeholder="+1 (555) 000-0000" stateKey="primaryPhone" value={draft.primaryPhone} onChange={handleInputChange} />
-          <InputGroup icon={Phone} label="WhatsApp Business" placeholder="+1 (555) 000-0000" stateKey="whatsappBusiness" value={draft.whatsappBusiness} onChange={handleInputChange} />
+          {/* Primary Phone */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Primary Phone</label>
+            <PhoneInput
+              value={draft.primaryPhone || ''}
+              countryCode={primaryPhoneCode}
+              onChange={(phone, code) => setDraft(prev => ({ ...prev, primaryPhone: phone, primaryPhoneCode: code }))}
+              placeholder="Phone number"
+            />
+          </div>
+
+          {/* WhatsApp Business */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>WhatsApp Business</label>
+            <PhoneInput
+              value={draft.whatsappBusiness || ''}
+              countryCode={whatsappCode}
+              onChange={(phone, code) => setDraft(prev => ({ ...prev, whatsappBusiness: phone, whatsappCode: code }))}
+              placeholder="WhatsApp number"
+            />
+          </div>
           <InputGroup icon={Mail} label="Support Email" placeholder="hello@domain.com" stateKey="supportEmail" value={draft.supportEmail} onChange={handleInputChange} />
           
           <div style={{ height: 1, background: 'var(--admin-stroke)', margin: '1rem 0' }}></div>

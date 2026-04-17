@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Plus, Edit2, Trash2, X, UploadCloud, User } from 'lucide-react';
+import PhoneInput from '../../components/common/PhoneInput';
 import { FlatIcon, PlotIcon, WarehouseIcon, VillaIcon } from '../components/icons/PropertyIcons';
 import { useAdmin } from '../context/AdminContext';
 import { addProperty, updateProperty, deleteProperty } from '../../services/propertyService';
@@ -58,7 +59,8 @@ export default function AdminProperties() {
     price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
     address: '', district: '', mapsUrl: '', 
     agentName: 'Property Express', 
-    agentPhone: '+91 97787 45146', 
+    agentPhone: '97787 45146', 
+    agentPhoneCode: '+91',
     agentPhoto: null,
     description: '', amenities: [], dynamicFilters: {},
     addedOn: new Date().toISOString().slice(0, 10),
@@ -122,7 +124,8 @@ export default function AdminProperties() {
         district:    selectedProperty.district || '',
         mapsUrl:     selectedProperty.mapsUrl || '',
         agentName:   selectedProperty.agentName || '',
-        agentPhone:  selectedProperty.agentPhone || '',
+        agentPhone:  selectedProperty.agentPhone?.replace(/^\+\d+\s*/, '') || selectedProperty.agentPhone || '',
+        agentPhoneCode: selectedProperty.agentPhoneCode || '+91',
         agentPhoto:  selectedProperty.agentPhoto || null,
         description: selectedProperty.description || '',
         amenities:   selectedProperty.amenities || [],
@@ -132,8 +135,9 @@ export default function AdminProperties() {
         facebookLink: selectedProperty.facebookLink || '',
         youtubeLink: selectedProperty.youtubeLink || '',
       });
-      // Pre-fill existing images (Cloudinary URLs or base64 previews)
-      setImages(selectedProperty.imageUrls || (selectedProperty.image ? [selectedProperty.image] : []));
+      // Pre-fill existing images (Cloudinary URLs or base64 previews), prioritizing 'images' which is used by Seller submissions
+      const legacyImageArray = selectedProperty.images || selectedProperty.imageUrls;
+      setImages(legacyImageArray || (selectedProperty.image ? [selectedProperty.image] : []));
     }
   }, [editingId, selectedProperty]);
 
@@ -367,7 +371,8 @@ export default function AdminProperties() {
             district: formData.district,
             mapsUrl: formData.mapsUrl,
             agentName: formData.agentName,
-            agentPhone: formData.agentPhone,
+            agentPhone: (formData.agentPhoneCode || '+91') + (formData.agentPhone || ''),
+            agentPhoneCode: formData.agentPhoneCode || '+91',
             agentPhoto: uploadedAgentPhotoUrl,
             description: formData.description,
             amenities: formData.amenities,
@@ -377,8 +382,9 @@ export default function AdminProperties() {
             facebookLink: formData.facebookLink || '',
             youtubeLink: formData.youtubeLink || '',
             updatedAt: new Date(),
-            image: uploadedImageUrls[0] || (editingId ? selectedProperty.image : fallbackImage),
-            imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : (editingId ? selectedProperty.imageUrls : [fallbackImage]),
+            image: uploadedImageUrls[0] || (editingId ? selectedProperty.image || (selectedProperty.images && selectedProperty.images[0]) : fallbackImage),
+            imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : (editingId ? (selectedProperty.images || selectedProperty.imageUrls) : [fallbackImage]),
+            images: uploadedImageUrls.length > 0 ? uploadedImageUrls : (editingId ? (selectedProperty.images || selectedProperty.imageUrls) : [fallbackImage]),
           };
           
           if (editingId) {
@@ -404,7 +410,8 @@ export default function AdminProperties() {
             district: '',
             mapsUrl: '',
             agentName: 'Property Express',
-            agentPhone: '+91 97787 45146',
+            agentPhone: '97787 45146',
+            agentPhoneCode: '+91',
             agentPhoto: '',
             description: '',
             amenities: ['Parking', 'Security', 'Gated Community'],
@@ -906,7 +913,12 @@ export default function AdminProperties() {
                     </div>
                     <div>
                       <Label>Agent Phone</Label>
-                      <input type="text" placeholder="Agent contact number..." value={formData.agentPhone} onChange={e => handleFormChange('agentPhone', e.target.value)} style={getInputStyle('agentPhone')} />
+                      <PhoneInput
+                        value={formData.agentPhone}
+                        countryCode={formData.agentPhoneCode || '+91'}
+                        onChange={(phone, code) => handleFormChange('agentPhone', phone) || setFormData(prev => ({ ...prev, agentPhoneCode: code }))}
+                        placeholder="Agent contact number"
+                      />
                     </div>
                   </div>
                 </div>

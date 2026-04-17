@@ -18,6 +18,7 @@ import {
 import { useAdmin } from '../context/AdminContext';
 import { createAgreement } from '../../services/agreementService';
 import { sendAgreementLink } from '../../services/notificationService';
+import PhoneInput from '../../components/common/PhoneInput';
 import styles from '../styles/admin.module.css';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -34,6 +35,7 @@ export default function Agreements() {
     propertyId: '',
     sellerName: '',
     sellerPhone: '',
+    sellerPhoneCode: '+91',
     customLegalText: ''
   });
 
@@ -47,8 +49,10 @@ export default function Agreements() {
 
   const handleCreate = async () => {
     const selectedProp = properties.find(p => p.id === formData.propertyId);
+    const fullPhone = (formData.sellerPhoneCode || '+91') + formData.sellerPhone;
     const agreementData = {
       ...formData,
+      sellerPhone: fullPhone,
       propertyTitle: selectedProp?.title || 'Unknown Property',
       propertyCategory: selectedProp?.category || 'Residential',
       propertyAddress: selectedProp?.address || 'N/A'
@@ -56,9 +60,9 @@ export default function Agreements() {
 
     try {
       const { id, token } = await createAgreement(agreementData);
-      await sendAgreementLink(formData.sellerPhone, selectedProp.title, token);
+      await sendAgreementLink(fullPhone, selectedProp.title, token);
       setIsModalOpen(false);
-      setFormData({ propertyId: '', sellerName: '', sellerPhone: '', customLegalText: '' });
+      setFormData({ propertyId: '', sellerName: '', sellerPhone: '', sellerPhoneCode: '+91', customLegalText: '' });
     } catch (err) {
       console.error(err);
     }
@@ -184,11 +188,11 @@ export default function Agreements() {
                   </div>
                   <div className={styles.formGroup} style={{ flex: 1 }}>
                     <label>Seller Phone (WhatsApp)</label>
-                    <input 
-                      type="text" 
+                    <PhoneInput
                       value={formData.sellerPhone}
-                      onChange={(e) => setFormData({...formData, sellerPhone: e.target.value})}
-                      placeholder="+91 ..."
+                      countryCode={formData.sellerPhoneCode || '+91'}
+                      onChange={(phone, code) => setFormData({ ...formData, sellerPhone: phone, sellerPhoneCode: code })}
+                      placeholder="Phone number"
                     />
                   </div>
                 </div>
