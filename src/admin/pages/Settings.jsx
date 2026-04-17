@@ -78,20 +78,20 @@ export default function Settings() {
     setTimeout(() => setToastConfig(prev => ({ ...prev, isOpen: false })), 3000);
   };
 
-  const initiateDelete = (name) => {
+  const initiateDelete = (cat) => {
     // Check if property type is assigned to existing properties (case-insensitive)
-    const isInUse = properties.some(p => p.category?.toLowerCase() === name.toLowerCase());
+    const isInUse = properties.some(p => p.category?.toLowerCase() === cat.name.toLowerCase());
     if (isInUse) {
-      triggerToast(`Cannot delete '${name}' — it is assigned to existing listings.`, 'error');
+      triggerToast(`Cannot delete '${cat.name}' — it is assigned to existing listings.`, 'error');
       return;
     }
-    setDeleteData({ name });
+    setDeleteData({ id: cat.id, name: cat.name });
   };
 
   const confirmDelete = async () => {
     if (!deleteData) return;
     try {
-      await removePropertyType(deleteData.name);
+      await removePropertyType(deleteData.id);
       setDeleteData(null);
       triggerToast(`Property type '${deleteData.name}' deleted`, 'success');
     } catch (err) {
@@ -321,7 +321,7 @@ export default function Settings() {
                   </button>
                 </div>
                 <button
-                  onClick={() => initiateDelete(cat.name)}
+                  onClick={() => initiateDelete(cat)}
                   style={{ background: 'rgba(229,57,53,0.1)', border: '1px solid rgba(229,57,53,0.2)', cursor: 'pointer', color: '#E53935', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: 8 }}
                   title={`Delete ${cat.name}`}
                 >
