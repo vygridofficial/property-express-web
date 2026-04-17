@@ -12,14 +12,14 @@ export const generateAgreementPDF = async (submissionData, adminSignatureData, d
     // 1. Check for Active Template in Firestore
     const docRef = doc(db, 'admin_settings', 'agreement_template');
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists() && docSnap.data().status === 'active') {
       const templateData = docSnap.data();
-      
-      console.log('[AgreementPDF] Template fields:', { 
+
+      console.log('[AgreementPDF] Template fields:', {
         hasTemplateHtml: !!templateData.templateHtml,
-        hasBase64: !!templateData.fileBase64, 
-        hasUrl: !!templateData.fileUrl, 
+        hasBase64: !!templateData.fileBase64,
+        hasUrl: !!templateData.fileUrl,
         fileName: templateData.fileName,
         mappingCount: Object.keys(templateData.mappings || {}).length
       });
@@ -159,7 +159,7 @@ export const generateAgreementPDF = async (submissionData, adminSignatureData, d
       pdf.addImage(submissionData.sellerSignature, 'PNG', 20, yPos + 5, 50, 20);
     }
   }
-  
+
   pdf.text("Authorized Signatory:", pageWidth - 80, yPos);
   if (adminSignatureData) {
     if (typeof adminSignatureData === 'object' && adminSignatureData.type === 'text') {
