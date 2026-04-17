@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useSeller } from '../context/SellerContext';
 import logo from '../../assets/logo.png';
 import styles from '../styles/seller.module.css';
@@ -40,7 +41,34 @@ export default function SellerLogin() {
       {isSubmitting ? (
         <Skeleton height={40} width={200} />
       ) : (
-        <motion.div 
+        <>
+          <Link 
+            to="/"
+            style={{
+              position: 'absolute',
+              top: '2rem',
+              left: '2rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              color: '#475569',
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+              fontWeight: 500,
+              padding: '0.5rem 1rem',
+              borderRadius: '20px',
+              background: 'rgba(255,255,255,0.7)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.4)',
+              transition: 'all 0.2s ease',
+              zIndex: 10
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#1e293b'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.7)'; e.currentTarget.style.color = '#475569'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
+          >
+            <ArrowLeft size={16} /> Return to Main Website
+          </Link>
+          <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
@@ -100,6 +128,7 @@ export default function SellerLogin() {
             </motion.p>
           )}
         </motion.div>
+        </>
       )}
     </div>
   );
