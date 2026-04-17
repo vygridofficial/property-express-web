@@ -201,17 +201,21 @@ export const filterProperties = (properties, query, filters, knownLocations = []
     );
   }
 
+  // Helper to extract true numeric value from formatted strings (e.g., '1.5Cr', '50L')
+  const getActualPrice = (p) => {
+    if (p.numericPrice && p.numericPrice > 0) return p.numericPrice;
+    const pStr = (p.price || '0').toString().toLowerCase();
+    let val = parseFloat(pStr.replace(/[^0-9.]/g, '')) || 0;
+    if (pStr.includes('cr')) val *= 10000000;
+    else if (pStr.includes('l')) val *= 100000;
+    else if (pStr.includes('k')) val *= 1000;
+    return val;
+  };
+
   // 4. Price Filter
   if (filters.price && filters.price !== 'Any Price') {
     results = results.filter(p => {
-      // Use numericPrice if available (set by admin), otherwise parse from price string
-      let priceVal = 0;
-      if (p.numericPrice && p.numericPrice > 0) {
-        priceVal = p.numericPrice;
-      } else {
-        const raw = (p.price || '0').toString().replace(/[^0-9.]/g, '');
-        priceVal = parseFloat(raw) || 0;
-      }
+      const priceVal = getActualPrice(p);
 
       const priceLower = filters.price.toLowerCase().replace(/[^a-z0-9]/g, '');
       // Keyword pattern matching (avoids ₹ URL-encoding issues)
@@ -245,7 +249,6 @@ export const filterProperties = (properties, query, filters, knownLocations = []
       }
       return 0;
     };
-    const parsePrice = (p) => parseFloat((p.price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
 
     switch (filters.sort) {
       case 'Newest First':
@@ -255,10 +258,10 @@ export const filterProperties = (properties, query, filters, knownLocations = []
         results.sort((a, b) => parseDate(a) - parseDate(b));
         break;
       case 'Price Low to High':
-        results.sort((a, b) => parsePrice(a) - parsePrice(b));
+        results.sort((a, b) => getActualPrice(a) - getActualPrice(b));
         break;
       case 'Price High to Low':
-        results.sort((a, b) => parsePrice(b) - parsePrice(a));
+        results.sort((a, b) => getActualPrice(b) - getActualPrice(a));
         break;
       default:
         break;
