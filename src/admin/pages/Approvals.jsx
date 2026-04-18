@@ -125,13 +125,27 @@ export default function Approvals() {
   };
 
   const handleDownloadPreview = async () => {
+    if (!selectedSub) {
+      alert('No submission selected');
+      return;
+    }
     setIsPreviewing(true);
+    console.log('[Download] Starting PDF generation for:', selectedSub.id);
     try {
       const signatures = {
         seller: selectedSub.sellerSignature,
         admin: adminSignature || { type: 'text', value: 'PREVIEW ADMIN' }
       };
+      console.log('[Download] Calling generateAgreementPDF with:', { 
+        propertyTitle: selectedSub.propertyTitle,
+        sellerSignature: !!signatures.seller,
+        adminSignature: !!signatures.admin 
+      });
       await generateAgreementPDF(selectedSub, signatures.admin, true);
+      console.log('[Download] PDF generation completed');
+    } catch (err) {
+      console.error('[Download] Error:', err);
+      alert('PDF generation failed: ' + err.message);
     } finally {
       setIsPreviewing(false);
     }

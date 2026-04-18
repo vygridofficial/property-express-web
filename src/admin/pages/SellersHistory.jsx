@@ -334,8 +334,11 @@ export default function SellersHistory() {
                       <button
                         onClick={async (e) => {
                           e.stopPropagation();
+                          console.log('[SellersHistory] Downloading PDF for:', sub.id, sub.propertyTitle);
                           const { generateAgreementPDF } = await import('../../utils/generateAgreementPDF');
+                          console.log('[SellersHistory] Calling generateAgreementPDF...');
                           await generateAgreementPDF(sub, sub.adminSignature, true);
+                          console.log('[SellersHistory] PDF generation complete');
                         }}
                         title="Download PDF"
                         style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#3b82f6', borderRadius: 8, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}

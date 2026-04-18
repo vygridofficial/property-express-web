@@ -74,11 +74,36 @@ function escapeRegExp(string) {
  * Merges data directly into a pre-extracted HTML string (stored in Firestore as templateHtml).
  * This is the preferred path — no DOCX binary, no network fetch, no CORS issues.
  */
+
+// Default mappings - used when no mappings are provided in Firestore
+const DEFAULT_MAPPINGS = {
+  '{{Govt.ID_number}}': 'id',
+  '{{Govt._ID_number}}': 'id',
+  '{{Full_legal_name}}': 'sellerName',
+  '{{Seller_email}}': 'sellerEmail',
+  '{{Seller_phone}}': 'sellerPhone',
+  '{{Property_title}}': 'propertyTitle',
+  '{{Property_type}}': 'propertyType',
+  '{{Property_address}}': 'address',
+  '{{Property_location}}': 'location',
+  '{{Property_area}}': 'area',
+  '{{Listed_sale_price}}': 'price',
+  '{{Seller_signature_(image)}}': 'seller_signature',
+  '{{Admin_signature_(image)}}': 'admin_signature',
+  '{{Approval_date_(auto)}}': 'current_date',
+  '{{Approval_date(auto)}}': 'current_date'
+};
+
 export const mergeHtmlTemplate = async (htmlString, submissionData, mapping, signatures = {}) => {
+  // Use provided mappings or fall back to defaults
+  const effectiveMapping = (mapping && Object.keys(mapping).length > 0) ? mapping : DEFAULT_MAPPINGS;
+  
+  console.log('[TemplateProcessor] Using mappings:', effectiveMapping);
+  
   try {
     let html = htmlString;
 
-    for (const [placeholder, fieldId] of Object.entries(mapping || {})) {
+    for (const [placeholder, fieldId] of Object.entries(effectiveMapping)) {
       // Create a regex that strips invisible zero-width spaces/soft hyphens and exactly matches the placeholder
       // Also handles variable internal spacing
       const cleanPlaceholder = placeholder.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
@@ -97,41 +122,54 @@ export const mergeHtmlTemplate = async (htmlString, submissionData, mapping, sig
           : `<img src="${sig}" style="height: 60px; object-fit: contain; vertical-align: middle;" crossorigin="anonymous" />`;
       } else if (fieldId === 'current_date') {
         replacement = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+      } else if (fieldId === 'agreement_id') {
+        replacement = submissionData.id || 'N/A';
       } else {
         replacement = submissionData[fieldId] !== undefined ? String(submissionData[fieldId]) : (placeholder || '');
       }
 
+      // Debugging: Log the replacement process
+      console.log(`[TemplateProcessor] Replacing {{${placeholder}}} (field: ${fieldId}) with: ${String(replacement).substring(0, 50)}...`);
+
       html = html.replace(regex, replacement);
     }
 
-    // 4. Wrap in a standard A4 container for preview/print
-    return `
+    // 4. Wrap in a standard container - styling is managed by the caller (Preview or Export)
+    const styledContainer = `
       <div class="agreement-document" style="
         font-family: 'Times New Roman', serif; 
-        padding: 60px 80px; 
         color: #000; 
-        line-height: 1.6; 
+        line-height: 1.5; 
         background: #fff;
-        font-size: 15px;
-        width: 800px;
+        font-size: 11pt;
+        width: 100%;
         box-sizing: border-box;
+        margin: 0;
       ">
         <style>
-          .agreement-document p { margin-bottom: 1em; text-align: justify; }
+          .agreement-document { 
+            font-family: 'Times New Roman', serif; 
+            font-size: 11pt;
+            line-height: 1.5;
+          }
+          .agreement-document p { margin-bottom: 0.8em; text-align: justify; }
           .agreement-document h1, .agreement-document h2, .agreement-document h3 { 
             text-align: center; 
             text-transform: uppercase; 
-            margin-bottom: 1.2em;
-            letter-spacing: 0.5px;
+            margin: 1em 0 0.5em;
+            font-size: 14pt;
           }
           .agreement-document strong { color: #000; font-weight: 700; }
-          .agreement-document table { width: 100%; border-collapse: collapse; margin-bottom: 1.5em; }
-          .agreement-document td { padding: 8px; vertical-align: top; border: 1px solid #eee; }
-          .agreement-document img { display: inline-block; }
+          .agreement-document table { width: 100%; border-collapse: collapse; margin-bottom: 1em; font-size: 10pt; }
+          .agreement-document td { padding: 4px; vertical-align: top; border: 1px solid #ccc; }
+          .agreement-document img { display: inline-block; max-width: 100%; height: auto; }
+          .agreement-document ul, .agreement-document ol { margin-bottom: 0.8em; padding-left: 1.5em; }
+          .agreement-document li { margin-bottom: 0.3em; }
         </style>
         ${html}
       </div>
     `;
+    return styledContainer;
   } catch (err) {
     console.error("HTML template merging failed:", err);
     throw new Error("Unable to generate agreement from template.");

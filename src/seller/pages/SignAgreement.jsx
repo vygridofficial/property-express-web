@@ -16,7 +16,7 @@ import {
 import { useSeller } from '../context/SellerContext';
 import { generateAgreementOTP, finalizeAgreement } from '../../services/agreementService';
 import { sendOTP } from '../../services/notificationService';
-import { generateAgreementPDF } from '../../utils/agreementPdf';
+import { generateAgreementPDF } from '../../utils/generateAgreementPDF';
 import SignaturePad from '../components/SignaturePad';
 import Skeleton from 'react-loading-skeleton';
 import styles from '../styles/SignAgreement.module.css';
@@ -200,7 +200,7 @@ export default function SignAgreement() {
                   <p>Your agreement for "{agreement.propertyTitle}" has been securely signed and timestamped.</p>
                   
                   <div className={styles.successActions}>
-                    <button className={styles.ctaBtn} onClick={() => generateAgreementPDF(agreement, signature)}>
+                    <button className={styles.ctaBtn} onClick={() => generateAgreementPDF(agreement, null, true, signature)}>
                       Download Signed PDF
                     </button>
                     <button className={styles.ghostBtn} onClick={() => navigate('/agreements')}>
