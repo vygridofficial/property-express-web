@@ -151,29 +151,54 @@ export function AdminProvider({ children }) {
 
   // ── Notifications ──
   const [notifications, setNotifications] = useState([]);
+  const [rawLeads, setRawLeads] = useState([]);
+  const [clearedNotifs, setClearedNotifs] = useState(() => JSON.parse(localStorage.getItem('adminClearedNotifs') || '[]'));
+  const [readNotifs, setReadNotifs] = useState(() => JSON.parse(localStorage.getItem('adminReadNotifs') || '[]'));
+
+  useEffect(() => {
+    localStorage.setItem('adminClearedNotifs', JSON.stringify(clearedNotifs));
+  }, [clearedNotifs]);
+
+  useEffect(() => {
+    localStorage.setItem('adminReadNotifs', JSON.stringify(readNotifs));
+  }, [readNotifs]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'leads'), (snapshot) => {
-      const newLeads = snapshot.docs
-        .filter(d => d.data().status === 'new')
-        .map(d => ({
-          id: d.id,
-          type: 'New Enquiry',
-          message: `New enquiry from ${d.data().name || 'Someone'}`,
-          time: d.data().createdAt?.toDate 
-            ? d.data().createdAt.toDate().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) 
-            : (d.data().createdAt ? new Date(d.data().createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently'),
-          read: false,
-          link: '/admin/inquiries'
-        }));
-      setNotifications(newLeads);
+      setRawLeads(snapshot.docs.filter(d => d.data().status === 'new'));
     });
     return () => unsubscribe();
   }, []);
 
-  const markAllAsRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  const deleteNotification = (id) => setNotifications(prev => prev.filter(n => n.id !== id));
-  const clearAllNotifications = () => setNotifications([]);
+  useEffect(() => {
+    const derived = rawLeads
+      .filter(d => !clearedNotifs.includes(d.id))
+      .map(d => ({
+        id: d.id,
+        type: 'New Enquiry',
+        message: `New enquiry from ${d.data().name || 'Someone'}`,
+        time: d.data().createdAt?.toDate 
+          ? d.data().createdAt.toDate().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+          : (d.data().createdAt ? new Date(d.data().createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently'),
+        read: readNotifs.includes(d.id),
+        link: '/admin/inquiries'
+      }));
+    setNotifications(derived);
+  }, [rawLeads, clearedNotifs, readNotifs]);
+
+  const markAllAsRead = () => {
+    const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+    setReadNotifs(prev => [...new Set([...prev, ...unreadIds])]);
+  };
+
+  const deleteNotification = (id) => {
+    setClearedNotifs(prev => [...new Set([...prev, id])]);
+  };
+
+  const clearAllNotifications = () => {
+    const allIds = notifications.map(n => n.id);
+    setClearedNotifs(prev => [...new Set([...prev, ...allIds])]);
+  };
 
   const login = () => {
     // Firebase auth handles login via signInWithEmailAndPassword in Login.jsx
