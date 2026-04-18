@@ -195,7 +195,7 @@ export default function AgreementTemplateTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
       <div style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#3b82f6', padding: '1rem', borderRadius: '12px', fontSize: '0.85rem' }}>
-         <strong>High-Fidelity Mode Active</strong>: Upload a .tex file to generate vector-perfect PDFs. Clipping issues are now resolved.
+         Upload a .tex file to generate vector-perfect PDFs.
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.3fr', gap: '1.5rem', alignItems: 'start' }}>
@@ -257,7 +257,8 @@ export default function AgreementTemplateTab() {
                {placeholders.map(ph => (
                  <div key={ph} style={{ 
                    display: 'flex', 
-                   alignItems: 'center', 
+                   flexDirection: isMobile ? 'column' : 'row',
+                   alignItems: isMobile ? 'stretch' : 'center', 
                    gap: '1rem', 
                    padding: '0.5rem', 
                    borderRadius: '12px',
@@ -281,7 +282,7 @@ export default function AgreementTemplateTab() {
                     }}>
                        {`{{${ph}}}`}
                     </div>
-                    <ArrowRight size={14} color="var(--admin-text-muted)" style={{ opacity: 0.5 }} />
+                    {!isMobile && <ArrowRight size={14} color="var(--admin-text-muted)" style={{ opacity: 0.5 }} />}
                     <select
                       value={mappings[ph] || ''}
                       onChange={(e) => updateMapping(ph, e.target.value)}
@@ -308,7 +309,7 @@ export default function AgreementTemplateTab() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '1rem', marginTop: '1rem' }}>
         <button onClick={handleSave} disabled={uploading} style={{ padding: '0.8rem 2rem', background: '#ed1b24', color: 'white', border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer' }}>
           {uploading ? 'Activating...' : 'Save & Activate LaTeX Template'}
         </button>
