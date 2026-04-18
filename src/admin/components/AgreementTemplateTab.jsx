@@ -7,7 +7,7 @@ import {
 import { db } from '../../firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import mammoth from 'mammoth';
-import { generateAgreementPDF } from '../../utils/generateAgreementPDF';
+import html2pdf from 'html2pdf.js';
 import { mergeHtmlTemplate } from '../../utils/templateProcessor';
 import AgreementPreviewModal from './AgreementPreviewModal';
 
@@ -57,6 +57,7 @@ export default function AgreementTemplateTab() {
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
+  const [showRawHtmlModal, setShowRawHtmlModal] = useState(false);
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -201,46 +202,50 @@ export default function AgreementTemplateTab() {
 
   const unmappedCount = placeholders.filter(p => !mappings[p]).length;
 
-  const handleFullPreview = async () => {
-    setIsPreviewing(true);
-    try {
-      const mockSubmission = {};
-      Object.entries(mappings).forEach(([tag, fieldId]) => {
-        mockSubmission[fieldId] = PREVIEW_SAMPLE[fieldId] || `[${tag}]`;
-      });
-      
-      const signatures = {
-        seller: { type: 'text', value: 'RAJESH KUMAR (SELLER)' },
-        admin: { type: 'text', value: 'PROPERTY EXPRESS (ADMIN)' }
-      };
-
-      const html = await mergeHtmlTemplate(templateHtml || template?.templateHtml, mockSubmission, mappings, signatures);
-      setPreviewHtml(html);
-      setShowPreviewModal(true);
-    } catch (err) {
-      console.error('Preview failed:', err);
-      alert('Failed to generate preview. Check console for details.');
-    } finally {
-      setIsPreviewing(false);
-    }
-  };
-
   const handleDownloadPreview = async () => {
     setIsPreviewing(true);
     try {
-      const mockSubmission = {};
-      Object.entries(mappings).forEach(([tag, fieldId]) => {
-        mockSubmission[fieldId] = PREVIEW_SAMPLE[fieldId] || `[${tag}]`;
-      });
-      const signatures = {
-        seller: { type: 'text', value: 'RAJESH KUMAR (SELLER)' },
-        admin: { type: 'text', value: 'PROPERTY EXPRESS (ADMIN)' }
-      };
-      await generateAgreementPDF(mockSubmission, signatures.admin, true);
+      // Try to use the preview modal's DOM node if available
+      let previewNode = document.querySelector('.agreement-preview-for-pdf');
+      let usedNode = null;
+      if (previewNode) {
+        usedNode = previewNode;
+      } else {
+        // Fallback: create a hidden container with the previewHtml
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = '-9999px';
+        container.style.top = '0';
+        container.style.width = '800px';
+        container.style.minHeight = '1120px';
+        container.style.background = '#fff';
+        container.style.padding = '2.5rem 3rem';
+        container.style.fontFamily = 'serif';
+        container.style.color = '#334155';
+        container.style.fontSize = '1.1rem';
+        container.style.lineHeight = '1.6';
+        container.className = 'agreement-preview-for-pdf';
+        container.innerHTML = previewHtml || templateHtml || template?.templateHtml || '<div>No template HTML found.</div>';
+        document.body.appendChild(container);
+        usedNode = container;
+      }
+
+      await html2pdf().set({
+        margin: 0,
+        filename: `Agreement_${PREVIEW_SAMPLE.propertyTitle.replace(/\s+/g, '_')}.pdf`,
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#fff' },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+      }).from(usedNode).save();
+
+      // Clean up if we created a hidden node
+      if (usedNode && usedNode.classList.contains('agreement-preview-for-pdf') && !previewNode) {
+        document.body.removeChild(usedNode);
+      }
     } finally {
       setIsPreviewing(false);
     }
   };
+
 
   const renderPreview = (text) =>
     text.split(/(\{\{[^{}]+\}\})/g).map((part, i) => {
@@ -252,6 +257,94 @@ export default function AgreementTemplateTab() {
         ? <span key={i} style={{ color: '#22c55e', fontWeight: 600 }}>{val}</span>
         : <span key={i} style={{ color: '#ef4444', fontStyle: 'italic' }}>missing — not yet mapped</span>;
     });
+
+  // Fix: Define handleFullPreview to open the preview modal with merged HTML
+  const handleFullPreview = () => {
+    // Merge placeholders into the template HTML for preview
+    let html = templateHtml || template?.templateHtml || '';
+    if (html) {
+      // Replace placeholders with PREVIEW_SAMPLE values or fallback
+      html = html.replace(/\{\{([^{}]+)\}\}/g, (match, p1) => {
+        const tag = p1.trim();
+        return PREVIEW_SAMPLE[mappings[tag]] || `<span style='color:#ef4444;font-style:italic;'>missing — not yet mapped</span>`;
+      });
+    }
+    // Add print-friendly CSS and section wrappers
+    const printCss = `
+      <style>
+        .agreement-preview-for-pdf {
+          background: #fff;
+          color: #22223b;
+          font-family: 'Times New Roman', serif;
+          padding: 3.5rem 4rem 3.5rem 4rem;
+          min-width: 720px;
+          line-height: 2.1;
+          font-size: 1.18rem;
+        }
+        .agreement-title {
+          text-align: center;
+          font-size: 2.2rem;
+          font-weight: bold;
+          margin-bottom: 2.7rem;
+          letter-spacing: 0.04em;
+        }
+        .agreement-section {
+          margin-bottom: 2.8rem;
+          page-break-inside: avoid;
+        }
+        .agreement-section h2, .agreement-section h3 {
+          margin-top: 0;
+          margin-bottom: 1.1rem;
+          font-size: 1.22rem;
+          color: #22223b;
+        }
+        .agreement-section p {
+          margin-top: 0.7rem;
+          margin-bottom: 1.1rem;
+          font-size: 1.13rem;
+          letter-spacing: 0.01em;
+        }
+        .agreement-signature {
+          margin-top: 3.2rem;
+          display: flex;
+          justify-content: space-between;
+          gap: 2.5rem;
+          page-break-inside: avoid;
+        }
+        .agreement-signature-block {
+          text-align: center;
+          min-width: 220px;
+        }
+        .agreement-signature-block img {
+          max-height: 60px;
+          margin-bottom: 0.7rem;
+        }
+        .agreement-footer {
+          text-align: center;
+          color: #888;
+          font-size: 1.05rem;
+          margin-top: 2.7rem;
+        }
+        @media print {
+          .agreement-preview-for-pdf { box-shadow: none !important; }
+        }
+      </style>
+    `;
+    // Optionally, wrap main content in .agreement-section if not already
+    let wrappedHtml = html;
+    if (!/class=['\"]agreement-section['\"]/.test(html)) {
+      wrappedHtml = `<div class='agreement-section'>${html}</div>`;
+    }
+    setPreviewHtml(`
+      <div class='agreement-preview-for-pdf'>
+        ${printCss}
+        <div class='agreement-title'>PROPERTY EXPRESS AGREEMENT</div>
+        ${wrappedHtml}
+        <div class='agreement-footer'>Generated by Property Express Admin • ${new Date().getFullYear()}</div>
+      </div>
+    `);
+    setShowPreviewModal(true);
+  };
 
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem' }}>
@@ -472,21 +565,38 @@ export default function AgreementTemplateTab() {
           Save &amp; activate template
         </button>
 
+
         {template?.fileUrl && (
-          <a
-            href={template.fileUrl} target="_blank" rel="noopener noreferrer"
-            style={{
-              padding: '0.9rem 2rem',
-              background: 'var(--admin-glass-bg)',
-              border: '1px solid var(--admin-glass-border)',
-              color: 'var(--admin-text-main)',
-              borderRadius: '12px', textDecoration: 'none', fontWeight: 700,
-              display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem',
-              fontFamily: 'Outfit, sans-serif'
-            }}
-          >
-            <Download size={16} /> Download current template
-          </a>
+          <>
+            <a
+              href={template.fileUrl} target="_blank" rel="noopener noreferrer"
+              style={{
+                padding: '0.9rem 2rem',
+                background: 'var(--admin-glass-bg)',
+                border: '1px solid var(--admin-glass-border)',
+                color: 'var(--admin-text-main)',
+                borderRadius: '12px', textDecoration: 'none', fontWeight: 700,
+                display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem',
+                fontFamily: 'Outfit, sans-serif'
+              }}
+            >
+              <Download size={16} /> Download current template
+            </a>
+            <button
+              onClick={() => window.open(`https://docs.google.com/gview?url=${encodeURIComponent(template.fileUrl)}&embedded=true`, '_blank')}
+              style={{
+                padding: '0.9rem 2rem',
+                background: 'var(--admin-glass-bg)',
+                border: '1px solid var(--admin-glass-border)',
+                color: '#3b82f6',
+                borderRadius: '12px', fontWeight: 700, marginLeft: 8,
+                display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem',
+                fontFamily: 'Outfit, sans-serif', cursor: 'pointer', textDecoration: 'none'
+              }}
+            >
+              <Eye size={16} /> Preview raw .docx
+            </button>
+          </>
         )}
 
         <button
@@ -505,6 +615,32 @@ export default function AgreementTemplateTab() {
           {isPreviewing ? <RotateCw size={16} className="animate-spin" /> : <Eye size={16} />}
           Preview full agreement
         </button>
+        <button
+          onClick={() => setShowRawHtmlModal(true)}
+          disabled={!templateHtml}
+          style={{
+            padding: '0.9rem 2rem',
+            background: 'var(--admin-glass-bg)',
+            border: '1px solid var(--admin-glass-border)',
+            color: '#a21caf',
+            borderRadius: '12px', fontWeight: 700, marginLeft: 8,
+            display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem',
+            fontFamily: 'Outfit, sans-serif', cursor: !templateHtml ? 'not-allowed' : 'pointer', textDecoration: 'none'
+          }}
+        >
+          <Eye size={16} /> Preview template
+        </button>
+        // Raw HTML preview modal state
+        const [showRawHtmlModal, setShowRawHtmlModal] = useState(false);
+            {/* ── Raw HTML Preview Modal ── */}
+            <AgreementPreviewModal
+              isOpen={showRawHtmlModal}
+              onClose={() => setShowRawHtmlModal(false)}
+              htmlContent={templateHtml}
+              title={file?.name || template?.fileName || 'Raw Extracted HTML'}
+              onDownload={null}
+              isDownloading={false}
+            />
       </div>
 
       {unmappedCount > 0 && (
