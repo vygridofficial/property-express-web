@@ -91,7 +91,7 @@ export const approveSubmission = async (submissionId, adminSignature) => {
   // 3. Move data to Public `properties` collection so it becomes visible on the website
   const propertyRef = await addDoc(collection(db, 'properties'), {
     title: submissionData.propertyTitle || 'Property Listing',
-    category: submissionData.propertyType || 'Uncategorized',
+    category: submissionData.propertyType || '',
     price: submissionData.price || 0,
     numericPrice: Number(submissionData.price),
     location: submissionData.location || '',
