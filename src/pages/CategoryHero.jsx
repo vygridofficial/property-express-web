@@ -64,11 +64,15 @@ function FloatingImage({ src, position, scrollProgress, index, onClick }) {
 
 function PropertyListingCard({ property, index }) {
   const { siteSettings } = useAdmin();
+  const [activeSlide, setActiveSlide] = useState(0);
 
-  // Ensure we have an image to show
-  const displayImage = property.images && property.images.length > 0
-    ? property.images[0]
-    : (property.image || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80');
+  // Robust image array
+  const rawImages = property.images && Array.isArray(property.images) && property.images.length > 0
+    ? property.images
+    : (property.image ? [property.image] : []);
+  const allImages = rawImages.length > 0 ? rawImages : ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'];
+
+
 
   const displayPrice = formatPrice(property.price);
 
@@ -93,35 +97,62 @@ function PropertyListingCard({ property, index }) {
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
     >
       <div className={styles.listingImgWrap}>
-        <span
-          className={styles.listingBadge}
-          style={{
-            background: property.status === 'For Rent' ? '#1a1a1a' : 'rgba(255,255,255,0.55)',
-            color: property.status === 'For Rent' ? '#fff' : '#222',
-          }}
-        >
-          {property.status}
-        </span>
-        <img src={displayImage} alt={property.title} className={styles.listingImg} />
+        {property.status && property.status !== 'Active' && (
+          <span
+            className={styles.listingBadge}
+            style={{
+              background: property.status === 'For Rent' ? 'var(--color-primary)' : 'rgba(255,255,255,0.55)',
+              color: property.status === 'For Rent' ? '#fff' : '#222',
+            }}
+          >
+            {property.status}
+          </span>
+        )}
 
-        <div className={styles.cardActions}>
-          {callLink && (
-            <a href={callLink} className={styles.cardActionBtn} title="Call agent" onClick={e => e.stopPropagation()}>
-              <Phone size={18} />
-            </a>
-          )}
-          {waLink && (
-            <a href={waLink} target="_blank" rel="noreferrer" className={`${styles.cardActionBtn} ${styles.cardActionWa}`} title="WhatsApp agent" onClick={e => e.stopPropagation()}>
-              <WhatsAppIcon size={18} />
-            </a>
-          )}
+        <div className={styles.slides}>
+          {allImages.map((img, idx) => (
+            <img
+              key={idx}
+              src={img}
+              alt={`${property.title} view ${idx + 1}`}
+              className={styles.listingImg}
+              style={{ transform: `translateX(${(idx - activeSlide) * 100}%)` }}
+            />
+          ))}
         </div>
+
+        {allImages.length > 1 && (
+          <>
+            <button
+              className={`${styles.slideArrow} ${styles.slideArrowLeft}`}
+              onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i - 1 + allImages.length) % allImages.length); }}
+              aria-label="Previous image"
+            >‹</button>
+            <button
+              className={`${styles.slideArrow} ${styles.slideArrowRight}`}
+              onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i + 1) % allImages.length); }}
+              aria-label="Next image"
+            >›</button>
+            <div className={styles.dots}>
+              {allImages.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`${styles.dot} ${idx === activeSlide ? styles.dotActive : ''}`}
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(idx); }}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
       <div className={styles.listingContent}>
         <div className={styles.listingPrice} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             {displayPrice}
             {property.status === 'For Rent' && <span className={styles.perMonth}> /mo</span>}
+            {property.isFeatured && (
+              <span className={styles.featuredTag}>Featured</span>
+            )}
           </div>
           {property._distance !== undefined && property._distance < 999999 && (
             <span style={{ fontSize: '0.75rem', color: '#ed1b24', fontWeight: 700, background: 'rgba(237,27,36,0.1)', padding: '4px 8px', borderRadius: '12px' }}>
@@ -138,6 +169,19 @@ function PropertyListingCard({ property, index }) {
             Added on: {formatDate(property.createdAt)}
           </div>
         )}
+
+        <div className={styles.cardActions}>
+          {callLink && (
+            <a href={callLink} className={styles.cardActionBtn} title="Call agent" onClick={e => e.stopPropagation()}>
+              <Phone size={18} /> Call
+            </a>
+          )}
+          {waLink && (
+            <a href={waLink} target="_blank" rel="noreferrer" className={`${styles.cardActionBtn} ${styles.cardActionWa}`} title="WhatsApp agent" onClick={e => e.stopPropagation()}>
+              <WhatsAppIcon size={18} /> WhatsApp
+            </a>
+          )}
+        </div>
         <div className={styles.listingFeatures}>
           {(property.beds > 0 || property.bedrooms > 0) && (
             <span>🛏 {property.beds || property.bedrooms} Beds</span>

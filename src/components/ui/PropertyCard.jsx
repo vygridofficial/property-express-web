@@ -57,43 +57,21 @@ export default function PropertyCard({ property }) {
     >
       {/* Image Carousel */}
       <div className={styles.carousel}>
-        <span
-          className={styles.badge}
-          style={{
-            backgroundColor: status === 'For Rent' ? 'var(--color-primary)' : 'rgba(255,255,255,0.5)',
-            color: status === 'For Rent' ? 'white' : '#222'
-          }}
-        >
-          {status}
-        </span>
-
-        {property.isFeatured && (
+        {status !== 'Active' && (
           <span
             className={styles.badge}
             style={{
-              top: '4.5rem',
-              backgroundColor: '#f5ebd9',
-              color: '#9c6b24',
-              border: '1px solid #dcb57e'
+              backgroundColor: status === 'For Rent' ? 'var(--color-primary)' : 'rgba(255,255,255,0.5)',
+              color: status === 'For Rent' ? 'white' : '#222'
             }}
           >
-            Featured
+            {status}
           </span>
         )}
 
-        {/* Contact quick-buttons */}
-        <div className={styles.cardActions}>
-          {callLink && (
-            <a href={callLink} className={styles.cardActionBtn} title="Call agent" onClick={e => e.stopPropagation()}>
-              <Phone size={18} />
-            </a>
-          )}
-          {waLink && (
-            <a href={waLink} target="_blank" rel="noreferrer" className={`${styles.cardActionBtn} ${styles.cardActionWa}`} title="WhatsApp agent" onClick={e => e.stopPropagation()}>
-              <WhatsAppIcon size={18} />
-            </a>
-          )}
-        </div>
+
+
+
 
         <div className={styles.slides}>
           {allImages.map((img, idx) => (
@@ -136,6 +114,9 @@ export default function PropertyCard({ property }) {
       <div className={styles.content}>
         <div className={styles.price}>
           {displayPrice} {status === 'For Rent' && <span className={styles.perMonth}>/mo</span>}
+          {property.isFeatured && (
+            <span className={styles.featuredTag}>Featured</span>
+          )}
         </div>
         <div className={styles.titleWrap}>
           <h3 className={styles.title}>{title}</h3>
@@ -148,6 +129,20 @@ export default function PropertyCard({ property }) {
             Added on: {formatDate(property.createdAt || property.addedOn)}
           </div>
         )}
+
+        {/* Contact quick-buttons moved here */}
+        <div className={styles.cardActions}>
+          {callLink && (
+            <a href={callLink} className={styles.cardActionBtn} title="Call agent" onClick={e => e.stopPropagation()}>
+              <Phone size={18} /> Call
+            </a>
+          )}
+          {waLink && (
+            <a href={waLink} target="_blank" rel="noreferrer" className={`${styles.cardActionBtn} ${styles.cardActionWa}`} title="WhatsApp agent" onClick={e => e.stopPropagation()}>
+              <WhatsAppIcon size={18} /> WhatsApp
+            </a>
+          )}
+        </div>
         <div className={styles.features}>
           {displayBeds > 0 && (
             <span className={styles.featureItem}><BedDouble size={16} /> {displayBeds} Beds</span>

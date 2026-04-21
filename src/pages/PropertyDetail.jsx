@@ -237,8 +237,8 @@ export default function PropertyDetail() {
         <div className={styles.detailMain}>
           <motion.div variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
             <div className={styles.badgeGroup} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <span className={styles.badge}>{property.status}</span>
-              {property.featured && <span className={styles.badge} style={{ background: '#f5ebd9', color: '#9c6b24', border: '1px solid #dcb57e' }}>Featured</span>}
+              {property.status && property.status !== 'Active' && <span className={styles.badge}>{property.status}</span>}
+              {property.isFeatured && <span className={styles.badge} style={{ background: '#fdf2f2', color: '#ed1b24', border: '1px solid #fecaca' }}>Featured</span>}
               {property.instagramLink && (
                 <a href={property.instagramLink} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg,#f09433,#dc2743,#bc1888)', color: 'white', padding: '0.35rem 1rem', borderRadius: 999, fontWeight: 600, textDecoration: 'none', fontSize: '0.8rem', lineHeight: 1 }}>

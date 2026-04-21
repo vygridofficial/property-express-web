@@ -299,14 +299,16 @@
 
 /* ── Listing card ─────────────────────────────────────────── */
 .listingCard {
-  background: #fff;
-  border-radius: 20px;
+  background: var(--glass-bg);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--glass-shadow);
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
 }
 
 .listingCard:hover {
@@ -331,17 +333,101 @@
   transform: scale(1.06);
 }
 
+.slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slideArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  opacity: 1;
+  transition: all 0.2s;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.slideArrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.slideArrowLeft {
+  left: 10px;
+}
+
+.slideArrowRight {
+  right: 10px;
+}
+
+.dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 4;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dotActive {
+  background: white;
+  transform: scale(1.3);
+}
+
 .listingBadge {
   position: absolute;
   top: 1.2rem;
   left: 1.2rem;
-  padding: 0.35rem 1rem;
-  border-radius: 30px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 0.4rem 1.1rem;
+  border-radius: 40px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   z-index: 2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.featuredTag {
+  display: inline-block;
+  margin-left: 0.8rem;
+  padding: 0.25rem 0.75rem;
+  background: #fdf2f2;
+  color: #ed1b24;
+  border: 1px solid #fecaca;
+  border-radius: 40px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
 }
 
 .listingContent {
@@ -352,11 +438,13 @@
 }
 
 .listingPrice {
-  font-size: 1.9rem;
+  color: var(--color-primary);
+  font-size: 1.75rem;
   font-weight: 700;
-  letter-spacing: -0.04em;
-  color: #1a1a1a;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
 }
 
 .perMonth {
@@ -391,10 +479,10 @@
 }
 
 .listingAddedDate {
-  font-size: 0.75rem;
-  color: #94a3b8;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
   margin-bottom: 1.25rem;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .listingFeatures {
@@ -413,20 +501,21 @@
   width: 100%;
   padding: 0.85rem;
   border-radius: 50px;
-  border: 1.5px solid #e0e0e0;
-  background: #fff;
-  color: #1a1a1a;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-main);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.25s ease;
+  margin-top: 0.5rem;
 }
 
 .viewBtn:hover {
-  background: #1a1a1a;
+  background: var(--color-primary);
   color: #fff;
-  border-color: #1a1a1a;
+  border-color: var(--color-primary);
 }
 
 /* ── Responsive ───────────────────────────────────────────── */
@@ -470,34 +559,44 @@
 
 /* ── Quick-action buttons (Call / WhatsApp) ── */
 .cardActions {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
   display: flex;
-  gap: 8px;
-  z-index: 5;
-  opacity: 1;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .cardActionBtn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: white;
-  color: #1a1a1a;
+  flex: 1;
+  height: 42px;
+  border-radius: 40px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--color-text-main);
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: transform 0.15s;
+  font-size: 0.85rem;
+  font-weight: 600;
+  gap: 8px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.2s ease;
 }
 
 .cardActionBtn:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
+  background: white;
+  border-color: var(--color-primary);
 }
 
 .cardActionWa {
   background: #25d366;
+  color: white;
+  border-color: #25d366;
+}
+
+.cardActionWa:hover {
+  background: #20bd5a;
+  border-color: #20bd5a;
   color: white;
 }
