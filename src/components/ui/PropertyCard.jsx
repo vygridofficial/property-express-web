@@ -36,6 +36,10 @@ export default function PropertyCard({ property }) {
   const allImagesRaw = property.imageUrls || property.images || (property.image ? [property.image] : []);
   const allImages = (allImagesRaw && allImagesRaw.length > 0) ? allImagesRaw : [PLACEHOLDER];
 
+  if (title === 'Spice Notes' || title === 'Cardomom Casa') {
+    console.log(`PropertyCard [${title}]:`, { allImagesRaw, allImagesLength: allImages.length });
+  }
+
   const displayPrice = formatPrice(price);
 
   // ── Contact Logic ──
