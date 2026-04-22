@@ -67,10 +67,8 @@ function PropertyListingCard({ property, index }) {
   const [activeSlide, setActiveSlide] = useState(0);
 
   // Robust image array
-  const rawImages = property.images && Array.isArray(property.images) && property.images.length > 0
-    ? property.images
-    : (property.image ? [property.image] : []);
-  const allImages = rawImages.length > 0 ? rawImages : ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'];
+  const rawImages = property.imageUrls || property.images || (property.image ? [property.image] : []);
+  const allImages = (Array.isArray(rawImages) && rawImages.length > 0) ? rawImages : ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'];
 
 
 
