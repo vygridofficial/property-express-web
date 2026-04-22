@@ -27,27 +27,13 @@ export default function PropertyCard({ property }) {
   const displayBaths = baths || bathrooms || 0;
   const displaySqft = sqft || area || 0;
 
-  // Build image array — use placeholder if none provided
-  const rawImages = images && Array.isArray(images) && images.length > 0
-    ? images
-    : (image ? [image] : []);
-  const allImages = rawImages.length > 0 ? rawImages : [PLACEHOLDER];
+
+  // Build image array — match details page logic
+  const allImagesRaw = property.imageUrls || property.images || (property.image ? [property.image] : []);
+  const allImages = (allImagesRaw && allImagesRaw.length > 0) ? allImagesRaw : [PLACEHOLDER];
 
   const displayPrice = formatPrice(price);
   
-  // ── Contact Logic ──
-  // Use property-specific phone, or fallback to site-wide numbers
-  const propertyPhone = property.sellerPhone || property.agentPhone || agentPhone;
-  const globalPhone = siteSettings?.whatsappBusiness || siteSettings?.primaryPhone || '';
-  const finalPhone = (propertyPhone || globalPhone || '').toString();
-  
-  const cleanPhone = finalPhone.replace(/\D/g, '');
-  const waLink = cleanPhone
-    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi, I'm interested in ${title}`)}`
-    : null;
-  const callLink = cleanPhone ? `tel:${cleanPhone}` : null;
-
-  const handleImgError = (idx) => setImgErrors(prev => ({ ...prev, [idx]: true }));
 
   return (
     <motion.article
@@ -55,7 +41,7 @@ export default function PropertyCard({ property }) {
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Image Carousel */}
+      {/* Image Slideshow/Carousel */}
       <div className={styles.carousel}>
         {status !== 'Active' && (
           <span
@@ -68,10 +54,6 @@ export default function PropertyCard({ property }) {
             {status}
           </span>
         )}
-
-
-
-
 
         <div className={styles.slides}>
           {allImages.map((img, idx) => (
@@ -90,12 +72,12 @@ export default function PropertyCard({ property }) {
           <>
             <button
               className={`${styles.slideArrow} ${styles.slideArrowLeft}`}
-              onClick={e => { e.preventDefault(); setActiveSlide(i => (i - 1 + allImages.length) % allImages.length); }}
+              onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i - 1 + allImages.length) % allImages.length); }}
               aria-label="Previous image"
             >‹</button>
             <button
               className={`${styles.slideArrow} ${styles.slideArrowRight}`}
-              onClick={e => { e.preventDefault(); setActiveSlide(i => (i + 1) % allImages.length); }}
+              onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i + 1) % allImages.length); }}
               aria-label="Next image"
             >›</button>
             <div className={styles.dots}>
@@ -103,12 +85,13 @@ export default function PropertyCard({ property }) {
                 <span
                   key={idx}
                   className={`${styles.dot} ${idx === activeSlide ? styles.dotActive : ''}`}
-                  onClick={e => { e.preventDefault(); setActiveSlide(idx); }}
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(idx); }}
                 />
               ))}
             </div>
           </>
         )}
+
       </div>
 
       <div className={styles.content}>
