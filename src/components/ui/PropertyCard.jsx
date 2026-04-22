@@ -27,12 +27,27 @@ export default function PropertyCard({ property }) {
   const displayBaths = baths || bathrooms || 0;
   const displaySqft = sqft || area || 0;
 
+  const handleImgError = (idx) => {
+    setImgErrors(prev => ({ ...prev, [idx]: true }));
+  };
+
 
   // Build image array — match details page logic
   const allImagesRaw = property.imageUrls || property.images || (property.image ? [property.image] : []);
   const allImages = (allImagesRaw && allImagesRaw.length > 0) ? allImagesRaw : [PLACEHOLDER];
 
   const displayPrice = formatPrice(price);
+
+  // ── Contact Logic ──
+  const propertyPhone = property.sellerPhone || property.agentPhone;
+  const globalPhone = siteSettings?.whatsappBusiness || siteSettings?.primaryPhone || '';
+  const finalPhone = (propertyPhone || globalPhone || '').toString();
+  const cleanPhone = finalPhone.replace(/\D/g, '');
+
+  const waLink = cleanPhone
+    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi, I'm interested in ${title}`)}`
+    : null;
+  const callLink = cleanPhone ? `tel:${cleanPhone}` : null;
   
 
   return (
