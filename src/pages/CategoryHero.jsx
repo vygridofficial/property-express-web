@@ -16,6 +16,8 @@ const WhatsAppIcon = ({ size = 18 }) => (
   </svg>
 );
 
+const PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmaWxsPSIjYWFhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
+
 // Floating positions for 4 images: top-left, top-right, center-left, bottom-right
 const FLOAT_POSITIONS = [
   { top: '8%', left: '-2%', rotate: -8, zIndex: 2 },
@@ -65,10 +67,15 @@ function FloatingImage({ src, position, scrollProgress, index, onClick }) {
 function PropertyListingCard({ property, index }) {
   const { siteSettings } = useAdmin();
   const [activeSlide, setActiveSlide] = useState(0);
+  const [imgErrors, setImgErrors] = useState({});
+
+  const handleImgError = (idx) => {
+    setImgErrors(prev => ({ ...prev, [idx]: true }));
+  };
 
   // Robust image array
   const rawImages = property.imageUrls || property.images || (property.image ? [property.image] : []);
-  const allImages = (Array.isArray(rawImages) && rawImages.length > 0) ? rawImages : ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'];
+  const allImages = (Array.isArray(rawImages) && rawImages.length > 0) ? rawImages : [PLACEHOLDER];
 
 
 
@@ -111,10 +118,11 @@ function PropertyListingCard({ property, index }) {
           {allImages.map((img, idx) => (
             <img
               key={idx}
-              src={img}
+              src={imgErrors[idx] ? PLACEHOLDER : img}
               alt={`${property.title} view ${idx + 1}`}
               className={styles.listingImg}
               style={{ transform: `translateX(${(idx - activeSlide) * 100}%)` }}
+              onError={() => handleImgError(idx)}
             />
           ))}
         </div>
