@@ -34,7 +34,9 @@ export default function PropertyCard({ property }) {
 
   // Build image array — match details page logic
   const rawImages = property.imageUrls || property.images || (property.image ? [property.image] : []);
-  const allImages = (Array.isArray(rawImages) && rawImages.length > 0) ? rawImages : [PLACEHOLDER];
+  const allImages = (Array.isArray(rawImages) && rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '').length > 0) 
+    ? rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '') 
+    : [PLACEHOLDER];
 
   const displayPrice = formatPrice(price);
 
