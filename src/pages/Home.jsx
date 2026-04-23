@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home as HomeIcon, Building, Store, Map, Award, Handshake, Headphones, Star } from 'lucide-react';
+import { Home as HomeIcon, Building, Store, Map, Award, Handshake, Headphones, Star, BedDouble, Search as SearchIcon } from 'lucide-react';
 import { getFeaturedProperties, getSiteSettings, getAllProperties } from '../services/propertyService';
 import { getAllReviews, addReview } from '../services/reviewService';
 import PropertyCard from '../components/ui/PropertyCard';
@@ -13,6 +13,7 @@ import styles from './Home.module.css';
 import { useInView } from 'framer-motion';
 import SEO from '../components/common/SEO';
 import SearchBar from '../components/ui/SearchBar';
+import FilterMenu from '../components/ui/FilterMenu';
 
 import { getPropertyCoordinates, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
 
@@ -315,6 +316,30 @@ export default function Home() {
           >
             <Link to="/properties" className={`btn ${styles.btnPrimary}`}>Search Properties</Link>
             <Link to="/contact" className={`btn ${styles.btnSecondary}`}>Contact Us</Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Universal Property Filter Section */}
+      <section className="section" style={{ padding: '2rem 0', background: 'var(--color-bg)', zIndex: 20, position: 'relative' }}>
+        <div className="container">
+          <motion.div
+            variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
+            style={{ width: '100%' }}
+          >
+            <FilterMenu 
+              filters={{ category: '', type: '', bhk: '', status: '', location: '', features: '' }}
+              properties={allProps}
+              isHorizontal={true}
+              showApplyButton={true}
+              onApply={(newFilters) => {
+                const params = new URLSearchParams();
+                Object.entries(newFilters).forEach(([key, value]) => {
+                  if (value) params.set(key, value);
+                });
+                navigate(`/results?${params.toString()}`);
+              }}
+            />
           </motion.div>
         </div>
       </section>

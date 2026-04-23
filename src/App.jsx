@@ -14,6 +14,7 @@ import PropertyTypesPage from './pages/PropertyTypesPage';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
 import Search from './pages/Search';
+import Results from './pages/Results';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Maintenance from './pages/Maintenance';
@@ -140,6 +141,7 @@ function AppContent() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/results" element={<Results />} />
             {/* New category-first properties navigation */}
             <Route path="/properties" element={<PropertiesPage />} />
             <Route path="/properties/category/:category" element={<PropertyTypesPage />} />
