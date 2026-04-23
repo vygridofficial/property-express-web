@@ -329,6 +329,15 @@ export default function Home() {
                 }}
               />
             </div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', width: '100%' }}
+            >
+              <Link to="/contact" className={`btn ${styles.btnSecondary}`} style={{ padding: '0.6rem 2rem', fontSize: '0.95rem' }}>Contact Us Directly</Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>
