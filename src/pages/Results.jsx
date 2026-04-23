@@ -92,10 +92,16 @@ export default function Results() {
       const propType = prop.propertyType?.toLowerCase() || '';
 
       if (filters.category) {
-        const allowedTypes = categoryToTypesMap[filters.category.toLowerCase()] || [];
-        if (!allowedTypes.includes(propCategory) && !allowedTypes.includes(propType)) {
-          match = false;
+        const selectedCategories = filters.category.split(',').map(c => c.toLowerCase());
+        
+        let catMatch = false;
+        for (const cat of selectedCategories) {
+           const mappedAllowed = categoryToTypesMap[cat] || [cat];
+           if (mappedAllowed.includes(propCategory) || mappedAllowed.includes(propType)) {
+             catMatch = true;
+           }
         }
+        if (!catMatch) match = false;
       }
 
       if (filters.type) {

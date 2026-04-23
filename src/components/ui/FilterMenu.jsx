@@ -63,7 +63,7 @@ export default function FilterMenu({
     else onChange(localFilters);
   };
 
-  // Categories (Hardcoded to match user requirement)
+  // Categories (Fixed Taxonomy to prevent breaking other pages)
   const categories = useMemo(() => {
     return ['Residential', 'Commercial', 'Industrial', 'Agricultural', 'Plot'];
   }, []);
