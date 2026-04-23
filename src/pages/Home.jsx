@@ -315,16 +315,37 @@ export default function Home() {
                 }}
               />
             </div>
+          </motion.div>
 
+          <div style={{ marginTop: '3rem' }}>
+            <motion.h1
+              className={styles.heroTitle}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              style={{ fontSize: '2.5rem', marginBottom: '1rem' }}
+            >
+              {siteSettings?.heroTitle || 'Find Your Perfect Property'}
+            </motion.h1>
+            <motion.p
+              className={styles.heroSubtitle}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              style={{ fontSize: '1.1rem', marginBottom: '2rem', maxWidth: '800px' }}
+            >
+              {siteSettings?.heroDescription || 'Discover the most premium luxury villas, apartments, and plots available.'}
+            </motion.p>
+            
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', width: '100%' }}
+              style={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}
             >
               <Link to="/contact" className={`btn ${styles.btnSecondary}`} style={{ padding: '0.6rem 2rem', fontSize: '0.95rem' }}>Contact Us Directly</Link>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
