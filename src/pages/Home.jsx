@@ -285,7 +285,10 @@ export default function Home() {
       <SEO />
       
       {/* Hero Section */}
-      <section className={styles.hero}>
+      <section 
+        className={styles.hero}
+        style={siteSettings?.heroImage ? { backgroundImage: `url(${siteSettings.heroImage})` } : {}}
+      >
         <div className={styles.heroSearchWrap}>
           <SearchBar properties={allProps} />
         </div>

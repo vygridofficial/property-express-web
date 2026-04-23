@@ -60,6 +60,8 @@ export default function Settings() {
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [editImage, setEditImage] = useState(null); // base64 preview or null = unchanged
   const [isAddingNew, setIsAddingNew] = useState(false); // Flag if modal is adding rather than editing
+  const [heroImagePreview, setHeroImagePreview] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const uploadToCloudinary = async (base64) => {
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dm9tmagpg';
@@ -117,12 +119,22 @@ export default function Settings() {
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
-      await updateSiteSettings(draft);
+      let finalSettings = { ...draft };
+      if (heroImagePreview) {
+        const url = await uploadToCloudinary(heroImagePreview);
+        finalSettings.heroImage = url;
+        // Update local draft so it reflects the new URL immediately
+        setDraft(finalSettings);
+        setHeroImagePreview(null);
+      }
+      
+      await updateSiteSettings(finalSettings);
 
       // Sync visibility back to propertyTypes isActive field
       for (const cat of propertyTypes) {
-        const newVis = draft.visibility?.[cat.name];
+        const newVis = finalSettings.visibility?.[cat.name];
         const isCurrentlyActive = cat.isActive !== false;
         const shouldBeActive = newVis !== false;
         
@@ -134,6 +146,9 @@ export default function Settings() {
       triggerToast('Settings saved successfully', 'success');
     } catch (error) {
       console.error('Failed to save settings:', error);
+      triggerToast('Failed to save settings', 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -181,6 +196,52 @@ export default function Settings() {
                   onChange={(e) => handleInputChange('heroDescription', e.target.value)}
                   style={{ width: '100%', maxWidth: 600, resize: 'none' }}
                 ></textarea>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Hero Background Image</label>
+                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', background: 'rgba(0,0,0,0.03)', padding: '1rem', borderRadius: 12, border: '1px solid var(--admin-stroke)' }}>
+                  <div style={{ width: 120, height: 70, borderRadius: 8, overflow: 'hidden', background: '#eee', border: '1px solid var(--admin-stroke)', flexShrink: 0 }}>
+                    {heroImagePreview ? (
+                      <img src={heroImagePreview} alt="Hero preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : draft.heroImage ? (
+                      <img src={draft.heroImage} alt="Current Hero" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '0.7rem' }}>No Image</div>
+                    )}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '0.75rem' }}>Resolution recommended: 1920x1080px or higher.</p>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                      <label htmlFor="heroImageInput" style={{ background: '#18181a', color: 'white', padding: '0.5rem 1rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <ArrowUp size={14} /> {draft.heroImage || heroImagePreview ? 'Change Image' : 'Upload Image'}
+                      </label>
+                      <input 
+                        id="heroImageInput" 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = ev => setHeroImagePreview(ev.target.result);
+                            reader.readAsDataURL(e.target.files[0]);
+                          }
+                        }} 
+                        style={{ display: 'none' }} 
+                      />
+                      {(heroImagePreview || draft.heroImage) && (
+                        <button 
+                          onClick={() => {
+                            if (heroImagePreview) setHeroImagePreview(null);
+                            else handleInputChange('heroImage', '');
+                          }}
+                          style={{ background: 'rgba(237,27,36,0.1)', color: '#ed1b24', border: 'none', padding: '0.5rem 1rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -458,8 +519,8 @@ export default function Settings() {
             exit={{ opacity: 0, y: 20 }}
             style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', position: 'sticky', bottom: '2rem' }}
           >
-            <button className="btn" onClick={handleSave} style={{ background: '#ed1b24', color: 'white', border: 'none', fontWeight: 700, padding: '1rem 3rem', boxShadow: '0 8px 30px rgba(237,27,36,0.3)' }}>
-              Save Settings
+            <button className="btn" onClick={handleSave} disabled={isSaving} style={{ background: '#ed1b24', color: 'white', border: 'none', fontWeight: 700, padding: '1rem 3rem', boxShadow: '0 8px 30px rgba(237,27,36,0.3)', opacity: isSaving ? 0.6 : 1, cursor: isSaving ? 'wait' : 'pointer' }}>
+              {isSaving ? 'Saving...' : 'Save Settings'}
             </button>
           </motion.div>
         )}
