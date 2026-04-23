@@ -32,21 +32,16 @@ export default function FilterMenu({
       newFilters.type = '';
       newFilters.bhk = '';
       newFilters.features = '';
-    } else if (key === 'features') {
-      const currentFeatures = newFilters.features ? newFilters.features.split(',').filter(Boolean) : [];
-      if (currentFeatures.includes(value)) {
-        newFilters.features = currentFeatures.filter(f => f !== value).join(',');
+    } else if (['features', 'type', 'bhk', 'status'].includes(key)) {
+      const currentValues = newFilters[key] ? newFilters[key].split(',').filter(Boolean) : [];
+      if (currentValues.includes(value)) {
+        newFilters[key] = currentValues.filter(f => f !== value).join(',');
       } else {
-        newFilters.features = [...currentFeatures, value].join(',');
+        newFilters[key] = [...currentValues, value].join(',');
       }
     } else {
-      // Toggle logic for single selection
+      // Toggle logic for single selection (location)
       newFilters[key] = newFilters[key] === value ? '' : value;
-      
-      // Reset features if property type changes
-      if (key === 'type') {
-        newFilters.features = '';
-      }
     }
     
     setLocalFilters(newFilters);
@@ -162,7 +157,7 @@ export default function FilterMenu({
                 {dynamicTypes.map(type => (
                   <button
                     key={type}
-                    className={`${styles.filterChip} ${localFilters.type === type ? styles.active : ''}`}
+                    className={`${styles.filterChip} ${localFilters.type?.includes(type) ? styles.active : ''}`}
                     onClick={() => handleChange('type', type)}
                   >
                     {type}
@@ -184,7 +179,7 @@ export default function FilterMenu({
                 {['1BHK', '2BHK', '3BHK', '4BHK+'].map(bhk => (
                   <button
                     key={bhk}
-                    className={`${styles.filterChip} ${localFilters.bhk === bhk ? styles.active : ''}`}
+                    className={`${styles.filterChip} ${localFilters.bhk?.includes(bhk) ? styles.active : ''}`}
                     onClick={() => handleChange('bhk', bhk)}
                   >
                     {bhk}
@@ -205,7 +200,7 @@ export default function FilterMenu({
               {['Sale', 'Rent'].map(status => (
                 <button
                   key={status}
-                  className={`${styles.filterChip} ${localFilters.status === status ? styles.active : ''}`}
+                  className={`${styles.filterChip} ${localFilters.status?.includes(status) ? styles.active : ''}`}
                   onClick={() => handleChange('status', status)}
                 >
                   For {status}

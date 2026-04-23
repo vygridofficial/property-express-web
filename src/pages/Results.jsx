@@ -98,14 +98,41 @@ export default function Results() {
         }
       }
 
-      if (filters.type && propType !== filters.type.toLowerCase() && propCategory !== filters.type.toLowerCase()) match = false;
+      if (filters.type) {
+        const selectedTypes = filters.type.split(',').map(t => t.toLowerCase());
+        if (!selectedTypes.includes(propType) && !selectedTypes.includes(propCategory)) {
+          match = false;
+        }
+      }
       
       if (filters.bhk) {
-        const bhkValue = filters.bhk.replace(/\D/g, '');
-        if (bhkValue && prop.bedrooms !== parseInt(bhkValue, 10)) match = false;
+        const selectedBhkValues = filters.bhk.split(',').map(bhk => {
+           if (bhk === '4BHK+') return 4;
+           return parseInt(bhk.replace(/\D/g, ''), 10);
+        });
+        const propBeds = prop.bedrooms || prop.beds || 0;
+        
+        let bhkMatch = false;
+        for (const val of selectedBhkValues) {
+           if (val === 4 && propBeds >= 4) bhkMatch = true;
+           else if (val === propBeds) bhkMatch = true;
+        }
+        if (!bhkMatch) match = false;
       }
 
-      if (filters.status && prop.status?.toLowerCase() !== filters.status.toLowerCase()) match = false;
+      if (filters.status) {
+        const selectedStatuses = filters.status.split(',').map(s => s.toLowerCase());
+        const propStatusStr = prop.status?.toLowerCase() || '';
+        const propPurposeStr = prop.purpose?.toLowerCase() || prop.listingType?.toLowerCase() || ''; 
+        
+        let statusMatch = false;
+        for (const selectedStatus of selectedStatuses) {
+           if (selectedStatus === 'rent' && (propStatusStr.includes('rent') || propPurposeStr.includes('rent'))) statusMatch = true;
+           if (selectedStatus === 'sale' && (propStatusStr.includes('sale') || propPurposeStr.includes('sale') || propStatusStr === 'active')) statusMatch = true;
+        }
+        if (!statusMatch) match = false;
+      }
+
       if (filters.location && prop.location?.toLowerCase() !== filters.location.toLowerCase()) match = false;
 
       // Check features
