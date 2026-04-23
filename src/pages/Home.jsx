@@ -294,28 +294,11 @@ export default function Home() {
         </div>
 
         <div className={styles.heroContent}>
-          <motion.h1
-            className={styles.heroTitle}
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            {siteSettings?.heroTitle || 'Find Your Perfect Property'}
-          </motion.h1>
-          <motion.p
-            className={styles.heroSubtitle}
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            {siteSettings?.heroDescription || 'Discover the most premium luxury villas, apartments, and plots available.'}
-          </motion.p>
-          
           <motion.div
             className={styles.heroFilterWrap}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
             <div>
               <FilterMenu 

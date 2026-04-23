@@ -6,8 +6,8 @@
   justify-content: flex-start; /* Switch to flex-start for more precise control */
   position: relative;
   background: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
-  padding-top: 100px; /* Exact navbar height offset */
-  padding-bottom: 6rem; /* Space at the bottom */
+  padding-top: 60px; /* Reduced navbar height offset to push everything up */
+  padding-bottom: 4rem; 
 }
 
 .hero::before {
@@ -29,7 +29,7 @@
   position: relative;
   z-index: 100;
   margin-top: 1.5rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   padding: 0 1rem;
 }
 
@@ -37,7 +37,7 @@
   width: 100%;
   position: relative;
   z-index: 100;
-  margin-top: 2rem;
+  margin-top: 0;
 }
 
 .heroContent {
@@ -45,7 +45,7 @@
   z-index: 10;
   max-width: 960px;
   width: 95%;
-  padding: 4rem 3rem;
+  padding: 2.5rem 3rem;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
