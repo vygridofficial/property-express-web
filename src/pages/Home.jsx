@@ -286,7 +286,6 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className={styles.hero}>
-        {/* Master Search Bar - now inside hero for better visibility/layering */}
         <div className={styles.heroSearchWrap}>
           <SearchBar properties={allProps} />
         </div>
@@ -308,38 +307,28 @@ export default function Home() {
           >
             {siteSettings?.heroDescription || 'Discover the most premium luxury villas, apartments, and plots available.'}
           </motion.p>
+          
           <motion.div
-            className={styles.heroCtas}
+            className={styles.heroFilterWrap}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Link to="/properties" className={`btn ${styles.btnPrimary}`}>Search Properties</Link>
-            <Link to="/contact" className={`btn ${styles.btnSecondary}`}>Contact Us</Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Universal Property Filter Section */}
-      <section className="section" style={{ padding: '2rem 0', background: 'var(--color-bg)', zIndex: 20, position: 'relative' }}>
-        <div className="container">
-          <motion.div
-            variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
-            style={{ width: '100%' }}
-          >
-            <FilterMenu 
-              filters={{ category: '', type: '', bhk: '', status: '', location: '', features: '' }}
-              properties={allProps}
-              isHorizontal={true}
-              showApplyButton={true}
-              onApply={(newFilters) => {
-                const params = new URLSearchParams();
-                Object.entries(newFilters).forEach(([key, value]) => {
-                  if (value) params.set(key, value);
-                });
-                navigate(`/results?${params.toString()}`);
-              }}
-            />
+            <div>
+              <FilterMenu 
+                filters={{ category: '', type: '', bhk: '', status: '', location: '', features: '' }}
+                properties={allProps}
+                isHorizontal={true}
+                showApplyButton={true}
+                onApply={(newFilters) => {
+                  const params = new URLSearchParams();
+                  Object.entries(newFilters).forEach(([key, value]) => {
+                    if (value) params.set(key, value);
+                  });
+                  navigate(`/results?${params.toString()}`);
+                }}
+              />
+            </div>
           </motion.div>
         </div>
       </section>

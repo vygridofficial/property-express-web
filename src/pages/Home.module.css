@@ -28,17 +28,24 @@
   max-width: 800px;
   position: relative;
   z-index: 100;
-  margin-top: 3.5rem;
-  margin-bottom: 3.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
   padding: 0 1rem;
+}
+
+.heroFilterWrap {
+  width: 100%;
+  position: relative;
+  z-index: 100;
+  margin-top: 2rem;
 }
 
 .heroContent {
   position: relative;
   z-index: 10;
-  max-width: 840px;
-  width: 90%;
-  padding: 5rem;
+  max-width: 960px;
+  width: 95%;
+  padding: 4rem 3rem;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
