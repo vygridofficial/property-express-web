@@ -225,10 +225,14 @@ export default function Home() {
     // Real-time site settings sync
     const unsubscribe = onSnapshot(doc(db, 'settings', 'global'), (docSnap) => {
       if (docSnap.exists()) {
-        setSiteSettings(docSnap.data());
+        const data = docSnap.data();
+        console.log("Home: Received site settings:", data);
+        setSiteSettings(data);
+      } else {
+        console.log("Home: Site settings document does not exist");
       }
     }, (err) => {
-      console.error("Error fetching site settings:", err);
+      console.error("Home: Error fetching site settings:", err);
     });
 
     return () => unsubscribe();
