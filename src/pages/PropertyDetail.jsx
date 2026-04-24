@@ -198,68 +198,75 @@ export default function PropertyDetail() {
           }}
         />
       )}
-      {/* 1. Image Gallery */}
+      {/* 1. Image Gallery (Ecommerce Style) */}
       <div className={styles.galleryHero}>
         <div className={styles.galleryGrid}>
-          <button
-            className={styles.backBtnFloating}
-            onClick={() => navigate(-1)}
-          >
-            &larr; Back
-          </button>
-          {/* Main Image Slot with Slider */}
-          <div 
-            className={`${styles.galleryItem} ${styles.galleryMain}`}
-            onClick={() => openLightbox(cycleIndices[currentMainIndex])}
-            style={{ cursor: 'pointer' }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={cycleIndices[currentMainIndex]}
-                src={activeMainImage}
-                alt={`${property.title} main view`}
-                initial={{ x: 100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -100, opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-              />
-            </AnimatePresence>
-            
-            {cycleIndices.length > 1 && (
-              <>
-                <button 
-                  className={`${styles.navArrow} ${styles.navArrowLeft}`} 
-                  onClick={handlePrev}
-                  aria-label="Previous image"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-                <button 
-                  className={`${styles.navArrow} ${styles.navArrowRight}`} 
-                  onClick={handleNext}
-                  aria-label="Next image"
-                >
-                  <ChevronRight size={24} />
-                </button>
-              </>
-            )}
+          {/* Main Slider Area */}
+          <div className={styles.galleryMain}>
+            <button
+              className={styles.backBtnFloating}
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft size={18} /> Back
+            </button>
+
+            <div 
+              className={styles.mainImageWrap}
+              onClick={() => openLightbox(currentMainIndex)}
+              style={{ cursor: 'zoom-in', height: '100%', position: 'relative' }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentMainIndex}
+                  src={allImages[currentMainIndex] || safeImg}
+                  alt={`${property.title} - Image ${currentMainIndex + 1}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </AnimatePresence>
+
+              {allImages.length > 1 && (
+                <>
+                  <button 
+                    className={`${styles.navArrow} ${styles.navArrowLeft}`} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentMainIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+                    }}
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  <button 
+                    className={`${styles.navArrow} ${styles.navArrowRight}`} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentMainIndex(prev => (prev + 1) % allImages.length);
+                    }}
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Side Images (Static) */}
-          <div 
-            className={styles.galleryItem} 
-            onClick={() => openLightbox(1)}
-            style={{ cursor: 'pointer' }}
-          >
-            <img src={displayImages[1]} alt={`${property.title} view 2`} />
-          </div>
-          <div 
-            className={styles.galleryItem} 
-            onClick={() => openLightbox(2)}
-            style={{ cursor: 'pointer' }}
-          >
-            <img src={displayImages[2]} alt={`${property.title} view 3`} />
-          </div>
+          {/* Thumbnails Strip */}
+          {allImages.length > 1 && (
+            <div className={styles.thumbnailStrip}>
+              {allImages.map((img, idx) => (
+                <div 
+                  key={idx} 
+                  className={`${styles.thumbnail} ${currentMainIndex === idx ? styles.thumbnailActive : ''}`}
+                  onClick={() => setCurrentMainIndex(idx)}
+                >
+                  <img src={img} alt={`${property.title} thumbnail ${idx + 1}`} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
