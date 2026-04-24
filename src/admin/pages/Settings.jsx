@@ -211,8 +211,25 @@ export default function Settings() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Hero Background Image</label>
-                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', background: 'rgba(0,0,0,0.03)', padding: '1rem', borderRadius: 12, border: '1px solid var(--admin-stroke)' }}>
-                  <div style={{ width: 120, height: 70, borderRadius: 8, overflow: 'hidden', background: '#eee', border: '1px solid var(--admin-stroke)', flexShrink: 0 }}>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: isMobile ? 'column' : 'row',
+                  gap: '1.5rem', 
+                  alignItems: isMobile ? 'flex-start' : 'center', 
+                  background: 'rgba(0,0,0,0.03)', 
+                  padding: isMobile ? '1.5rem' : '1rem', 
+                  borderRadius: 12, 
+                  border: '1px solid var(--admin-stroke)' 
+                }}>
+                  <div style={{ 
+                    width: isMobile ? '100%' : 120, 
+                    height: isMobile ? 180 : 70, 
+                    borderRadius: 8, 
+                    overflow: 'hidden', 
+                    background: '#eee', 
+                    border: '1px solid var(--admin-stroke)', 
+                    flexShrink: 0 
+                  }}>
                     {heroImagePreview ? (
                       <img src={heroImagePreview} alt="Hero preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : draft.heroImage ? (
@@ -221,10 +238,9 @@ export default function Settings() {
                       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '0.7rem' }}>No Image</div>
                     )}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '0.75rem' }}>Resolution recommended: 1920x1080px or higher.</p>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <label htmlFor="heroImageInput" style={{ background: '#18181a', color: 'white', padding: '0.5rem 1rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ flex: 1, width: isMobile ? '100%' : 'auto' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                      <label htmlFor="heroImageInput" style={{ background: '#18181a', color: 'white', padding: '0.65rem 1.25rem', borderRadius: 8, fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', flex: isMobile ? 1 : 'none', justifyContent: 'center' }}>
                         <ArrowUp size={14} /> {draft.heroImage || heroImagePreview ? 'Change Image' : 'Upload Image'}
                       </label>
                       <input 
@@ -246,7 +262,7 @@ export default function Settings() {
                             if (heroImagePreview) setHeroImagePreview(null);
                             else handleInputChange('heroImage', '');
                           }}
-                          style={{ background: 'rgba(237,27,36,0.1)', color: '#ed1b24', border: 'none', padding: '0.5rem 1rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                          style={{ background: 'rgba(237,27,36,0.1)', color: '#ed1b24', border: 'none', padding: '0.65rem 1.25rem', borderRadius: 8, fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', flex: isMobile ? 1 : 'none' }}
                         >
                           Remove
                         </button>
