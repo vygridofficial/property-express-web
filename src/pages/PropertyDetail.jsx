@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import { MapPin, Map, BedDouble, Bath, Scaling, Calendar, ShieldCheck, Check, Phone, MessageCircle, ArrowLeft, ChevronLeft, ChevronRight, Info, X } from 'lucide-react';
 import { getPropertyById } from '../services/propertyService';
 import { formatDate } from '../utils/formatDate';
 import { submitLead } from '../services/leadService';
@@ -31,6 +31,8 @@ export default function PropertyDetail() {
   });
   const [errors, setErrors] = useState({});
   const [currentMainIndex, setCurrentMainIndex] = useState(0);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     // If we have data from state, we can already initialize agent info
@@ -99,6 +101,23 @@ export default function PropertyDetail() {
   const handleNext = (e) => {
     e.stopPropagation();
     setCurrentMainIndex(prev => (prev + 1) % cycleIndices.length);
+  };
+
+  const openLightbox = (index) => {
+    setLightboxIndex(index);
+    setShowLightbox(true);
+  };
+
+  const closeLightbox = () => {
+    setShowLightbox(false);
+  };
+
+  const nextLightboxImage = () => {
+    setLightboxIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevLightboxImage = () => {
+    setLightboxIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
   const validate = () => {
@@ -189,7 +208,11 @@ export default function PropertyDetail() {
             &larr; Back
           </button>
           {/* Main Image Slot with Slider */}
-          <div className={`${styles.galleryItem} ${styles.galleryMain}`}>
+          <div 
+            className={`${styles.galleryItem} ${styles.galleryMain}`}
+            onClick={() => openLightbox(cycleIndices[currentMainIndex])}
+            style={{ cursor: 'pointer' }}
+          >
             <AnimatePresence mode="wait">
               <motion.img
                 key={cycleIndices[currentMainIndex]}
@@ -223,14 +246,68 @@ export default function PropertyDetail() {
           </div>
 
           {/* Side Images (Static) */}
-          <div className={styles.galleryItem}>
+          <div 
+            className={styles.galleryItem} 
+            onClick={() => openLightbox(1)}
+            style={{ cursor: 'pointer' }}
+          >
             <img src={displayImages[1]} alt={`${property.title} view 2`} />
           </div>
-          <div className={styles.galleryItem}>
+          <div 
+            className={styles.galleryItem} 
+            onClick={() => openLightbox(2)}
+            style={{ cursor: 'pointer' }}
+          >
             <img src={displayImages[2]} alt={`${property.title} view 3`} />
           </div>
         </div>
       </div>
+
+      {/* Image Lightbox */}
+      <AnimatePresence>
+        {showLightbox && (
+          <motion.div 
+            className={styles.lightboxOverlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeLightbox}
+          >
+            <button className={styles.lightboxClose} onClick={closeLightbox}>
+              <X size={32} />
+            </button>
+            
+            <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={lightboxIndex}
+                  src={allImages[lightboxIndex]}
+                  alt="Property view enlarged"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </AnimatePresence>
+              
+              {allImages.length > 1 && (
+                <>
+                  <button className={`${styles.lightboxArrow} ${styles.lightboxArrowLeft}`} onClick={prevLightboxImage}>
+                    <ChevronLeft size={48} />
+                  </button>
+                  <button className={`${styles.lightboxArrow} ${styles.lightboxArrowRight}`} onClick={nextLightboxImage}>
+                    <ChevronRight size={48} />
+                  </button>
+                  
+                  <div className={styles.lightboxCounter}>
+                    {lightboxIndex + 1} / {allImages.length}
+                  </div>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className={`container ${styles.detailContainer}`}>
         {/* 2. Property Info (Left Column) */}
