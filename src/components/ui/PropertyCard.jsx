@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, BedDouble, Bath, Scaling, Phone } from 'lucide-react';
+import { MapPin, BedDouble, Bath, Scaling, Phone, ZoomIn } from 'lucide-react';
 import { formatPrice } from '../../utils/formatPrice';
 import { formatDate } from '../../utils/formatDate';
 import { useAdmin } from '../../admin/context/AdminContext';
 import styles from './PropertyCard.module.css';
+import Lightbox from './Lightbox';
 
 const WhatsAppIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -20,6 +21,8 @@ export default function PropertyCard({ property }) {
   const { id, title, price, status, location, address, beds, bedrooms, baths, bathrooms, sqft, area, images, image, agentPhone } = property;
   const [imgErrors, setImgErrors] = useState({});
   const [activeSlide, setActiveSlide] = useState(0);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Handle live data fallbacks
   const displayLocation = location || address || 'Location TBD';
@@ -31,6 +34,16 @@ export default function PropertyCard({ property }) {
     setImgErrors(prev => ({ ...prev, [idx]: true }));
   };
 
+  const openLightbox = (index, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setLightboxIndex(index);
+    setShowLightbox(true);
+  };
+
+  const closeLightbox = () => setShowLightbox(false);
 
   // Build image array — match details page logic
   const rawImages = property.imageUrls || property.images || (property.image ? [property.image] : []);
@@ -59,7 +72,7 @@ export default function PropertyCard({ property }) {
       transition={{ duration: 0.3 }}
     >
       {/* Image Slideshow/Carousel */}
-      <div className={styles.carousel}>
+      <div className={styles.carousel} onClick={(e) => openLightbox(activeSlide, e)}>
         {status !== 'Active' && (
           <span
             className={styles.badge}
@@ -71,6 +84,10 @@ export default function PropertyCard({ property }) {
             {status}
           </span>
         )}
+
+        <div className={styles.zoomHint}>
+          <ZoomIn size={16} /> Click to enlarge
+        </div>
 
         <div className={styles.slides}>
           {allImages.map((img, idx) => (
@@ -108,7 +125,6 @@ export default function PropertyCard({ property }) {
             </div>
           </>
         )}
-
       </div>
 
       <div className={styles.content}>
@@ -158,6 +174,15 @@ export default function PropertyCard({ property }) {
           View Details
         </Link>
       </div>
+
+      <Lightbox 
+        isOpen={showLightbox}
+        images={allImages}
+        index={lightboxIndex}
+        onClose={closeLightbox}
+        onPrev={() => setLightboxIndex(i => (i - 1 + allImages.length) % allImages.length)}
+        onNext={() => setLightboxIndex(i => (i + 1) % allImages.length)}
+      />
     </motion.article>
   );
 }

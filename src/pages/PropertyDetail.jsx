@@ -9,6 +9,7 @@ import EnquirySuccessPopup from '../components/common/EnquirySuccessPopup';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import styles from './PropertyDetail.module.css';
 import brandLogo from '../assets/logo.png';
+import Lightbox from '../components/ui/Lightbox';
 import { formatPrice } from '../utils/formatPrice';
 import { getPropertyCoordinates } from '../utils/geo';
 import SEO from '../components/common/SEO';
@@ -271,50 +272,14 @@ export default function PropertyDetail() {
       </div>
 
       {/* Image Lightbox */}
-      <AnimatePresence>
-        {showLightbox && (
-          <motion.div 
-            className={styles.lightboxOverlay}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeLightbox}
-          >
-            <button className={styles.lightboxClose} onClick={closeLightbox}>
-              <X size={32} />
-            </button>
-            
-            <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={lightboxIndex}
-                  src={allImages[lightboxIndex]}
-                  alt="Property view enlarged"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </AnimatePresence>
-              
-              {allImages.length > 1 && (
-                <>
-                  <button className={`${styles.lightboxArrow} ${styles.lightboxArrowLeft}`} onClick={prevLightboxImage}>
-                    <ChevronLeft size={48} />
-                  </button>
-                  <button className={`${styles.lightboxArrow} ${styles.lightboxArrowRight}`} onClick={nextLightboxImage}>
-                    <ChevronRight size={48} />
-                  </button>
-                  
-                  <div className={styles.lightboxCounter}>
-                    {lightboxIndex + 1} / {allImages.length}
-                  </div>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Lightbox 
+        images={allImages}
+        index={lightboxIndex}
+        isOpen={showLightbox}
+        onClose={closeLightbox}
+        onPrev={prevLightboxImage}
+        onNext={nextLightboxImage}
+      />
 
       <div className={`container ${styles.detailContainer}`}>
         {/* 2. Property Info (Left Column) */}
