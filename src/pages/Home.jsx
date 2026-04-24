@@ -287,7 +287,12 @@ export default function Home() {
       {/* Hero Section */}
       <section 
         className={styles.hero}
-        style={siteSettings?.heroImage ? { backgroundImage: `url(${siteSettings.heroImage})` } : {}}
+        style={{
+          backgroundImage: `url(${siteSettings?.heroImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
       >
         <div className={styles.heroSearchWrap}>
           <SearchBar properties={allProps} />

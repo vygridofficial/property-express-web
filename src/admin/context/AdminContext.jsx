@@ -237,6 +237,7 @@ export function AdminProvider({ children }) {
     showReviews: true,
     showContactForm: true,
     taxonomy: {},
+    heroImage: '',
     amenities: [
       'Swimming Pool', '24/7 Security', 'Private Garage', 
       'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',

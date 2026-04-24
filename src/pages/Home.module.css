@@ -5,7 +5,9 @@
   align-items: center;
   justify-content: flex-start; /* Switch to flex-start for more precise control */
   position: relative;
-  background: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   padding-top: 140px; 
   padding-bottom: 4rem; 
 }
