@@ -112,9 +112,10 @@ export default function Settings() {
   }, [siteSettings]);
 
   useEffect(() => {
-    const dirty = Object.keys(siteSettings).some(k => siteSettings[k] !== draft[k]);
-    setIsDirty(dirty);
-  }, [draft, siteSettings]);
+    const textDirty = Object.keys(siteSettings).some(k => siteSettings[k] !== draft[k]);
+    const imageDirty = heroImagePreview !== null;
+    setIsDirty(textDirty || imageDirty);
+  }, [draft, siteSettings, heroImagePreview]);
 
   const handleToggle = (key) => {
     setDraft(prev => ({ ...prev, [key]: !prev[key] }));
