@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Home as HomeIcon, Building, Store, Map, Award, Handshake, Headphones, Star, BedDouble, Search as SearchIcon } from 'lucide-react';
 import { getFeaturedProperties, getSiteSettings, getAllProperties } from '../services/propertyService';
 import { getAllReviews, addReview } from '../services/reviewService';
+import { db } from '../firebase';
+import { onSnapshot, doc } from 'firebase/firestore';
 import PropertyCard from '../components/ui/PropertyCard';
 import GtaMarker from '../components/ui/GtaMarker';
 import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
@@ -219,7 +221,17 @@ export default function Home() {
     getAllReviews().then(data => {
       setReviews(data.filter(r => r.status?.toLowerCase() === 'approved'));
     });
-    getSiteSettings().then(setSiteSettings);
+    
+    // Real-time site settings sync
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'global'), (docSnap) => {
+      if (docSnap.exists()) {
+        setSiteSettings(docSnap.data());
+      }
+    }, (err) => {
+      console.error("Error fetching site settings:", err);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Group properties by matching location string (case-insensitive approximation)
@@ -288,7 +300,7 @@ export default function Home() {
       <section 
         className={styles.hero}
         style={{
-          backgroundImage: `url(${siteSettings?.heroImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'})`,
+          backgroundImage: `url("${siteSettings?.heroImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
