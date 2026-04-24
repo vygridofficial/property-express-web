@@ -48,7 +48,7 @@ function useIsMobile() {
 
 export default function Settings() {
   const isMobile = useIsMobile();
-  const { siteSettings, updateSiteSettings, properties, propertyTypes = [], removePropertyType, updatePropertyType, reorderPropertyTypes, addPropertyType } = useAdmin();
+  const { siteSettings, updateSiteSettings, properties, propertyTypes = [], removePropertyType, updatePropertyType, reorderPropertyTypes, addPropertyType, settingsLoading } = useAdmin();
   
   // Local drafted state for dirty checking
   const [draft, setDraft] = useState(siteSettings);
@@ -64,15 +64,21 @@ export default function Settings() {
   const [isSaving, setIsSaving] = useState(false);
 
   const uploadToCloudinary = async (base64) => {
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dm9tmagpg';
-    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'property_express';
-    const uploadData = new FormData();
-    uploadData.append('file', base64);
-    uploadData.append('upload_preset', uploadPreset);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: uploadData });
-    const data = await res.json();
-    if (data.secure_url) return data.secure_url;
-    throw new Error('Cloudinary upload failed');
+    try {
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dm9tmagpg';
+      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'property_express';
+      const uploadData = new FormData();
+      uploadData.append('file', base64);
+      uploadData.append('upload_preset', uploadPreset);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: uploadData });
+      if (!res.ok) throw new Error('Network response was not ok');
+      const data = await res.json();
+      if (data.secure_url) return data.secure_url;
+      throw new Error(data.error?.message || 'Cloudinary upload failed');
+    } catch (err) {
+      console.error('Cloudinary Error:', err);
+      throw err;
+    }
   };
 
   const triggerToast = (message, type = 'success') => {
@@ -130,6 +136,7 @@ export default function Settings() {
         setHeroImagePreview(null);
       }
       
+      console.log('Saving settings:', finalSettings);
       await updateSiteSettings(finalSettings);
 
       // Sync visibility back to propertyTypes isActive field
@@ -151,6 +158,10 @@ export default function Settings() {
       setIsSaving(false);
     }
   };
+
+  if (settingsLoading || !draft) {
+    return <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--admin-text-muted)' }}>Loading site settings...</div>;
+  }
 
   return (
     <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay: 0.1}} style={{ maxWidth: 800, position: 'relative' }}>
