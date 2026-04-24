@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './Lightbox.module.css';
 
 export default function Lightbox({ images = [], index = 0, isOpen = false, onClose, onPrev, onNext }) {
+  // Prevent body scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   if (!images || images.length === 0) return null;
 
   const handleBackdropClick = (e) => {
@@ -12,7 +23,7 @@ export default function Lightbox({ images = [], index = 0, isOpen = false, onClo
     }
   };
 
-  return (
+  const content = (
     <AnimatePresence>
       {isOpen && (
         <motion.div 
@@ -34,19 +45,19 @@ export default function Lightbox({ images = [], index = 0, isOpen = false, onClo
                   src={images[index]}
                   alt={`View ${index + 1}`}
                   className={styles.mainImage}
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
+                  exit={{ opacity: 0, scale: 1.1 }}
                   transition={{ duration: 0.3, ease: 'easeOut' }}
                 />
               </AnimatePresence>
 
               {images.length > 1 && (
                 <>
-                  <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={(e) => { e.stopPropagation(); onPrev(); }} aria-label="Previous image">
+                  <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={(e) => { e.stopPropagation(); onPrev(); }}>
                     <ChevronLeft size={48} />
                   </button>
-                  <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={(e) => { e.stopPropagation(); onNext(); }} aria-label="Next image">
+                  <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={(e) => { e.stopPropagation(); onNext(); }}>
                     <ChevronRight size={48} />
                   </button>
                   
@@ -61,4 +72,6 @@ export default function Lightbox({ images = [], index = 0, isOpen = false, onClo
       )}
     </AnimatePresence>
   );
+
+  return createPortal(content, document.body);
 }
