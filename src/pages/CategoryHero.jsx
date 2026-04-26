@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal, Phone } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAdmin } from '../admin/context/AdminContext';
 import { FILTER_TAXONOMY } from '../data/filterTaxonomy';
 import { KERALA_DISTRICTS, DISTRICT_COORDINATES } from '../data/districts';
