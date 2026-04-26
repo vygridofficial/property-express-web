@@ -579,6 +579,10 @@
   .listingsGrid {
     grid-template-columns: 1fr;
   }
+
+  .desktopOnly {
+    display: none !important;
+  }
 }
 
 /* ── Quick-action buttons (Call / WhatsApp) ── */

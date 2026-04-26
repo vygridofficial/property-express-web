@@ -23,6 +23,28 @@ export default function Lightbox({ images = [], index = 0, isOpen = false, onClo
     }
   };
 
+  // Touch handlers for mobile swiping
+  const [touchStart, setTouchStart] = React.useState(null);
+  const [touchEnd, setTouchEnd] = React.useState(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) {
+      onNext();
+    } else if (distance < -minSwipeDistance) {
+      onPrev();
+    }
+  };
+
   const content = (
     <AnimatePresence>
       {isOpen && (
@@ -32,6 +54,9 @@ export default function Lightbox({ images = [], index = 0, isOpen = false, onClo
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleBackdropClick}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close lightbox">
             <X size={32} />
@@ -54,10 +79,10 @@ export default function Lightbox({ images = [], index = 0, isOpen = false, onClo
 
               {images.length > 1 && (
                 <>
-                  <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={(e) => { e.stopPropagation(); onPrev(); }}>
+                  <button className={`${styles.navBtn} ${styles.prevBtn} ${styles.desktopOnly}`} onClick={(e) => { e.stopPropagation(); onPrev(); }}>
                     <ChevronLeft size={48} />
                   </button>
-                  <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={(e) => { e.stopPropagation(); onNext(); }}>
+                  <button className={`${styles.navBtn} ${styles.nextBtn} ${styles.desktopOnly}`} onClick={(e) => { e.stopPropagation(); onNext(); }}>
                     <ChevronRight size={48} />
                   </button>
                   

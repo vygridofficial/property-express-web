@@ -323,6 +323,10 @@
     flex-wrap: wrap;
     font-size: 0.8rem;
   }
+
+  .desktopOnly {
+    display: none !important;
+  }
 }
 .zoomHint {
   position: absolute;

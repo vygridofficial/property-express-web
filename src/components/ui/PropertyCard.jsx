@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, BedDouble, Bath, Scaling, Phone, ZoomIn } from 'lucide-react';
+import { MapPin, BedDouble, Bath, Scaling, Phone } from 'lucide-react';
 import { formatPrice } from '../../utils/formatPrice';
 import { formatDate } from '../../utils/formatDate';
 import { useAdmin } from '../../admin/context/AdminContext';
 import styles from './PropertyCard.module.css';
-import Lightbox from './Lightbox';
 
 const WhatsAppIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -18,11 +17,10 @@ const PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9I
 
 export default function PropertyCard({ property }) {
   const { siteSettings } = useAdmin();
-  const { id, title, price, status, location, address, beds, bedrooms, baths, bathrooms, sqft, area, images, image, agentPhone } = property;
+  const navigate = useNavigate();
+  const { id, title, price, status, location, address, beds, bedrooms, baths, bathrooms, sqft, area } = property;
   const [imgErrors, setImgErrors] = useState({});
   const [activeSlide, setActiveSlide] = useState(0);
-  const [showLightbox, setShowLightbox] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
   
   // Touch handlers for mobile swiping
   const [touchStart, setTouchStart] = useState(null);
@@ -46,6 +44,18 @@ export default function PropertyCard({ property }) {
     }
   };
 
+  const handleImageClick = (e) => {
+    // Only navigate if user was not swiping
+    if (touchStart && touchEnd && Math.abs(touchStart - touchEnd) > minSwipeDistance) return;
+    navigate(`/properties/${id}`, { state: { property } });
+  };
+
+  // Build image array — match details page logic
+  const rawImages = property.imageUrls || property.images || (property.image ? [property.image] : []);
+  const allImages = (Array.isArray(rawImages) && rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '').length > 0) 
+    ? rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '') 
+    : [PLACEHOLDER];
+
   // Handle live data fallbacks
   const displayLocation = location || address || 'Location TBD';
   const displayBeds = beds || bedrooms || 0;
@@ -55,27 +65,6 @@ export default function PropertyCard({ property }) {
   const handleImgError = (idx) => {
     setImgErrors(prev => ({ ...prev, [idx]: true }));
   };
-
-  const openLightbox = (index, e) => {
-    // Prevent opening lightbox if user was swiping
-    if (touchStart && touchEnd && Math.abs(touchStart - touchEnd) > minSwipeDistance) {
-      return;
-    }
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    setLightboxIndex(index);
-    setShowLightbox(true);
-  };
-
-  const closeLightbox = () => setShowLightbox(false);
-
-  // Build image array — match details page logic
-  const rawImages = property.imageUrls || property.images || (property.image ? [property.image] : []);
-  const allImages = (Array.isArray(rawImages) && rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '').length > 0) 
-    ? rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '') 
-    : [PLACEHOLDER];
 
   const displayPrice = formatPrice(price);
 
@@ -97,19 +86,16 @@ export default function PropertyCard({ property }) {
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Image Slideshow/Carousel */}
+      {/* Image Slideshow/Carousel — click navigates to detail page */}
       <div 
         className={styles.carousel} 
-        onClick={(e) => openLightbox(activeSlide, e)}
+        onClick={handleImageClick}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
+        style={{ cursor: 'pointer' }}
       >
 
-
-        <div className={styles.zoomHint}>
-          <ZoomIn size={16} /> Click to enlarge
-        </div>
 
         <div className={styles.slides}>
           {allImages.map((img, idx) => (
@@ -127,12 +113,12 @@ export default function PropertyCard({ property }) {
         {allImages.length > 1 && (
           <>
             <button
-              className={`${styles.slideArrow} ${styles.slideArrowLeft}`}
+              className={`${styles.slideArrow} ${styles.slideArrowLeft} ${styles.desktopOnly}`}
               onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i - 1 + allImages.length) % allImages.length); }}
               aria-label="Previous image"
             >‹</button>
             <button
-              className={`${styles.slideArrow} ${styles.slideArrowRight}`}
+              className={`${styles.slideArrow} ${styles.slideArrowRight} ${styles.desktopOnly}`}
               onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i + 1) % allImages.length); }}
               aria-label="Next image"
             >›</button>
@@ -212,15 +198,6 @@ export default function PropertyCard({ property }) {
           View Details
         </Link>
       </div>
-
-      <Lightbox 
-        isOpen={showLightbox}
-        images={allImages}
-        index={lightboxIndex}
-        onClose={closeLightbox}
-        onPrev={() => setLightboxIndex(i => (i - 1 + allImages.length) % allImages.length)}
-        onNext={() => setLightboxIndex(i => (i + 1) % allImages.length)}
-      />
     </motion.article>
   );
 }

@@ -430,6 +430,10 @@
   .mapWrapper {
     height: 300px;
   }
+
+  .desktopOnly {
+    display: none !important;
+  }
 }
 
 .navArrow {

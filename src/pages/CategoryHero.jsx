@@ -112,6 +112,14 @@ function PropertyListingCard({ property, index }) {
     : null;
   const callLink = cleanPhone ? `tel:${cleanPhone}` : null;
 
+  const navigate = useNavigate();
+
+  const handleImageClick = (e) => {
+    // Only navigate if user was not swiping
+    if (touchStart && touchEnd && Math.abs(touchStart - touchEnd) > minSwipeDistance) return;
+    navigate(`/properties/${property.id}`, { state: { property } });
+  };
+
   return (
     <motion.div
       className={styles.listingCard}
@@ -126,6 +134,8 @@ function PropertyListingCard({ property, index }) {
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
+        onClick={handleImageClick}
+        style={{ cursor: 'pointer' }}
       >
 
         <div className={styles.slides}>
@@ -144,12 +154,12 @@ function PropertyListingCard({ property, index }) {
         {allImages.length > 1 && (
           <>
             <button
-              className={`${styles.slideArrow} ${styles.slideArrowLeft}`}
+              className={`${styles.slideArrow} ${styles.slideArrowLeft} ${styles.desktopOnly}`}
               onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i - 1 + allImages.length) % allImages.length); }}
               aria-label="Previous image"
             >‹</button>
             <button
-              className={`${styles.slideArrow} ${styles.slideArrowRight}`}
+              className={`${styles.slideArrow} ${styles.slideArrowRight} ${styles.desktopOnly}`}
               onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveSlide(i => (i + 1) % allImages.length); }}
               aria-label="Next image"
             >›</button>

@@ -168,6 +168,28 @@ export default function PropertyDetail() {
     }
   };
 
+  // Touch handlers for mobile swiping
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) {
+      setCurrentMainIndex(prev => (prev + 1) % allImages.length);
+    } else if (distance < -minSwipeDistance) {
+      setCurrentMainIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -214,6 +236,9 @@ export default function PropertyDetail() {
             <div 
               className={styles.mainImageWrap}
               onClick={() => openLightbox(currentMainIndex)}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
               style={{ cursor: 'zoom-in', height: '100%', position: 'relative' }}
             >
               <AnimatePresence mode="wait">
@@ -232,7 +257,7 @@ export default function PropertyDetail() {
               {allImages.length > 1 && (
                 <>
                   <button 
-                    className={`${styles.navArrow} ${styles.navArrowLeft}`} 
+                    className={`${styles.navArrow} ${styles.navArrowLeft} ${styles.desktopOnly}`} 
                     onClick={(e) => {
                       e.stopPropagation();
                       setCurrentMainIndex(prev => (prev - 1 + allImages.length) % allImages.length);
@@ -241,7 +266,7 @@ export default function PropertyDetail() {
                     <ChevronLeft size={24} />
                   </button>
                   <button 
-                    className={`${styles.navArrow} ${styles.navArrowRight}`} 
+                    className={`${styles.navArrow} ${styles.navArrowRight} ${styles.desktopOnly}`} 
                     onClick={(e) => {
                       e.stopPropagation();
                       setCurrentMainIndex(prev => (prev + 1) % allImages.length);
@@ -286,8 +311,29 @@ export default function PropertyDetail() {
         <div className={styles.detailMain}>
           <motion.div variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
             <div className={styles.badgeGroup} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {property.status && property.status !== 'Active' && <span className={styles.badge}>{property.status}</span>}
-              {property.isFeatured && <span className={styles.badge} style={{ background: '#fdf2f2', color: '#ed1b24', border: '1px solid #fecaca' }}>Featured</span>}
+              {/* For Rent / For Sale Badge */}
+              <span
+                className={styles.badge}
+                style={{
+                  background: (property.listingType === 'Rent' || property.status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24',
+                  color: 'white',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  padding: '0.5rem 1.25rem'
+                }}
+              >
+                {(property.listingType === 'Rent' || property.status === 'For Rent') ? 'For Rent' : 'For Sale'}
+              </span>
+
+              {property.status && property.status !== 'Active' && property.status !== 'For Rent' && property.status !== 'For Sale' && (
+                <span className={styles.badge} style={{ background: '#eee', color: '#333' }}>{property.status}</span>
+              )}
+              
+              {property.isFeatured && (
+                <span className={styles.badge} style={{ background: '#fdf2f2', color: '#ed1b24', border: '1px solid #fecaca' }}>
+                  Featured
+                </span>
+              )}
               {property.instagramLink && (
                 <a href={property.instagramLink} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg,#f09433,#dc2743,#bc1888)', color: 'white', padding: '0.35rem 1rem', borderRadius: 999, fontWeight: 600, textDecoration: 'none', fontSize: '0.8rem', lineHeight: 1 }}>
