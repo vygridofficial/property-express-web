@@ -18,6 +18,8 @@
   overflow: hidden;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: #f0f0f0;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 .slides {

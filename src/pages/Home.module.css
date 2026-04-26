@@ -561,24 +561,16 @@
 
 @media (max-width: 768px) {
   .featuredGrid {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 1rem !important;
-    padding: 0 1rem 1rem 1rem !important;
-    scroll-snap-type: x mandatory;
-  }
-  
-  .featuredGrid::-webkit-scrollbar {
-    display: none;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
   
   .featuredGrid > div {
-    flex: 0 0 85% !important;
-    scroll-snap-align: center;
+    flex: unset !important;
+    width: 100% !important;
   }
 }
 

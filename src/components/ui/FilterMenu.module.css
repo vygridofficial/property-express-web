@@ -298,11 +298,13 @@
 
   .horizontalVariant .inputsGrid {
     flex: 1 1 100%;
-    flex-wrap: wrap;
+    flex-direction: column;
   }
 
+  /* Each dropdown takes full width on mobile */
   .horizontalVariant .customSelectWrapper {
-    flex: 1 1 calc(50% - 0.375rem);
+    flex: 1 1 100%;
+    width: 100%;
   }
 
   .horizontalVariant .actionsContainer {

@@ -69,6 +69,26 @@ function PropertyListingCard({ property, index }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [imgErrors, setImgErrors] = useState({});
 
+  // Touch swipe support for mobile
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) {
+      setActiveSlide(i => (i + 1) % allImages.length);
+    } else if (distance < -minSwipeDistance) {
+      setActiveSlide(i => (i - 1 + allImages.length) % allImages.length);
+    }
+  };
+
   const handleImgError = (idx) => {
     setImgErrors(prev => ({ ...prev, [idx]: true }));
   };
@@ -78,8 +98,6 @@ function PropertyListingCard({ property, index }) {
   const allImages = (Array.isArray(rawImages) && rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '').length > 0) 
     ? rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '') 
     : [PLACEHOLDER];
-
-
 
   const displayPrice = formatPrice(property.price);
 
@@ -103,28 +121,12 @@ function PropertyListingCard({ property, index }) {
       transition={{ duration: 0.6, delay: index * 0.08, ease: 'easeOut' }}
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
     >
-      <div className={styles.listingImgWrap}>
-        <span
-          className={styles.listingBadge}
-          style={{
-            background: property.status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || property.status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24'),
-            color: property.status === 'Inactive' ? '#222' : 'white',
-            border: property.status === 'Inactive' ? '1px solid #ccc' : 'none',
-            position: 'absolute',
-            top: '1rem',
-            left: '1rem',
-            zIndex: 10,
-            padding: '0.4rem 1rem',
-            borderRadius: '30px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            boxShadow: '0 5px 15px rgba(0, 0, 0, 0.15)'
-          }}
-        >
-          {property.status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || property.status === 'For Rent') ? 'For Rent' : 'For Sale')}
-        </span>
+      <div
+        className={styles.listingImgWrap}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
 
         <div className={styles.slides}>
           {allImages.map((img, idx) => (
@@ -164,6 +166,27 @@ function PropertyListingCard({ property, index }) {
         )}
       </div>
       <div className={styles.listingContent}>
+        {/* Badge placed below image */}
+        <div style={{ marginBottom: '0.5rem' }}>
+          <span
+            className={styles.listingBadge}
+            style={{
+              background: property.status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || property.status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24'),
+              color: property.status === 'Inactive' ? '#222' : 'white',
+              border: property.status === 'Inactive' ? '1px solid #ccc' : 'none',
+              display: 'inline-block',
+              padding: '0.4rem 1rem',
+              borderRadius: '30px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            {property.status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || property.status === 'For Rent') ? 'For Rent' : 'For Sale')}
+          </span>
+        </div>
         <div className={styles.listingPrice} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {displayPrice}

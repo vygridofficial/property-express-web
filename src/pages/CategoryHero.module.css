@@ -319,6 +319,8 @@
   position: relative;
   height: 260px;
   overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 .listingImg {
@@ -401,19 +403,13 @@
 }
 
 .listingBadge {
-  position: absolute;
-  top: 1.2rem;
-  left: 1.2rem;
+  display: inline-block;
   padding: 0.4rem 1.1rem;
   border-radius: 40px;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  z-index: 2;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
