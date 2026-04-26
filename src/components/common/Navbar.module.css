@@ -84,6 +84,29 @@
   display: none;
 }
 
+.ownerPortalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 40px;
+  background: var(--color-primary);
+  color: #fff !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(237, 27, 36, 0.3);
+}
+
+.ownerPortalBtn:hover {
+  background: #c8000a;
+  box-shadow: 0 6px 20px rgba(237, 27, 36, 0.4);
+  transform: translateY(-1px);
+}
+
 @media (max-width: 768px) {
   .navLinks {
     display: none;
@@ -109,5 +132,16 @@
     padding: 1rem 0;
     font-size: 1.25rem;
     border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .ownerPortalMobile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0;
+    font-size: 1.25rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: var(--color-primary) !important;
+    font-weight: 600;
+    text-decoration: none;
   }
 }

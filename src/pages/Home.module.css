@@ -322,12 +322,11 @@
 }
 
 .marqueeContainer {
-  overflow-x: hidden;
   position: relative;
   width: 100%;
   margin-top: 3rem;
   padding: 1rem 0;
-  display: flex;
+  overflow: hidden;
 }
 
 /* Fading out the edges for a smoother look */
@@ -337,7 +336,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 100px;
+  width: 60px;
   z-index: 2;
   pointer-events: none;
 }
@@ -355,22 +354,15 @@
 .marqueeTrack {
   display: flex;
   gap: 2rem;
-  width: max-content;
-  animation: scrollMarquee 45s linear infinite;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 1rem 2rem;
 }
 
-.marqueeTrack:hover {
-  animation-play-state: paused;
-}
-
-@keyframes scrollMarquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(calc(-50% - 1rem));
-  }
+.marqueeTrack::-webkit-scrollbar {
+  display: none;
 }
 
 .interactiveMapSection {

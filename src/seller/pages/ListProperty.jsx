@@ -96,6 +96,7 @@ export default function ListProperty() {
   const [details, setDetails] = useState({
     propertyTitle: '',
     sellerName: '',
+    listingType: 'Sell',
     propertyType: 'Apartment',
     configuration: '1BHK',
     area: '',
@@ -338,6 +339,19 @@ export default function ListProperty() {
                       onChange={e => setDetails({...details, sellerName: e.target.value})}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
+                  </div>
+
+                  <div>
+                    <label style={label}>Listing Type</label>
+                    <select
+                      value={details.listingType}
+                      onChange={e => setDetails({...details, listingType: e.target.value})}
+                      style={{ ...inp, appearance: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '16px', paddingRight: '2.5rem' }}
+                      onFocus={onFocus} onBlur={onBlur}
+                    >
+                      <option value="Sell">Sell</option>
+                      <option value="Rent">Rent</option>
+                    </select>
                   </div>
 
                   <div>

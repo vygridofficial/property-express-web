@@ -86,8 +86,8 @@ export default function SellerLogin() {
           }}
         >
           <img src={logo} alt="Property Express" style={{ height: '42px', marginBottom: '1.5rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} />
-          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.75rem', fontFamily: 'Outfit, sans-serif' }}>Seller Portal Access</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', lineHeight: '1.6', fontSize: '0.95rem' }}>Securely log in to review, manage, and sign your property agreements.</p>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.75rem', fontFamily: 'Outfit, sans-serif' }}>Owner Portal Access</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', lineHeight: '1.6', fontSize: '0.95rem' }}>Securely log in to review, manage, and sign your property sale or rental agreements.</p>
 
           <button 
             type="button"
@@ -120,7 +120,7 @@ export default function SellerLogin() {
               </>
             )}
           </button>
-          <p style={{ margin: '1.5rem 0 0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Only authorized sellers can access this portal.</p>
+          <p style={{ margin: '1.5rem 0 0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Only authorized owners can access this portal.</p>
 
           {(localError || authError) && (
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.875rem', marginTop: '1.5rem', background: 'rgba(239,68,68,0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.2)' }}>

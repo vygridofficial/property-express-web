@@ -104,17 +104,27 @@ function PropertyListingCard({ property, index }) {
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
     >
       <div className={styles.listingImgWrap}>
-        {property.status && property.status !== 'Active' && (
-          <span
-            className={styles.listingBadge}
-            style={{
-              background: property.status === 'For Rent' ? 'var(--color-primary)' : 'rgba(255,255,255,0.55)',
-              color: property.status === 'For Rent' ? '#fff' : '#222',
-            }}
-          >
-            {property.status}
-          </span>
-        )}
+        <span
+          className={styles.listingBadge}
+          style={{
+            background: property.status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || property.status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24'),
+            color: property.status === 'Inactive' ? '#222' : 'white',
+            border: property.status === 'Inactive' ? '1px solid #ccc' : 'none',
+            position: 'absolute',
+            top: '1rem',
+            left: '1rem',
+            zIndex: 10,
+            padding: '0.4rem 1rem',
+            borderRadius: '30px',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            boxShadow: '0 5px 15px rgba(0, 0, 0, 0.15)'
+          }}
+        >
+          {property.status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || property.status === 'For Rent') ? 'For Rent' : 'For Sale')}
+        </span>
 
         <div className={styles.slides}>
           {allImages.map((img, idx) => (
@@ -169,9 +179,13 @@ function PropertyListingCard({ property, index }) {
           )}
         </div>
         <div className={styles.titleWrap}>
-          <h3 className={styles.listingTitle}>{property.title}</h3>
+          <Link to={`/properties/${property.id}`} state={{ property }} className={styles.titleLink}>
+            <h3 className={styles.listingTitle}>{property.title}</h3>
+          </Link>
         </div>
-        <p className={styles.listingLocation}>📍 {property.location}</p>
+        <Link to={`/properties/${property.id}`} state={{ property }} className={styles.locationLink}>
+          <p className={styles.listingLocation}>📍 {property.location}</p>
+        </Link>
         {formatDate(property.createdAt) && (
           <div className={styles.listingAddedDate}>
             Added on: {formatDate(property.createdAt)}
@@ -236,6 +250,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
   }, [categoryId, siteSettings]);
 
   const [localFilters, setLocalFilters] = useState({
+    listingType: '',
     district: '',
     location: '',
     priceMax: '',
@@ -280,6 +295,7 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     const isAutoGeo = searchParams.get('autoGeo') === 'true';
 
     setLocalFilters({
+      listingType: '',
       district: '',
       location: isAutoGeo ? 'My Location' : '',
       priceMax: '',
@@ -390,6 +406,14 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
     // Filter Price
     if (localFilters.priceMax) {
       result = result.filter(img => (img.numericPrice || 0) <= parseFloat(localFilters.priceMax));
+    }
+
+    // Filter Listing Type
+    if (localFilters.listingType) {
+      result = result.filter(img => {
+        const type = img.listingType || (img.status === 'For Rent' ? 'Rent' : 'Sell');
+        return type === localFilters.listingType;
+      });
     }
 
     // Filter Subfilters (Taxonomy & Dynamic)
@@ -537,6 +561,14 @@ export default function CategoryHero({ categoryId, categoryTitle, onBack, livePr
                 {KERALA_DISTRICTS.map(dist => (
                   <option key={dist} value={dist}>{dist}</option>
                 ))}
+              </select>
+            </div>
+            <div className={styles.filterGroup}>
+              <label>Listing Type</label>
+              <select name="listingType" value={localFilters.listingType} onChange={handleFilterChange}>
+                <option value="">All Types</option>
+                <option value="Sell">For Sale</option>
+                <option value="Rent">For Rent</option>
               </select>
             </div>
             {(taxonomy?.subFilters?.length > 0 || dynamicKeys.length > 0) && (

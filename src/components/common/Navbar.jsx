@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Handshake } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScrolled } from '../../hooks/useScrolled';
 import styles from './Navbar.module.css';
@@ -29,6 +29,9 @@ export default function Navbar() {
             <NavLink to="/" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>Home</NavLink>
             <NavLink to="/properties" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>Properties</NavLink>
             <NavLink to="/about" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>About Us</NavLink>
+            <Link to="/agreements" className={styles.ownerPortalBtn}>
+              <Handshake size={15} /> Owner Portal
+            </Link>
             <NavLink to="/contact" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}>Contact</NavLink>
           </nav>
 
@@ -50,6 +53,9 @@ export default function Navbar() {
             <NavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</NavLink>
             <NavLink to="/properties" onClick={() => setIsMobileMenuOpen(false)}>Properties</NavLink>
             <NavLink to="/about" onClick={() => setIsMobileMenuOpen(false)}>About Us</NavLink>
+            <Link to="/agreements" className={styles.ownerPortalMobile} onClick={() => setIsMobileMenuOpen(false)}>
+              <Handshake size={16} /> Owner Portal
+            </Link>
             <NavLink to="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</NavLink>
             <Link to="/contact" className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Book a Visit</Link>
           </motion.div>

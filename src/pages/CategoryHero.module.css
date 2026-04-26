@@ -462,6 +462,18 @@
   margin-bottom: 0.4rem;
 }
 
+.titleLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.titleLink:hover .listingTitle {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .listingTitle {
   font-size: 1.15rem;
   font-weight: 600;
@@ -470,14 +482,28 @@
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.2s ease;
 }
 
 /* Animation removed per request */
+
+.locationLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.locationLink:hover .listingLocation {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 .listingLocation {
   font-size: 0.85rem;
   color: #888;
   margin-bottom: 0.25rem;
+  transition: color 0.2s ease;
 }
 
 .listingAddedDate {

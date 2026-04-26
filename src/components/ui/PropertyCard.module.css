@@ -202,6 +202,18 @@
   margin-bottom: 0.5rem;
 }
 
+.titleLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.titleLink:hover .title {
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  text-underline-offset: 3px;
+}
+
 .title {
   font-size: 1.5rem;
   font-weight: 400;
@@ -209,9 +221,26 @@
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.2s ease;
+}
+
+.titleLink:hover .title {
+  color: var(--color-primary);
 }
 
 /* Animation removed per request */
+
+.locationLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.locationLink:hover .location {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 .location {
   color: var(--color-text-light);
@@ -221,6 +250,7 @@
   margin-bottom: 0.25rem;
   font-size: 0.95rem;
   font-weight: 300;
+  transition: color 0.2s ease;
 }
 
 .addedDate {

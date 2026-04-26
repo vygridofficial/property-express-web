@@ -55,7 +55,7 @@ export default function AdminProperties() {
 
   // Expanded Form State
   const initialForm = {
-    title: '', category: '', status: 'Active', isFeatured: false,
+    title: '', category: '', status: 'Active', isFeatured: false, listingType: 'Sell',
     price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
     address: '', district: '', mapsUrl: '', 
     agentName: 'Property Express', 
@@ -112,6 +112,7 @@ export default function AdminProperties() {
 
       setFormData({
         title:       selectedProperty.title || '',
+        listingType: selectedProperty.listingType || 'Sell',
         category:    selectedProperty.category || 'Apartment',
         status:      selectedProperty.status || 'Active',
         isFeatured:  selectedProperty.isFeatured || false,
@@ -358,6 +359,7 @@ export default function AdminProperties() {
 
           const finalData = {
             title: formData.title,
+            listingType: formData.listingType || 'Sell',
             category: formData.category,
             status: formData.status,
             isFeatured: formData.isFeatured,
@@ -399,6 +401,7 @@ export default function AdminProperties() {
           setEditingId(null);
         setFormData({
             title: '',
+            listingType: 'Sell',
             category: '',
             status: 'Active',
             isFeatured: false,
@@ -805,7 +808,14 @@ export default function AdminProperties() {
                       {KERALA_DISTRICTS.map(dist => <option key={dist} value={dist}>{dist}</option>)}
                     </select>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <Label required>Listing Type</Label>
+                      <select value={formData.listingType} onChange={e => handleFormChange('listingType', e.target.value)} style={getInputStyle('listingType')}>
+                        <option value="Sell">Sell</option>
+                        <option value="Rent">Rent</option>
+                      </select>
+                    </div>
                     <div>
                       <Label required>Category</Label>
                       <select 

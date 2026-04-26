@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -288,8 +288,33 @@ export default function Home() {
       };
     });
   }, [allProps, isLocationDetected, mapCenter, zoomIndex, ZOOM_LEVELS]);
+  const trackRef = useRef(null);
+  const isHovered = useRef(false);
+
+  useEffect(() => {
+    let animationId;
+    const scroll = () => {
+      if (trackRef.current && !isHovered.current) {
+        // Adjust speed by changing the increment value
+        trackRef.current.scrollLeft += 0.8; 
+        
+        // When we've scrolled exactly halfway (the end of the first original set), loop back to 0
+        if (trackRef.current.scrollLeft >= (trackRef.current.scrollWidth - trackRef.current.clientWidth) / 2) {
+          trackRef.current.scrollLeft = 0;
+        }
+      }
+      animationId = requestAnimationFrame(scroll);
+    };
+    
+    if (reviews.length > 0) {
+      animationId = requestAnimationFrame(scroll);
+    }
+    
+    return () => cancelAnimationFrame(animationId);
+  }, [reviews.length]);
 
   const duplicatedTestimonials = reviews.length > 0 ? [...reviews, ...reviews] : [];
+
 
   return (
     <motion.div
@@ -519,7 +544,14 @@ export default function Home() {
 
           {reviews.length > 0 ? (
             <div className={styles.marqueeContainer}>
-              <div className={styles.marqueeTrack}>
+              <div 
+                className={styles.marqueeTrack}
+                ref={trackRef}
+                onMouseEnter={() => isHovered.current = true}
+                onMouseLeave={() => isHovered.current = false}
+                onTouchStart={() => isHovered.current = true}
+                onTouchEnd={() => isHovered.current = false}
+              >
                 {duplicatedTestimonials.map((t, idx) => (
                   <div key={idx} className={styles.testimonialCard}>
                     <div className={styles.stars}>
@@ -577,11 +609,11 @@ export default function Home() {
           >
             <div className={styles.sellerPortalContent}>
               <div className={styles.sellerPortalText}>
-                <h2 className={styles.sellerPortalTitle}>Are You a Property Owner?</h2>
-                <p className={styles.sellerPortalSubtitle}>List your properties with us and reach thousands of potential buyers. Experience a seamless selling journey.</p>
+                <h2 className={styles.sellerPortalTitle}>List Your Property — For Sale or Rent</h2>
+                <p className={styles.sellerPortalSubtitle}>Whether you're selling or renting out, list your property with us and connect with thousands of verified buyers and tenants. Experience a seamless, hassle-free journey.</p>
               </div>
               <Link to="/agreements" className={`btn ${styles.btnSellerPortal}`}>
-                <Handshake size={20} /> Seller Portal
+                <Handshake size={20} /> Owner Portal
               </Link>
             </div>
           </motion.div>

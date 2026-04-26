@@ -23,6 +23,28 @@ export default function PropertyCard({ property }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  
+  // Touch handlers for mobile swiping
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) {
+      setActiveSlide(i => (i + 1) % allImages.length);
+    } else if (distance < -minSwipeDistance) {
+      setActiveSlide(i => (i - 1 + allImages.length) % allImages.length);
+    }
+  };
 
   // Handle live data fallbacks
   const displayLocation = location || address || 'Location TBD';
@@ -35,6 +57,10 @@ export default function PropertyCard({ property }) {
   };
 
   const openLightbox = (index, e) => {
+    // Prevent opening lightbox if user was swiping
+    if (touchStart && touchEnd && Math.abs(touchStart - touchEnd) > minSwipeDistance) {
+      return;
+    }
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -72,18 +98,23 @@ export default function PropertyCard({ property }) {
       transition={{ duration: 0.3 }}
     >
       {/* Image Slideshow/Carousel */}
-      <div className={styles.carousel} onClick={(e) => openLightbox(activeSlide, e)}>
-        {status !== 'Active' && (
-          <span
-            className={styles.badge}
-            style={{
-              backgroundColor: status === 'For Rent' ? 'var(--color-primary)' : 'rgba(255,255,255,0.5)',
-              color: status === 'For Rent' ? 'white' : '#222'
-            }}
-          >
-            {status}
-          </span>
-        )}
+      <div 
+        className={styles.carousel} 
+        onClick={(e) => openLightbox(activeSlide, e)}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <span
+          className={styles.badge}
+          style={{
+            backgroundColor: status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24'),
+            color: status === 'Inactive' ? '#222' : 'white',
+            border: status === 'Inactive' ? '1px solid #ccc' : 'none'
+          }}
+        >
+          {status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'For Rent' : 'For Sale')}
+        </span>
 
         <div className={styles.zoomHint}>
           <ZoomIn size={16} /> Click to enlarge
@@ -135,11 +166,15 @@ export default function PropertyCard({ property }) {
           )}
         </div>
         <div className={styles.titleWrap}>
-          <h3 className={styles.title}>{title}</h3>
+          <Link to={`/properties/${id}`} state={{ property }} className={styles.titleLink}>
+            <h3 className={styles.title}>{title}</h3>
+          </Link>
         </div>
-        <div className={styles.location}>
-          <MapPin size={16} /> {displayLocation}{property.district ? `, ${property.district}` : ''}
-        </div>
+        <Link to={`/properties/${id}`} state={{ property }} className={styles.locationLink}>
+          <div className={styles.location}>
+            <MapPin size={16} /> {displayLocation}{property.district ? `, ${property.district}` : ''}
+          </div>
+        </Link>
         {(property.createdAt || property.addedOn) && (
           <div className={styles.addedDate}>
             Added on: {formatDate(property.createdAt || property.addedOn)}
