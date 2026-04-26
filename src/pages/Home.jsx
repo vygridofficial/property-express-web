@@ -348,7 +348,7 @@ export default function Home() {
           >
             <div>
               <FilterMenu 
-                filters={{ category: '', type: '', bhk: '', status: '', location: '', features: '' }}
+                filters={{ category: '', type: '', bhk: '', status: '', district: '', features: '' }}
                 properties={allProps}
                 isHorizontal={true}
                 showApplyButton={true}

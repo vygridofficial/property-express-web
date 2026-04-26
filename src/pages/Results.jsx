@@ -25,7 +25,7 @@ export default function Results() {
     type: query.get('type') || '',
     bhk: query.get('bhk') || '',
     status: query.get('status') || '',
-    location: query.get('location') || '',
+    district: query.get('district') || '',
     features: query.get('features') || ''
   });
 
@@ -36,7 +36,7 @@ export default function Results() {
       type: query.get('type') || '',
       bhk: query.get('bhk') || '',
       status: query.get('status') || '',
-      location: query.get('location') || '',
+      district: query.get('district') || '',
       features: query.get('features') || ''
     });
   }, [location.search]);
@@ -71,15 +71,18 @@ export default function Results() {
   };
 
   const clearFilters = () => {
-    const emptyFilters = { category: '', type: '', bhk: '', status: '', location: '', features: '' };
+    const emptyFilters = { category: '', type: '', bhk: '', status: '', district: '', features: '' };
     setFilters(emptyFilters);
     updateURLParams(emptyFilters);
   };
 
   const categoryToTypesMap = {
     'residential': ['villa', 'apartment', 'flat', 'residential'],
+    'residential properties': ['villa', 'apartment', 'flat', 'residential'],
     'commercial': ['commercial', 'office', 'shop', 'warehouse'],
+    'commercial properties': ['commercial', 'office', 'shop', 'warehouse'],
     'industrial': ['industrial', 'factory', 'land', 'warehouse'],
+    'industrial properties': ['industrial', 'factory', 'land', 'warehouse'],
     'agricultural': ['agricultural', 'farm', 'land'],
     'plot': ['plot', 'land', 'residential plot', 'commercial plot']
   };
@@ -139,7 +142,7 @@ export default function Results() {
         if (!statusMatch) match = false;
       }
 
-      if (filters.location && prop.location?.toLowerCase() !== filters.location.toLowerCase()) match = false;
+      if (filters.district && prop.district?.toLowerCase() !== filters.district.toLowerCase()) match = false;
 
       // Check features
       if (filters.features) {

@@ -1,6 +1,8 @@
 import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronDown, MapPin, Home, Layers } from 'lucide-react';
+import { useAdmin } from '../../admin/context/AdminContext';
+import { KERALA_DISTRICTS } from '../../data/districts';
 import styles from './FilterMenu.module.css';
 
 // Custom Select Component for Modern Look
@@ -71,11 +73,13 @@ export default function FilterMenu({
   isHorizontal = false,
   showApplyButton = false
 }) {
+  const { propertyTypes: adminPropertyTypes } = useAdmin();
+
   const [localFilters, setLocalFilters] = useState({
     status: filters.status || 'sale',
     category: filters.category || '',
     type: filters.type || '',
-    location: filters.location || ''
+    district: filters.district || ''
   });
 
   // Sync internal state if props change
@@ -84,7 +88,7 @@ export default function FilterMenu({
       status: filters.status || 'sale',
       category: filters.category || '',
       type: filters.type || '',
-      location: filters.location || ''
+      district: filters.district || ''
     });
   }, [filters]);
 
@@ -100,7 +104,7 @@ export default function FilterMenu({
   };
 
   const handleClear = () => {
-    const empty = { status: 'sale', category: '', type: '', location: '' };
+    const empty = { status: 'sale', category: '', type: '', district: '' };
     setLocalFilters(empty);
     if (!showApplyButton) onChange(empty);
     if (onClear) onClear();
@@ -111,29 +115,47 @@ export default function FilterMenu({
     else onChange(localFilters);
   };
 
-  const uniqueLocations = useMemo(() => {
-    if (!properties || properties.length === 0) return [];
-    const locs = properties.map(p => p.location?.trim()).filter(Boolean);
-    return [...new Set(locs)].sort();
-  }, [properties]);
-
   const categories = useMemo(() => {
-    if (!properties || properties.length === 0) return ['Residential', 'Commercial', 'Industrial'];
-    const cats = properties.map(p => p.category?.trim()).filter(Boolean);
-    const base = new Set(['Residential', 'Commercial', 'Industrial']);
-    cats.forEach(c => base.add(c));
+    const base = new Set(['Residential Properties', 'Commercial Properties', 'Industrial Properties']);
+    if (properties && properties.length > 0) {
+      properties.forEach(p => {
+        const c = p.category?.trim();
+        if (c) {
+          const lower = c.toLowerCase();
+          if (['villa', 'plot', 'category', 'apartment', 'flat'].includes(lower)) return;
+          
+          if (lower === 'residential') base.add('Residential Properties');
+          else if (lower === 'commercial') base.add('Commercial Properties');
+          else if (lower === 'industrial') base.add('Industrial Properties');
+          else base.add(c);
+        }
+      });
+    }
     return [...base].sort();
   }, [properties]);
 
   const uniqueTypes = useMemo(() => {
-    let relevantProps = properties;
     if (localFilters.category) {
-      relevantProps = properties.filter(p => p.category?.toLowerCase() === localFilters.category.toLowerCase());
+      const filterCat = localFilters.category.toLowerCase();
+      let targetCat = '';
+      if (filterCat === 'residential properties') targetCat = 'residential';
+      else if (filterCat === 'commercial properties') targetCat = 'commercial';
+      else if (filterCat === 'industrial properties') targetCat = 'industrial';
+      else targetCat = filterCat;
+
+      const categoryTypes = adminPropertyTypes?.filter(pt => pt.category?.toLowerCase() === targetCat) || [];
+      if (categoryTypes.length > 0) {
+        return categoryTypes.map(pt => pt.name).sort();
+      }
     }
-    if (!relevantProps || relevantProps.length === 0) return ['Apartment', 'Villa', 'Plot'];
-    const types = relevantProps.map(p => p.propertyType?.trim() || p.category?.trim()).filter(Boolean);
-    return [...new Set(types)].sort();
-  }, [properties, localFilters.category]);
+    
+    // If no category is selected, return all property types
+    if (adminPropertyTypes && adminPropertyTypes.length > 0) {
+      return adminPropertyTypes.map(pt => pt.name).sort();
+    }
+
+    return ['Apartment', 'Villa', 'Plot'];
+  }, [adminPropertyTypes, localFilters.category]);
 
   const activeFilterCount = Object.values(localFilters).filter(val => val && val !== 'sale').length;
 
@@ -183,13 +205,13 @@ export default function FilterMenu({
           icon={Home}
         />
 
-        {/* 4. City */}
+        {/* 4. District */}
         <CustomSelect 
-          label="City"
-          value={localFilters.location}
-          onChange={(v) => handleChange('location', v)}
-          options={uniqueLocations}
-          placeholder="All Cities"
+          label="District"
+          value={localFilters.district}
+          onChange={(v) => handleChange('district', v)}
+          options={KERALA_DISTRICTS}
+          placeholder="All Districts"
           icon={MapPin}
         />
       </div>

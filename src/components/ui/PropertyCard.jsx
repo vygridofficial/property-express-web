@@ -105,16 +105,7 @@ export default function PropertyCard({ property }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <span
-          className={styles.badge}
-          style={{
-            backgroundColor: status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24'),
-            color: status === 'Inactive' ? '#222' : 'white',
-            border: status === 'Inactive' ? '1px solid #ccc' : 'none'
-          }}
-        >
-          {status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'For Rent' : 'For Sale')}
-        </span>
+
 
         <div className={styles.zoomHint}>
           <ZoomIn size={16} /> Click to enlarge
@@ -159,6 +150,18 @@ export default function PropertyCard({ property }) {
       </div>
 
       <div className={styles.content}>
+        <div style={{ marginBottom: '0.75rem' }}>
+          <span
+            className={styles.badge}
+            style={{
+              backgroundColor: status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24'),
+              color: status === 'Inactive' ? '#222' : 'white',
+              border: status === 'Inactive' ? '1px solid #ccc' : 'none'
+            }}
+          >
+            {status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'For Rent' : 'For Sale')}
+          </span>
+        </div>
         <div className={styles.price}>
           {displayPrice} {status === 'For Rent' && <span className={styles.perMonth}>/mo</span>}
           {property.isFeatured && (
