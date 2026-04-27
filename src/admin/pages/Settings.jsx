@@ -110,8 +110,10 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    setDraft(siteSettings);
-  }, [siteSettings]);
+    if (!isDirty && !isSaving) {
+      setDraft(siteSettings);
+    }
+  }, [siteSettings, isDirty, isSaving]);
 
   const location = useLocation();
   useEffect(() => {

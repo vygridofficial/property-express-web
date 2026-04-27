@@ -28,8 +28,10 @@ export default function ContactSocial() {
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
-    setDraft(siteSettings);
-  }, [siteSettings]);
+    if (!isDirty) {
+      setDraft(siteSettings);
+    }
+  }, [siteSettings, isDirty]);
 
   // Derive phone code fields with fallback
   const primaryPhoneCode = draft.primaryPhoneCode || '+91';

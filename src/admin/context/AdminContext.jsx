@@ -385,8 +385,10 @@ export function AdminProvider({ children }) {
 
     // Auto-enable visibility for back-compatibility
     if (extendedData.isActive !== false) {
-      const updatedVis = { ...(siteSettings.visibility || {}), [trimmed]: true };
-      await updateSiteSettings({ visibility: updatedVis });
+      // Atomic update using dot notation
+      await updateDoc(doc(db, 'settings', 'global'), {
+        [`visibility.${trimmed}`]: true
+      });
     }
   };
 
@@ -406,10 +408,13 @@ export function AdminProvider({ children }) {
       }
       // Also migrate siteSettings visibility key
       if (siteSettings.visibility && siteSettings.visibility.hasOwnProperty(oldName)) {
-        const updatedVis = { ...(siteSettings.visibility) };
-        updatedVis[newName] = updatedVis[oldName];
-        delete updatedVis[oldName];
-        await updateSiteSettings({ visibility: updatedVis });
+        const val = siteSettings.visibility[oldName];
+        const ref = doc(db, 'settings', 'global');
+        // Atomic migration: delete old key and set new key
+        await updateDoc(ref, {
+          [`visibility.${oldName}`]: deleteField(),
+          [`visibility.${newName}`]: val
+        });
       }
     }
 
