@@ -809,7 +809,7 @@ export default function AdminProperties() {
                         {KERALA_DISTRICTS.map(dist => <option key={dist} value={dist}>{dist}</option>)}
                       </select>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '1rem' }}>
                       <div>
                         <Label required>Listing Type</Label>
                         <select value={formData.listingType} onChange={e => handleFormChange('listingType', e.target.value)} style={getInputStyle('listingType')}>
@@ -865,7 +865,7 @@ export default function AdminProperties() {
 
                   {/* Section 2 */}
                   <SectionHeading>Section 2 — Pricing & Size</SectionHeading>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <Label required>Price (₹)</Label>
                       <input type="number" placeholder="Enter price in ₹..." className="no-spinners" value={formData.price} onChange={e => handleFormChange('price', e.target.value)} style={getInputStyle('price')} />
@@ -878,7 +878,7 @@ export default function AdminProperties() {
                   <AnimatePresence>
                     {isRoomApplicable && (
                       <motion.div initial={{ height: 0, opacity: 0, marginTop: 0 }} animate={{ height: 'auto', opacity: 1, marginTop: '1rem' }} exit={{ height: 0, opacity: 0, marginTop: 0 }} style={{ overflow: 'hidden' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem' }}>
                           <div>
                             <Label>Bedrooms</Label>
                             <input type="number" placeholder="No. of bedrooms" className="no-spinners" value={formData.bedrooms} onChange={e => handleFormChange('bedrooms', e.target.value)} style={getInputStyle('bedrooms')} />
@@ -908,7 +908,7 @@ export default function AdminProperties() {
 
                   {/* Section 4 */}
                   <SectionHeading>Section 4 — Agent Details</SectionHeading>
-                  <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '1.5rem', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row' }}>
                     <div style={{ position: 'relative', width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.4)', border: '1px dashed var(--admin-stroke)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }} onClick={() => agentPhotoRef.current?.click()}>
                       {formData.agentPhoto ? (
                         <img src={formData.agentPhoto} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Agent" />
@@ -917,7 +917,7 @@ export default function AdminProperties() {
                       )}
                       <input type="file" accept="image/*" style={{ display: 'none' }} ref={agentPhotoRef} onChange={handleAgentPhoto} />
                     </div>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
                       <div>
                         <Label>Agent Name</Label>
                         <input type="text" placeholder="Assigned agent name..." value={formData.agentName} onChange={e => handleFormChange('agentName', e.target.value)} style={getInputStyle('agentName')} />
@@ -1025,7 +1025,7 @@ export default function AdminProperties() {
                       }
 
                       return (
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
                           {categoryFilters.map(filter => (
                             <div key={filter.key}>
                               <Label>{filter.label}</Label>
@@ -1056,7 +1056,7 @@ export default function AdminProperties() {
                     <Label>Other Manual Attributes</Label>
                     <p style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginBottom: '1rem' }}>Add extra characteristics not covered by the category defaults.</p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.5rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr auto', gap: '0.5rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
                       <input type="text" placeholder="e.g. Construction Year" value={dynKey} onChange={e => setDynKey(e.target.value)} style={getInputStyle('dynKey')} />
                       <input type="text" placeholder="e.g. 2024" value={dynVal} onChange={e => setDynVal(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addDynamicFilter(); } }} style={getInputStyle('dynVal')} />
                       <button className="btn" onClick={(e) => { e.preventDefault(); addDynamicFilter(); }} style={{ height: 43, background: '#18181a', color: 'white', borderRadius: 12, padding: '0 1.5rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}>Add</button>
