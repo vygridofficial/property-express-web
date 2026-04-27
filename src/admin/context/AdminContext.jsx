@@ -299,8 +299,8 @@ export function AdminProvider({ children }) {
   // updateCategoryTaxonomy merges new filters for a specific category
   const updateCategoryTaxonomy = async (categoryName, subFilters) => {
     const ref = doc(db, 'settings', 'global');
-    const newTaxonomy = { ...(siteSettings.taxonomy || {}), [categoryName]: { subFilters } };
-    await setDoc(ref, { taxonomy: newTaxonomy }, { merge: true });
+    // Use dot notation for atomic update of nested taxonomy field
+    await updateDoc(ref, { [`taxonomy.${categoryName}`]: { subFilters } });
   };
 
   // updateSiteSettings merges new fields, does NOT overwrite the whole doc.
@@ -416,9 +416,10 @@ export function AdminProvider({ children }) {
     // If isActive changed, sync visibility
     if (data.hasOwnProperty('isActive') && targetType) {
       const nameKey = data.name || targetType.name;
-      const updatedVis = { ...(siteSettings.visibility || {}) };
-      updatedVis[nameKey] = data.isActive;
-      await updateSiteSettings({ visibility: updatedVis });
+      // Atomic update using dot notation to avoid race conditions with other updates to siteSettings
+      await updateDoc(doc(db, 'settings', 'global'), {
+        [`visibility.${nameKey}`]: data.isActive
+      });
     }
 
     await updateDoc(doc(db, 'propertyTypes', id), data);
