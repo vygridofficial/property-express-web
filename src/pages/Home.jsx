@@ -320,7 +320,8 @@ export default function Home() {
           backgroundImage: `url("${siteSettings?.heroImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          '--hero-blur': `${siteSettings?.heroBlur !== undefined ? siteSettings.heroBlur : 4}px`
         }}
       >
         <div className={styles.heroSearchWrap}>

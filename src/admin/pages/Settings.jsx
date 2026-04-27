@@ -243,6 +243,27 @@ export default function Settings() {
                 ></textarea>
               </div>
               <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Hero Background Blur (px)</label>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input 
+                    type="number" 
+                    value={draft.heroBlur !== undefined ? draft.heroBlur : 4} 
+                    onChange={(e) => handleInputChange('heroBlur', Number(e.target.value))}
+                    style={{ width: '100%', maxWidth: 200, padding: '0.75rem', borderRadius: 8, border: '1px solid var(--admin-stroke)' }} 
+                  />
+                  <button 
+                    onClick={handleSave} 
+                    disabled={isSaving}
+                    style={{ background: '#18181a', color: 'white', border: 'none', borderRadius: 8, padding: '0.75rem 1.5rem', fontWeight: 600, cursor: isSaving ? 'wait' : 'pointer' }}
+                  >
+                    Save
+                  </button>
+                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                  Note: A value of 0 means no blur. 4-8 is a light blur, 12-16 is a heavy blur.
+                </p>
+              </div>
+              <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Hero Background Image</label>
                 <div style={{ 
                   display: 'flex', 

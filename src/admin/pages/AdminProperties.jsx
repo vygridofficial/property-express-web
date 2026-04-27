@@ -988,7 +988,22 @@ export default function AdminProperties() {
                           {amenity} <X size={12} style={{ cursor: 'pointer' }} onClick={() => toggleAmenity(amenity)} />
                         </span>
                       ))}
-                      <input type="text" placeholder="Type custom amenity & press Enter..." value={customAmenity} onChange={e => setCustomAmenity(e.target.value)} onKeyDown={handleCustomAmenity} style={{ ...getInputStyle('customAmenity'), padding: '0.4rem 1rem', width: 220, borderRadius: 20 }} />
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <input type="text" placeholder="Type custom amenity..." value={customAmenity} onChange={e => setCustomAmenity(e.target.value)} onKeyDown={handleCustomAmenity} style={{ ...getInputStyle('customAmenity'), padding: '0.4rem 1rem', width: 220, borderRadius: 20 }} />
+                        <button 
+                          className="btn" 
+                          onClick={(e) => { 
+                            e.preventDefault(); 
+                            if(customAmenity.trim()) { 
+                              toggleAmenity(customAmenity.trim()); 
+                              setCustomAmenity(''); 
+                            } 
+                          }} 
+                          style={{ background: '#18181a', color: 'white', border: 'none', borderRadius: 20, padding: '0 1.2rem', height: '100%', minHeight: 38, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                        >
+                          Add
+                        </button>
+                      </div>
                     </div>
                   </div>
 

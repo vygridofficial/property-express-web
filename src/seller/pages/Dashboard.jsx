@@ -201,7 +201,7 @@ export default function SellerDashboard() {
                     </div>
                   ))}
                 </div>
-              ) : (
+              ) : filtered.length > 0 ? (
                 <motion.div
                   key={`${statusFilter}-${search}`}
                   variants={containerVariants}
@@ -209,7 +209,7 @@ export default function SellerDashboard() {
                   animate="visible"
                   className={styles.agreementsGrid}
                 >
-                  {filtered.length > 0 && filtered.map(sub => (
+                  {filtered.map(sub => (
                     <motion.div key={sub.id} variants={itemVariants} layout className={styles.agreementCard}>
                       <div className={styles.cardHeader}>
                         {/* Left: icon + title + date */}
@@ -284,9 +284,9 @@ export default function SellerDashboard() {
                       </div>
                     </motion.div>
                   ))}
-
-                  {filtered.length === 0 && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={styles.empty}>
+                </motion.div>
+              ) : (
+                <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={styles.empty}>
                       <Home size={48} color="var(--stroke)" style={{ marginBottom: '1rem' }} />
                       <p style={{ color: 'var(--text-muted)' }}>
                         {search
@@ -303,8 +303,6 @@ export default function SellerDashboard() {
                           List Your First Property
                         </button>
                       )}
-                    </motion.div>
-                  )}
                 </motion.div>
               )}
             </AnimatePresence>
