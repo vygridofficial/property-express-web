@@ -78,8 +78,8 @@ export function AdminProvider({ children }) {
         console.log('Seeding initial property types...');
         const initialTypes = [
           { name: 'Apartment', category: 'residential' },
-          { name: 'Villa',     category: 'residential' },
-          { name: 'Plot',      category: 'residential' },
+          { name: 'Villa', category: 'residential' },
+          { name: 'Plot', category: 'residential' },
           { name: 'Commercial', category: 'commercial' },
           { name: 'Uncategorized', category: 'residential' },
         ];
@@ -177,8 +177,8 @@ export function AdminProvider({ children }) {
         id: d.id,
         type: 'New Enquiry',
         message: `New enquiry from ${d.data().name || 'Someone'}`,
-        time: d.data().createdAt?.toDate 
-          ? d.data().createdAt.toDate().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+        time: d.data().createdAt?.toDate
+          ? d.data().createdAt.toDate().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
           : (d.data().createdAt ? new Date(d.data().createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently'),
         read: readNotifs.includes(d.id),
         link: '/admin/inquiries'
@@ -238,8 +238,11 @@ export function AdminProvider({ children }) {
     showContactForm: true,
     taxonomy: {},
     heroImage: '',
+    storyTitle: 'Our Story',
+    storyText1: 'Founded in 2020, Property Express started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region\'s leading exclusive real estate agency.',
+    storyText2: 'We believe that finding a home should be an inspiring journey, not a stressful task. That\'s why we don\'t rely on external agents—every property listed is verified and managed by our in-house experts.',
     amenities: [
-      'Swimming Pool', '24/7 Security', 'Private Garage', 
+      'Swimming Pool', '24/7 Security', 'Private Garage',
       'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',
       'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
       'CCTV', 'Power Backup'
@@ -263,7 +266,7 @@ export function AdminProvider({ children }) {
         if (!data.amenities) {
           updateDoc(doc(db, 'settings', 'global'), {
             amenities: [
-              'Swimming Pool', '24/7 Security', 'Private Garage', 
+              'Swimming Pool', '24/7 Security', 'Private Garage',
               'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',
               'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
               'CCTV', 'Power Backup'
@@ -361,25 +364,25 @@ export function AdminProvider({ children }) {
     const trimmed = name?.trim();
     if (!trimmed) return;
     const slug = extendedData.slug || trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    
+
     // Check if ID or name exists
     const exists = propertyTypes.some(pt => pt.id.toLowerCase() === slug || pt.name.toLowerCase() === trimmed.toLowerCase());
     if (exists) return;
 
-    await setDoc(doc(db, 'propertyTypes', slug), { 
-      name: trimmed, 
+    await setDoc(doc(db, 'propertyTypes', slug), {
+      name: trimmed,
       slug,
-      isDefault: false, 
-      image: customImageUrl, 
-      filters, 
+      isDefault: false,
+      image: customImageUrl,
+      filters,
       category: extendedData.category || 'residential',
       subTypes: extendedData.subTypes || [],
       icon: extendedData.icon || 'Building2',
       isActive: extendedData.isActive !== false,
       order: propertyTypes.length,
-      createdAt: new Date() 
+      createdAt: new Date()
     });
-    
+
     // Auto-enable visibility for back-compatibility
     if (extendedData.isActive !== false) {
       const updatedVis = { ...(siteSettings.visibility || {}), [trimmed]: true };
@@ -421,7 +424,7 @@ export function AdminProvider({ children }) {
     await updateDoc(doc(db, 'propertyTypes', id), data);
   };
 
-  
+
   const removePropertyType = async (id) => {
     await deleteDoc(doc(db, 'propertyTypes', id));
   };
@@ -430,7 +433,7 @@ export function AdminProvider({ children }) {
     if (direction === 'up' && currentIndex > 0) {
       const currentId = propertyTypes[currentIndex].id;
       const prevId = propertyTypes[currentIndex - 1].id;
-      
+
       const batch = writeBatch(db);
       batch.update(doc(db, 'propertyTypes', currentId), { order: currentIndex - 1 });
       batch.update(doc(db, 'propertyTypes', prevId), { order: currentIndex });
@@ -438,7 +441,7 @@ export function AdminProvider({ children }) {
     } else if (direction === 'down' && currentIndex < propertyTypes.length - 1) {
       const currentId = propertyTypes[currentIndex].id;
       const nextId = propertyTypes[currentIndex + 1].id;
-      
+
       const batch = writeBatch(db);
       batch.update(doc(db, 'propertyTypes', currentId), { order: currentIndex + 1 });
       batch.update(doc(db, 'propertyTypes', nextId), { order: currentIndex });

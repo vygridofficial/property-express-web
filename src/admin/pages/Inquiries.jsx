@@ -202,40 +202,40 @@ export default function Inquiries() {
                             <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Property Enquiry For</span>
                             <p style={{ margin: '0.25rem 0 0', fontSize: '0.9rem', fontWeight: 600 }}>{inq.propertyTitle || inq.property}</p>
                           </div>
-                          
+
                           <div>
                             <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Client Message</span>
                             <p style={{ margin: '0.5rem 0 0', fontSize: '0.9rem', lineHeight: 1.6, background: 'rgba(0,0,0,0.02)', padding: '1rem', borderRadius: 12 }}>"{inq.message || 'No message provided.'}"</p>
                           </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                             <div>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Status</span>
-                                <div style={{ marginTop: '0.25rem' }} onClick={e => e.stopPropagation()}>
-                                  <select
-                                    value={inq.status}
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      if (val === 'responded') markResponded(inq.id);
-                                      else if (val === 'closed') markClosed(inq.id);
-                                      else updateInquiry(inq.id, { status: val });
-                                    }}
-                                    style={{
-                                      padding: '0.35rem 0.85rem', borderRadius: '20px', fontSize: '0.75rem',
-                                      fontWeight: 700, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'pointer', appearance: 'none',
-                                      ...getStatusStyle(inq.status)
-                                    }}
-                                  >
-                                    <option value="new">New</option>
-                                    <option value="responded">Responded</option>
-                                    <option value="closed">Closed</option>
-                                  </select>
-                                </div>
-                             </div>
-                             <div style={{ textAlign: 'right' }}>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Received On</span>
-                                <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem' }}>{inq.createdAt?.toDate ? inq.createdAt.toDate().toLocaleDateString() : inq.date}</p>
-                             </div>
+                            <div>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Status</span>
+                              <div style={{ marginTop: '0.25rem' }} onClick={e => e.stopPropagation()}>
+                                <select
+                                  value={inq.status}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === 'responded') markResponded(inq.id);
+                                    else if (val === 'closed') markClosed(inq.id);
+                                    else updateInquiry(inq.id, { status: val });
+                                  }}
+                                  style={{
+                                    padding: '0.35rem 0.85rem', borderRadius: '20px', fontSize: '0.75rem',
+                                    fontWeight: 700, textTransform: 'uppercase', border: 'none', outline: 'none', cursor: 'pointer', appearance: 'none',
+                                    ...getStatusStyle(inq.status)
+                                  }}
+                                >
+                                  <option value="new">New</option>
+                                  <option value="responded">Responded</option>
+                                  <option value="closed">Closed</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Received On</span>
+                              <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem' }}>{inq.createdAt?.toDate ? inq.createdAt.toDate().toLocaleDateString() : inq.date}</p>
+                            </div>
                           </div>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
@@ -268,8 +268,8 @@ export default function Inquiries() {
                                 </a>
                               )}
                             </div>
-                            <button 
-                              className="btn" 
+                            <button
+                              className="btn"
                               style={{ width: '100%', border: '1px solid var(--admin-stroke)', color: '#ed1b24', background: 'transparent', padding: '0.75rem', borderRadius: 12, fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                               onClick={(e) => { e.stopPropagation(); handleDelete(inq.id); }}
                             >
@@ -361,64 +361,64 @@ export default function Inquiries() {
                           borderLeft: inq.status?.toLowerCase() === 'new' ? '3px solid #ed1b24' : '3px solid transparent',
                         }}
                       >
-                          <td colSpan="7" style={{ padding: 0, borderBottom: '1px solid var(--admin-stroke)' }}>
-                            <div style={{ padding: '1.5rem 2rem 2rem' }}>
-                              {/* Message */}
-                              <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.75rem' }}>
-                                Message
-                              </h4>
-                              <p style={{ fontSize: '0.95rem', lineHeight: 1.7, color: 'var(--admin-text-body)', background: 'rgba(255,255,255,0.4)', padding: '1.25rem', borderRadius: 10, border: '1px solid var(--admin-stroke)', marginBottom: '1.5rem' }}>
-                                "{inq.message || 'No message provided.'}"
-                              </p>
+                        <td colSpan="7" style={{ padding: 0, borderBottom: '1px solid var(--admin-stroke)' }}>
+                          <div style={{ padding: '1.5rem 2rem 2rem' }}>
+                            {/* Message */}
+                            <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.75rem' }}>
+                              Message
+                            </h4>
+                            <p style={{ fontSize: '0.95rem', lineHeight: 1.7, color: 'var(--admin-text-body)', background: 'rgba(255,255,255,0.4)', padding: '1.25rem', borderRadius: 10, border: '1px solid var(--admin-stroke)', marginBottom: '1.5rem' }}>
+                              "{inq.message || 'No message provided.'}"
+                            </p>
 
-                              {/* Issue 7: WhatsApp & Email reply buttons */}
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-                                {/* WhatsApp button — uses phone number from enquiry */}
-                                {inq.phone && (
-                                  <a
-                                    href={buildWhatsAppUrl(inq)}
-                                    target="_blank" rel="noopener noreferrer"
-                                    onClick={() => markResponded(inq.id)}
-                                    style={{
-                                      display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                                      padding: '0.7rem 1.5rem', background: '#25D366', color: 'white',
-                                      borderRadius: 10, fontWeight: 600, fontSize: '0.9rem',
-                                      textDecoration: 'none', border: 'none', cursor: 'pointer',
-                                      fontFamily: 'Outfit, sans-serif',
-                                    }}
-                                  >
-                                    <Phone size={16} />
-                                    Reply on WhatsApp
-                                  </a>
-                                )}
+                            {/* Issue 7: WhatsApp & Email reply buttons */}
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+                              {/* WhatsApp button — uses phone number from enquiry */}
+                              {inq.phone && (
+                                <a
+                                  href={buildWhatsAppUrl(inq)}
+                                  target="_blank" rel="noopener noreferrer"
+                                  onClick={() => markResponded(inq.id)}
+                                  style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                                    padding: '0.7rem 1.5rem', background: '#25D366', color: 'white',
+                                    borderRadius: 10, fontWeight: 600, fontSize: '0.9rem',
+                                    textDecoration: 'none', border: 'none', cursor: 'pointer',
+                                    fontFamily: 'Outfit, sans-serif',
+                                  }}
+                                >
+                                  <Phone size={16} />
+                                  Reply on WhatsApp
+                                </a>
+                              )}
 
-                                {/* Email button — uses email from enquiry */}
-                                {inq.email && (
-                                  <a
-                                    href={buildEmailUrl(inq)}
-                                    onClick={() => markResponded(inq.id)}
-                                    style={{
-                                      display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                                      padding: '0.7rem 1.5rem', background: '#18181a', color: 'white',
-                                      borderRadius: 10, fontWeight: 600, fontSize: '0.9rem',
-                                      textDecoration: 'none', border: 'none', cursor: 'pointer',
-                                      fontFamily: 'Outfit, sans-serif',
-                                    }}
-                                  >
-                                    <Mail size={16} />
-                                    Reply via Email
-                                  </a>
-                                )}
+                              {/* Email button — uses email from enquiry */}
+                              {inq.email && (
+                                <a
+                                  href={buildEmailUrl(inq)}
+                                  onClick={() => markResponded(inq.id)}
+                                  style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                                    padding: '0.7rem 1.5rem', background: '#18181a', color: 'white',
+                                    borderRadius: 10, fontWeight: 600, fontSize: '0.9rem',
+                                    textDecoration: 'none', border: 'none', cursor: 'pointer',
+                                    fontFamily: 'Outfit, sans-serif',
+                                  }}
+                                >
+                                  <Mail size={16} />
+                                  Reply via Email
+                                </a>
+                              )}
 
-                                {/* If no contact info available */}
-                                {!inq.phone && !inq.email && (
-                                  <span style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontStyle: 'italic' }}>
-                                    No contact info available to reply.
-                                  </span>
-                                )}
-                              </div>
+                              {/* If no contact info available */}
+                              {!inq.phone && !inq.email && (
+                                <span style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontStyle: 'italic' }}>
+                                  No contact info available to reply.
+                                </span>
+                              )}
                             </div>
-                          </td>
+                          </div>
+                        </td>
                       </tr>
                     )}
                   </React.Fragment>

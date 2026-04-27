@@ -35,21 +35,21 @@ const CustomSelect = ({ label, value, onChange, options, placeholder, icon: Icon
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             className={styles.optionsDropdown}
             initial={{ opacity: 0, y: 5, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.98 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
           >
-            <div 
+            <div
               className={`${styles.optionItem} ${!value ? styles.selectedOption : ''}`}
               onClick={() => { onChange(''); setIsOpen(false); }}
             >
               {placeholder}
             </div>
             {options.map(opt => (
-              <div 
+              <div
                 key={opt}
                 className={`${styles.optionItem} ${value === opt ? styles.selectedOption : ''}`}
                 onClick={() => { onChange(opt); setIsOpen(false); }}
@@ -116,23 +116,8 @@ export default function FilterMenu({
   };
 
   const categories = useMemo(() => {
-    const base = new Set(['Residential Properties', 'Commercial Properties', 'Industrial Properties']);
-    if (properties && properties.length > 0) {
-      properties.forEach(p => {
-        const c = p.category?.trim();
-        if (c) {
-          const lower = c.toLowerCase();
-          if (['villa', 'plot', 'category', 'apartment', 'flat'].includes(lower)) return;
-          
-          if (lower === 'residential') base.add('Residential Properties');
-          else if (lower === 'commercial') base.add('Commercial Properties');
-          else if (lower === 'industrial') base.add('Industrial Properties');
-          else base.add(c);
-        }
-      });
-    }
-    return [...base].sort();
-  }, [properties]);
+    return ['Residential Properties', 'Commercial Properties', 'Industrial Properties'].sort();
+  }, []);
 
   const uniqueTypes = useMemo(() => {
     if (localFilters.category) {
@@ -148,7 +133,7 @@ export default function FilterMenu({
         return categoryTypes.map(pt => pt.name).sort();
       }
     }
-    
+
     // If no category is selected, return all property types
     if (adminPropertyTypes && adminPropertyTypes.length > 0) {
       return adminPropertyTypes.map(pt => pt.name).sort();
@@ -161,7 +146,7 @@ export default function FilterMenu({
 
   return (
     <div className={`${styles.filterCard} ${isHorizontal ? styles.horizontalVariant : ''}`}>
-      
+
       {/* 1. Modern Segmented Control with sliding background */}
       <div className={styles.segmentedControl}>
         {['sale', 'rent'].map((status) => (
@@ -186,7 +171,7 @@ export default function FilterMenu({
 
       <div className={styles.inputsGrid}>
         {/* 2. Category */}
-        <CustomSelect 
+        <CustomSelect
           label="Category"
           value={localFilters.category}
           onChange={(v) => handleChange('category', v)}
@@ -196,7 +181,7 @@ export default function FilterMenu({
         />
 
         {/* 3. Property Type */}
-        <CustomSelect 
+        <CustomSelect
           label="Property Type"
           value={localFilters.type}
           onChange={(v) => handleChange('type', v)}
@@ -206,7 +191,7 @@ export default function FilterMenu({
         />
 
         {/* 4. District */}
-        <CustomSelect 
+        <CustomSelect
           label="District"
           value={localFilters.district}
           onChange={(v) => handleChange('district', v)}
@@ -218,8 +203,8 @@ export default function FilterMenu({
 
       <div className={styles.actionsContainer}>
         {showApplyButton && (
-          <motion.button 
-            className={styles.searchBtn} 
+          <motion.button
+            className={styles.searchBtn}
             onClick={handleApply}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -227,7 +212,7 @@ export default function FilterMenu({
             <Search size={18} /> Search
           </motion.button>
         )}
-        
+
         {(!showApplyButton || activeFilterCount > 0) && (
           <button className={styles.clearBtn} onClick={handleClear}>
             Clear Filters

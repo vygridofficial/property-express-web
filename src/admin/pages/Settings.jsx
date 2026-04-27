@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
+import { useLocation } from 'react-router-dom';
 import { Check, Trash2, X, AlertCircle, Edit2, ArrowUp, ArrowDown, Save } from 'lucide-react';
 import styles from '../styles/admin.module.css';
 
@@ -33,7 +34,8 @@ const DEFAULT_IMAGES = {
   Villa: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
   Apartment: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
   Commercial: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  Plot: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+  Plot: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+  Uncategorized: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'
 };
 
 function useIsMobile() {
@@ -110,6 +112,18 @@ export default function Settings() {
   useEffect(() => {
     setDraft(siteSettings);
   }, [siteSettings]);
+
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash === '#property-types') {
+      const el = document.getElementById('property-types');
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     const textDirty = Object.keys(siteSettings).some(k => siteSettings[k] !== draft[k]);
@@ -273,6 +287,39 @@ export default function Settings() {
               </div>
             </div>
           </div>
+
+          <div style={{ marginTop: '0.5rem', padding: '1.5rem 0', borderTop: '1px solid var(--admin-stroke)' }}>
+            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>About Us - Our Story</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Story Title</label>
+                <input 
+                  type="text" 
+                  value={draft.storyTitle || ''} 
+                  onChange={(e) => handleInputChange('storyTitle', e.target.value)}
+                  style={{ width: '100%', maxWidth: 400 }} 
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Story Paragraph 1</label>
+                <textarea 
+                  rows={4} 
+                  value={draft.storyText1 || ''} 
+                  onChange={(e) => handleInputChange('storyText1', e.target.value)}
+                  style={{ width: '100%', maxWidth: 600, resize: 'vertical' }}
+                ></textarea>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Story Paragraph 2</label>
+                <textarea 
+                  rows={4} 
+                  value={draft.storyText2 || ''} 
+                  onChange={(e) => handleInputChange('storyText2', e.target.value)}
+                  style={{ width: '100%', maxWidth: 600, resize: 'vertical' }}
+                ></textarea>
+              </div>
+            </div>
+          </div>
           <hr style={{ border: 'none', borderTop: '1px solid var(--admin-stroke)', margin: '0.5rem 0' }} />
           <div>
             <ToggleRow 
@@ -296,13 +343,13 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className={styles.glassCard} style={{ marginBottom: '2rem' }}>
+      <div id="property-types" className={styles.glassCard} style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', margin: 0 }}>Property Types Management</h3>
           <button
             onClick={() => {
               setIsAddingNew(true);
-              setEditData({ id: '', name: '', slug: '', category: 'residential', icon: 'Building2', isActive: true, subTypes: [], image: null, isDefault: false });
+              setEditData({ id: '', name: '', slug: '', category: 'residential', icon: 'Building2', isActive: true, subTypes: [], image: null });
               setSubTypeInput('');
               setEditImage(null);
             }}
@@ -330,9 +377,6 @@ export default function Settings() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span style={{ fontWeight: 600, fontSize: isMobile ? '1rem' : '1.05rem', color: 'var(--admin-text-main)' }}>{cat.name}</span>
-                {cat.isDefault && (
-                  <span style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--admin-text-muted)', fontSize: '0.65rem', padding: '0.2rem 0.5rem', borderRadius: 12, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Default</span>
-                )}
               </div>
 
               <div style={{ 
@@ -383,7 +427,6 @@ export default function Settings() {
                       isActive: cat.isActive !== false,
                       subTypes: cat.subTypes || [],
                       image: cat.image || null,
-                      isDefault: cat.isDefault
                     });
                     setSubTypeInput('');
                     setEditImage(null);
@@ -542,12 +585,43 @@ export default function Settings() {
       <AnimatePresence>
         {isDirty && (
           <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
+            initial={{ opacity: 0, y: 50 }} 
             animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: 20 }}
-            style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', position: 'sticky', bottom: '2rem' }}
+            exit={{ opacity: 0, y: 50 }}
+            style={{ 
+              position: 'fixed', 
+              bottom: isMobile ? 'calc(70px + env(safe-area-inset-bottom))' : '2rem', 
+              right: isMobile ? 0 : '2rem',
+              left: isMobile ? 0 : 'auto',
+              padding: isMobile ? '1rem' : 0,
+              background: isMobile ? 'rgba(255,255,255,0.8)' : 'transparent',
+              backdropFilter: isMobile ? 'blur(10px)' : 'none',
+              WebkitBackdropFilter: isMobile ? 'blur(10px)' : 'none',
+              borderTop: isMobile ? '1px solid rgba(0,0,0,0.05)' : 'none',
+              display: 'flex', 
+              justifyContent: 'center',
+              zIndex: 1000,
+              boxShadow: isMobile ? '0 -10px 30px rgba(0,0,0,0.05)' : 'none'
+            }}
           >
-            <button className="btn" onClick={handleSave} disabled={isSaving} style={{ background: '#ed1b24', color: 'white', border: 'none', fontWeight: 700, padding: '1rem 3rem', boxShadow: '0 8px 30px rgba(237,27,36,0.3)', opacity: isSaving ? 0.6 : 1, cursor: isSaving ? 'wait' : 'pointer' }}>
+            <button 
+              className="btn" 
+              onClick={handleSave} 
+              disabled={isSaving} 
+              style={{ 
+                background: '#ed1b24', 
+                color: 'white', 
+                border: 'none', 
+                fontWeight: 700, 
+                padding: isMobile ? '1rem 0' : '1rem 3rem', 
+                width: isMobile ? '100%' : 'auto',
+                borderRadius: isMobile ? 12 : 8,
+                boxShadow: '0 8px 30px rgba(237,27,36,0.3)', 
+                opacity: isSaving ? 0.6 : 1, 
+                cursor: isSaving ? 'wait' : 'pointer',
+                fontSize: isMobile ? '1rem' : '0.9rem'
+              }}
+            >
               {isSaving ? 'Saving...' : 'Save Settings'}
             </button>
           </motion.div>
@@ -600,7 +674,7 @@ export default function Settings() {
                   <div style={{ width: 80, height: 56, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--admin-stroke)', flexShrink: 0, background: 'rgba(0,0,0,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {editImage
                       ? <img src={editImage} alt="New preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : (editData.image || (editData.isDefault && DEFAULT_IMAGES[editData.name]))
+                      : (editData.image || DEFAULT_IMAGES[editData.name])
                         ? <img src={editData.image || DEFAULT_IMAGES[editData.name]} alt="Current" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         : <span style={{ fontSize: '0.7rem', color: 'var(--admin-text-muted)', textAlign: 'center', padding: '0.25rem' }}>No Image</span>
                     }
@@ -608,7 +682,7 @@ export default function Settings() {
                   <div style={{ flex: 1 }}>
                     <label htmlFor="editImageInput" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1rem', background: '#1565C0', color: 'white', borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                      {editImage ? 'Change Image' : 'Upload Image'}
+                      {(editImage || editData.image || DEFAULT_IMAGES[editData.name]) ? 'Change Image' : 'Upload Image'}
                     </label>
                     <input 
                       id="editImageInput"
@@ -622,8 +696,13 @@ export default function Settings() {
                       }}
                     />
                     {editImage && (
-                      <button onClick={() => setEditImage(null)} style={{ display: 'block', marginTop: '0.4rem', background: 'none', border: 'none', color: 'var(--admin-text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}>
-                        ✕ Remove new selection
+                      <button onClick={() => setEditImage(null)} style={{ display: 'block', marginTop: '0.4rem', background: 'none', border: 'none', color: '#E53935', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>
+                        ✕ Cancel new selection
+                      </button>
+                    )}
+                    {!editImage && editData.image && (
+                      <button onClick={() => setEditData({ ...editData, image: null })} style={{ display: 'block', marginTop: '0.4rem', background: 'none', border: 'none', color: '#E53935', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>
+                        ✕ Remove custom image
                       </button>
                     )}
                   </div>

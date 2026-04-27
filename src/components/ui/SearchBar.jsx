@@ -35,7 +35,7 @@ export default function SearchBar({ properties = [] }) {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [hoveredIndex, setHoveredIndex] = useState(-1);
-  
+
   const wrapperRef = useRef(null);
   const navigate = useNavigate();
 
@@ -43,7 +43,7 @@ export default function SearchBar({ properties = [] }) {
     const locs = new Set(properties.map(p => p.location).filter(Boolean));
     return ['All Locations', ...Array.from(locs).sort()];
   }, [properties]);
-  
+
   const dropdownOptions = useMemo(() => {
     return {
       ...DROPDOWN_OPTIONS,
@@ -87,7 +87,7 @@ export default function SearchBar({ properties = [] }) {
       if (!groups[type]) groups[type] = [];
       groups[type].push(prop);
     });
-    
+
     return Object.entries(groups)
       .sort((a, b) => b[1].length - a[1].length)
       .map(([type, props]) => ({
@@ -106,11 +106,11 @@ export default function SearchBar({ properties = [] }) {
       return items;
     }
     if (debouncedQuery.length >= 3 && filteredResults.length === 0 && isPropertyTypeKeyword(debouncedQuery)) {
-       items.push({ type: 'type_filter_cta', category: getCategoryFromKeyword(debouncedQuery) });
+      items.push({ type: 'type_filter_cta', category: getCategoryFromKeyword(debouncedQuery) });
     } else {
-       groupedResults.forEach(group => {
-         group.items.forEach(prop => items.push({ type: 'property', data: prop }));
-       });
+      groupedResults.forEach(group => {
+        group.items.forEach(prop => items.push({ type: 'property', data: prop }));
+      });
     }
     return items;
   }, [debouncedQuery, filteredResults, groupedResults]);
@@ -167,9 +167,9 @@ export default function SearchBar({ properties = [] }) {
         setQuery(suggestion);
         return;
       }
-      
+
       if (e.key === 'ArrowRight') {
-         // Continue with default behavior if no suggestion
+        // Continue with default behavior if no suggestion
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -201,18 +201,18 @@ export default function SearchBar({ properties = [] }) {
     setIsFocused(false);
     const params = new URLSearchParams();
     if (query.trim()) params.set('q', query.trim());
-    
+
     // Convert click/enter category bypass to type param
     if (typeof forceCategory === 'string') {
       params.set('type', forceCategory);
     } else if (filters.type !== 'All Types') {
       params.set('type', filters.type);
     }
-    
+
     if (filters.location !== 'All Locations') params.set('location', filters.location);
     if (filters.price !== 'Any Price') params.set('price', filters.price);
     if (filters.sort !== 'Newest First') params.set('sort', filters.sort);
-    
+
     navigate(`/search?${params.toString()}`);
   };
 
@@ -231,7 +231,7 @@ export default function SearchBar({ properties = [] }) {
         <div className={styles.searchIcon}>
           <Search size={22} />
         </div>
-        
+
         {!query && (
           <div className={styles.marqueePlaceholder}>
             <div className={styles.marqueeContent}>
@@ -325,7 +325,7 @@ export default function SearchBar({ properties = [] }) {
             <div style={{ flex: 1, overflowY: 'auto', margin: '4px -14px 0', padding: '0 14px' }}>
               {/* Scenario 1: < 3 chars */}
               {debouncedQuery.length > 0 && debouncedQuery.length < 3 && (
-                <div 
+                <div
                   className={`${styles.quickActionRow} ${activeIndex === 0 ? styles.rowHighlighted : ''}`}
                   onClick={() => handleSearchSubmit()}
                   onMouseEnter={() => setHoveredIndex(0)}
@@ -346,7 +346,7 @@ export default function SearchBar({ properties = [] }) {
                     const typeCategory = getCategoryFromKeyword(debouncedQuery);
                     const typeData = map[typeCategory] || { emoji: '🏢', color: '#f5f5f5' };
                     return (
-                      <div 
+                      <div
                         className={`${styles.typeFilterRow} ${activeIndex === 0 ? styles.rowHighlighted : ''}`}
                         onClick={() => handleSearchSubmit(typeCategory)}
                         onMouseEnter={() => setHoveredIndex(0)}
@@ -415,7 +415,7 @@ export default function SearchBar({ properties = [] }) {
                           );
                         })}
                         {group.hasMore && (
-                          <div 
+                          <div
                             className={styles.moreLink}
                             onClick={() => handleSearchSubmit(group.type)}
                           >
@@ -432,7 +432,7 @@ export default function SearchBar({ properties = [] }) {
 
             {/* Footer */}
             {debouncedQuery.length >= 3 && filteredResults.length > 0 && (
-              <div 
+              <div
                 className={styles.seeAllFooter}
                 onClick={() => handleSearchSubmit()}
               >

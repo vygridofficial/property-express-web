@@ -192,7 +192,7 @@ export default function Dashboard() {
     return `mailto:${inq.email || ''}?subject=${subject}&body=${body}`;
   };
 
-  const COLORS = ['#18181a', '#555555', '#888888', '#bbbbbb'];
+  const COLORS = ['#ed1b24', '#18181a', '#3498db', '#9b59b6', '#f1c40f', '#2ecc71', '#e67e22', '#1abc9c'];
 
   const getStatusStyle = (status) => {
     const s = status?.toLowerCase();
@@ -220,7 +220,7 @@ export default function Dashboard() {
       >
         <StatCard title="Total Properties" value={stats.totalProperties} icon="🏘️" to="/admin/properties" />
         <StatCard title="Total Enquiries" value={stats.totalInquiries} icon="📩" to="/admin/inquiries" />
-        <StatCard title="Property Types" value={stats.propertyTypes} icon="🏷️" to="/admin/settings" />
+        <StatCard title="Property Types" value={stats.propertyTypes} icon="🏷️" to="/admin/settings#property-types" />
         <StatCard title="Pending Reviews" value={stats.pendingReviews} icon="⭐" to="/admin/reviews?filter=pending" />
       </motion.div>
 

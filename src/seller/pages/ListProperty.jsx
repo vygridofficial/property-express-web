@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Building, 
-  MapPin, 
-  Image as ImageIcon, 
-  CheckCircle2, 
+import {
+  Building,
+  MapPin,
+  Image as ImageIcon,
+  CheckCircle2,
   ChevronRight,
   ChevronLeft,
   Loader2,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 const DEFAULT_AMENITIES = [
-  'Swimming Pool', '24/7 Security', 'Private Garage', 
+  'Swimming Pool', '24/7 Security', 'Private Garage',
   'Central AC / Heating', 'Smart Home System', 'Outdoor BBQ Area',
   'City Water Supply', 'High-Speed Internet', 'Gym', 'Elevator',
   'CCTV', 'Power Backup'
@@ -46,7 +46,7 @@ function isBlockedByClientError(err) {
 export default function ListProperty() {
   const navigate = useNavigate();
   const { user, refreshAgreements } = useSeller();
-  
+
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -66,7 +66,7 @@ export default function ListProperty() {
           .filter(t => t.isActive)
           .sort((a, b) => a.order - b.order)
           .map(t => t.name);
-        
+
         setPropertyTypes(fromFirestore);
       } else {
         setPropertyTypes([]);
@@ -198,10 +198,10 @@ export default function ListProperty() {
   };
 
   const isStep1Valid = details.propertyTitle &&
-                       details.price &&
-                       details.location &&
-                       details.district &&
-                       (!details.phone || isValidPhone(details.phone, details.phoneCode));
+    details.price &&
+    details.location &&
+    details.district &&
+    (!details.phone || isValidPhone(details.phone, details.phoneCode));
   const isStep2Valid = terms.accuracy && terms.exclusivity && terms.commission;
 
   // Glassmorphic input style (inline for elements that can't use CSS modules easily)
@@ -326,7 +326,7 @@ export default function ListProperty() {
                     <label style={label}>Property Title *</label>
                     <input
                       type="text" value={details.propertyTitle}
-                      onChange={e => setDetails({...details, propertyTitle: e.target.value})}
+                      onChange={e => setDetails({ ...details, propertyTitle: e.target.value })}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
                   </div>
@@ -336,7 +336,7 @@ export default function ListProperty() {
                     <input
                       type="text" value={details.sellerName}
                       placeholder={user?.displayName || 'Leave empty to use Google name'}
-                      onChange={e => setDetails({...details, sellerName: e.target.value})}
+                      onChange={e => setDetails({ ...details, sellerName: e.target.value })}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
                   </div>
@@ -345,7 +345,7 @@ export default function ListProperty() {
                     <label style={label}>Listing Type</label>
                     <select
                       value={details.listingType}
-                      onChange={e => setDetails({...details, listingType: e.target.value})}
+                      onChange={e => setDetails({ ...details, listingType: e.target.value })}
                       style={{ ...inp, appearance: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '16px', paddingRight: '2.5rem' }}
                       onFocus={onFocus} onBlur={onBlur}
                     >
@@ -358,7 +358,7 @@ export default function ListProperty() {
                     <label style={label}>Property Type</label>
                     <select
                       value={details.propertyType}
-                      onChange={e => setDetails({...details, propertyType: e.target.value})}
+                      onChange={e => setDetails({ ...details, propertyType: e.target.value })}
                       style={{ ...inp, appearance: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '16px', paddingRight: '2.5rem' }}
                       onFocus={onFocus} onBlur={onBlur}
                     >
@@ -370,7 +370,7 @@ export default function ListProperty() {
                     <label style={label}>Expected Price (₹) *</label>
                     <input
                       type="number" value={details.price}
-                      onChange={e => setDetails({...details, price: e.target.value})}
+                      onChange={e => setDetails({ ...details, price: e.target.value })}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
                   </div>
@@ -379,7 +379,7 @@ export default function ListProperty() {
                     <label style={label}>Total Area (sq.ft)</label>
                     <input
                       type="number" value={details.area}
-                      onChange={e => setDetails({...details, area: e.target.value})}
+                      onChange={e => setDetails({ ...details, area: e.target.value })}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
                   </div>
@@ -389,7 +389,7 @@ export default function ListProperty() {
                     <input
                       type="number" value={details.bedrooms}
                       placeholder="e.g. 3"
-                      onChange={e => setDetails({...details, bedrooms: e.target.value})}
+                      onChange={e => setDetails({ ...details, bedrooms: e.target.value })}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
                   </div>
@@ -399,7 +399,7 @@ export default function ListProperty() {
                     <input
                       type="number" value={details.bathrooms}
                       placeholder="e.g. 2"
-                      onChange={e => setDetails({...details, bathrooms: e.target.value})}
+                      onChange={e => setDetails({ ...details, bathrooms: e.target.value })}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
                   </div>
@@ -467,7 +467,7 @@ export default function ListProperty() {
                     <input
                       type="text" value={details.location}
                       placeholder="e.g. Aluva, Kochi"
-                      onChange={e => setDetails({...details, location: e.target.value})}
+                      onChange={e => setDetails({ ...details, location: e.target.value })}
                       style={inp} onFocus={onFocus} onBlur={onBlur}
                     />
                   </div>
@@ -476,7 +476,7 @@ export default function ListProperty() {
                     <label style={label}>District *</label>
                     <select
                       value={details.district}
-                      onChange={e => setDetails({...details, district: e.target.value})}
+                      onChange={e => setDetails({ ...details, district: e.target.value })}
                       style={{ ...inp, appearance: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '16px', paddingRight: '2.5rem' }}
                       onFocus={onFocus} onBlur={onBlur}
                     >
@@ -491,7 +491,7 @@ export default function ListProperty() {
                     <label style={label}>Configuration</label>
                     <select
                       value={details.configuration}
-                      onChange={e => setDetails({...details, configuration: e.target.value})}
+                      onChange={e => setDetails({ ...details, configuration: e.target.value })}
                       style={{ ...inp, appearance: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '16px', paddingRight: '2.5rem' }}
                       onFocus={onFocus} onBlur={onBlur}
                     >
@@ -522,7 +522,7 @@ export default function ListProperty() {
                   <label style={label}>Full Address</label>
                   <input
                     type="text" value={details.address}
-                    onChange={e => setDetails({...details, address: e.target.value})}
+                    onChange={e => setDetails({ ...details, address: e.target.value })}
                     style={inp} onFocus={onFocus} onBlur={onBlur}
                   />
                 </div>
@@ -533,7 +533,7 @@ export default function ListProperty() {
                     type="url"
                     placeholder="https://maps.google.com/..."
                     value={details.googleMapLink}
-                    onChange={e => setDetails({...details, googleMapLink: e.target.value})}
+                    onChange={e => setDetails({ ...details, googleMapLink: e.target.value })}
                     style={inp} onFocus={onFocus} onBlur={onBlur}
                   />
                 </div>
@@ -542,7 +542,7 @@ export default function ListProperty() {
                   <label style={label}>Detailed Description</label>
                   <textarea
                     rows={4} value={details.description}
-                    onChange={e => setDetails({...details, description: e.target.value})}
+                    onChange={e => setDetails({ ...details, description: e.target.value })}
                     style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }}
                     onFocus={onFocus} onBlur={onBlur}
                   />
@@ -586,7 +586,7 @@ export default function ListProperty() {
 
                   {/* Term 1 */}
                   <div id="accuracy" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', scrollMarginTop: '1rem' }}>
-                    <input type="checkbox" id="t1" checked={terms.accuracy} onChange={e => setTerms({...terms, accuracy: e.target.checked})} style={{ width: 20, height: 20, marginTop: 4, accentColor: '#ed1b24', flexShrink: 0 }} />
+                    <input type="checkbox" id="t1" checked={terms.accuracy} onChange={e => setTerms({ ...terms, accuracy: e.target.checked })} style={{ width: 20, height: 20, marginTop: 4, accentColor: '#ed1b24', flexShrink: 0 }} />
                     <label htmlFor="t1" style={{ color: 'var(--text-main)', lineHeight: 1.6 }}>
                       <a href="#accuracy" style={{ color: '#ed1b24', textDecoration: 'none', fontWeight: 700 }} onClick={e => e.preventDefault()}>Accuracy of Information</a>
                       <span>: I declare that all info, metrics, and photos provided for <em>{details.propertyTitle || 'this property'}</em> are fully accurate and truthful.</span>
@@ -595,7 +595,7 @@ export default function ListProperty() {
 
                   {/* Term 2 */}
                   <div id="exclusivity" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', scrollMarginTop: '1rem' }}>
-                    <input type="checkbox" id="t2" checked={terms.exclusivity} onChange={e => setTerms({...terms, exclusivity: e.target.checked})} style={{ width: 20, height: 20, marginTop: 4, accentColor: '#ed1b24', flexShrink: 0 }} />
+                    <input type="checkbox" id="t2" checked={terms.exclusivity} onChange={e => setTerms({ ...terms, exclusivity: e.target.checked })} style={{ width: 20, height: 20, marginTop: 4, accentColor: '#ed1b24', flexShrink: 0 }} />
                     <label htmlFor="t2" style={{ color: 'var(--text-body)', lineHeight: 1.6 }}>
                       <a href="#exclusivity" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 700 }} onClick={e => e.preventDefault()}>Platform Exclusivity</a>
                       <span>: I agree to list this property on Property Express exclusively for a minimum period of 30 days pending admin approval.</span>
@@ -604,7 +604,7 @@ export default function ListProperty() {
 
                   {/* Term 3 */}
                   <div id="commission" style={{ display: 'flex', gap: '1rem', scrollMarginTop: '1rem' }}>
-                    <input type="checkbox" id="t3" checked={terms.commission} onChange={e => setTerms({...terms, commission: e.target.checked})} style={{ width: 20, height: 20, marginTop: 4, accentColor: '#ed1b24', flexShrink: 0 }} />
+                    <input type="checkbox" id="t3" checked={terms.commission} onChange={e => setTerms({ ...terms, commission: e.target.checked })} style={{ width: 20, height: 20, marginTop: 4, accentColor: '#ed1b24', flexShrink: 0 }} />
                     <label htmlFor="t3" style={{ color: 'var(--text-body)', lineHeight: 1.6 }}>
                       <a href="#commission" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 700 }} onClick={e => e.preventDefault()}>Commission Agreement</a>
                       <span>: I agree to the standard platform commission rate as discussed, payable only upon successful closing.</span>

@@ -5,7 +5,10 @@ import { revealVariants, revealViewport } from '../hooks/useScrollReveal';
 import SEO from '../components/common/SEO';
 import styles from './About.module.css';
 
+import { useAdmin } from '../admin/context/AdminContext';
+
 export default function About() {
+  const { siteSettings } = useAdmin();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -41,12 +44,12 @@ export default function About() {
             className={styles.storySection}
             variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
           >
-            <h2>Our Story</h2>
+            <h2>{siteSettings?.storyTitle || 'Our Story'}</h2>
             <p className={styles.storyText}>
-              Founded in 2020, Property Express started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region's leading exclusive real estate agency.
+              {siteSettings?.storyText1 || "Founded in 2020, Property Express started with a simple mission: to eliminate the friction from buying and renting premium properties. Fast forward to today, and we have become the region's leading exclusive real estate agency."}
             </p>
             <p className={styles.storyText}>
-              We believe that finding a home should be an inspiring journey, not a stressful task. That's why we don't rely on external agents—every property listed is verified and managed by our in-house experts.
+              {siteSettings?.storyText2 || "We believe that finding a home should be an inspiring journey, not a stressful task. That's why we don't rely on external agents—every property listed is verified and managed by our in-house experts."}
             </p>
           </motion.div>
         </div>

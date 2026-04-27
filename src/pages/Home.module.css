@@ -357,12 +357,41 @@
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding: 1rem 2rem;
+  padding: 1rem 2rem 2.5rem; /* Increased bottom padding for scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(24, 24, 26, 0.2) transparent;
+  scroll-behavior: smooth;
 }
 
 .marqueeTrack::-webkit-scrollbar {
-  display: none;
+  display: block;
+  height: 6px;
+}
+
+.marqueeTrack::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+  margin: 0 2rem;
+}
+
+.marqueeTrack::-webkit-scrollbar-thumb {
+  background: rgba(24, 24, 26, 0.15);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.marqueeTrack:hover::-webkit-scrollbar-thumb {
+  background: rgba(24, 24, 26, 0.4);
+}
+
+@media (max-width: 768px) {
+  .marqueeTrack {
+    scrollbar-width: none;
+    padding-bottom: 1rem;
+  }
+  .marqueeTrack::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .interactiveMapSection {

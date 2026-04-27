@@ -201,11 +201,11 @@ export default function Search() {
   const setFilterParam = (key, value) => {
     setOpenDropdown(null);
     const newParams = new URLSearchParams(searchParams);
-    const defaults = { 
-      sort: 'Newest First', 
-      type: 'All Types', 
-      location: 'All Locations', 
-      price: 'Any Price' 
+    const defaults = {
+      sort: 'Newest First',
+      type: 'All Types',
+      location: 'All Locations',
+      price: 'Any Price'
     };
 
     // Handle dynamic defaults (e.g. Any Furnishing)
@@ -248,17 +248,17 @@ export default function Search() {
 
   return (
     <div className={styles.pageWrap}>
-      <SEO 
-        title={`Search Results for "${query}"`} 
-        description={`Browse ${filteredResults.length} properties matching your search criteria.`} 
+      <SEO
+        title={`Search Results for "${query}"`}
+        description={`Browse ${filteredResults.length} properties matching your search criteria.`}
       />
 
       <header className={styles.pageHeader}>
         <div className="container">
           <div className={styles.headerContent}>
-            <button 
-               onClick={() => navigate(-1)}
-               className={styles.backBtn}
+            <button
+              onClick={() => navigate(-1)}
+              className={styles.backBtn}
             >
               &larr; Back
             </button>
@@ -301,7 +301,7 @@ export default function Search() {
             {CORE_FILTER_KEYS.map(key => {
               if (key === 'type' && isTypeDisabled) return null;
               if (key === 'location' && isLocationDisabled) return null;
-              
+
               const isActive = key === 'sort' ? filters[key] !== 'Newest First' : filters[key] !== 'All Types' && filters[key] !== 'All Locations' && filters[key] !== 'Any Price';
               return (
                 <div key={key} className={styles.filterGroup}>
@@ -312,7 +312,7 @@ export default function Search() {
                   >
                     {filters[key]} <ChevronDown size={14} />
                   </button>
-                  
+
                   <AnimatePresence>
                     {openDropdown === key && (
                       <motion.div
@@ -342,7 +342,7 @@ export default function Search() {
             {dynamicSubFilters.map(f => {
               const currentVal = filters[f.key];
               const isActive = currentVal && currentVal !== 'Any' && !currentVal.includes('Any');
-              
+
               return (
                 <div key={f.key} className={styles.filterGroup}>
                   <button
@@ -352,7 +352,7 @@ export default function Search() {
                   >
                     {isActive ? currentVal : f.label} <ChevronDown size={14} />
                   </button>
-                  
+
                   <AnimatePresence>
                     {openDropdown === f.key && (
                       <motion.div
@@ -395,10 +395,10 @@ export default function Search() {
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ 
-                      duration: 0.5, 
+                    transition={{
+                      duration: 0.5,
                       delay: idx * 0.08,
-                      ease: "easeOut" 
+                      ease: "easeOut"
                     }}
                     layout
                   >

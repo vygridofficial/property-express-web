@@ -16,6 +16,7 @@ import { useInView } from 'framer-motion';
 import SEO from '../components/common/SEO';
 import SearchBar from '../components/ui/SearchBar';
 import FilterMenu from '../components/ui/FilterMenu';
+import { useAdmin } from '../admin/context/AdminContext';
 
 import { getPropertyCoordinates, getDistanceFromLatLonInKm, deg2rad } from '../utils/geo';
 
@@ -148,8 +149,8 @@ export default function Home() {
   const [isLocationDetected, setIsLocationDetected] = useState(() => {
     return sessionStorage.getItem('isLocationDetected') === 'true';
   });
+  const { siteSettings, propertyTypes } = useAdmin();
   const [allProps, setAllProps] = useState([]);
-  const [siteSettings, setSiteSettings] = useState(null);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -222,20 +223,7 @@ export default function Home() {
       setReviews(data.filter(r => r.status?.toLowerCase() === 'approved'));
     });
     
-    // Real-time site settings sync
-    const unsubscribe = onSnapshot(doc(db, 'settings', 'global'), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        console.log("Home: Received site settings:", data);
-        setSiteSettings(data);
-      } else {
-        console.log("Home: Site settings document does not exist");
-      }
-    }, (err) => {
-      console.error("Home: Error fetching site settings:", err);
-    });
-
-    return () => unsubscribe();
+    return () => {};
   }, []);
 
   // Group properties by matching location string (case-insensitive approximation)
@@ -371,7 +359,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.3 }}
               style={{ fontSize: '2.5rem', marginBottom: '1rem' }}
             >
-              {siteSettings?.heroTitle || 'Find Your Perfect Property'}
+              {siteSettings.heroTitle || 'Find Your Perfect Property'}
             </motion.h1>
             <motion.p
               className={styles.heroSubtitle}
@@ -380,7 +368,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.4 }}
               style={{ fontSize: '1.1rem', marginBottom: '2rem', maxWidth: '800px' }}
             >
-              {siteSettings?.heroDescription || 'Discover the most premium luxury villas, apartments, and plots available.'}
+              {siteSettings.heroDescription || 'Discover the most premium luxury villas, apartments, and plots available.'}
             </motion.p>
             
             <motion.div
