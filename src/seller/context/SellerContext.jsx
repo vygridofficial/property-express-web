@@ -7,6 +7,8 @@ import {
 import { auth, googleProvider } from '../../firebase';
 import { getAgreementsForSeller } from '../../services/agreementService';
 import { getMySubmissions, deleteSubmission } from '../../services/submissionService';
+import { db } from '../../firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 const SellerContext = createContext();
 
@@ -17,6 +19,7 @@ export const SellerProvider = ({ children }) => {
   const [agreements, setAgreements] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [siteSettings, setSiteSettings] = useState(null);
   const [authError, setAuthError] = useState(null);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('sellerTheme') || 'light';
@@ -29,6 +32,15 @@ export const SellerProvider = ({ children }) => {
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'global'), (docSnap) => {
+      if (docSnap.exists()) {
+        setSiteSettings(docSnap.data());
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -81,6 +93,7 @@ export const SellerProvider = ({ children }) => {
     isAuthenticated: !!user,
     theme,
     toggleTheme,
+    siteSettings,
     loginWithGoogle,
     logout,
     refreshAgreements: async () => {

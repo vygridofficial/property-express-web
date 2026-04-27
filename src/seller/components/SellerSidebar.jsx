@@ -10,7 +10,8 @@ import {
   LayoutDashboard,
   Moon,
   Sun,
-  Plus
+  Plus,
+  MessageSquare
 } from 'lucide-react';
 import { useSeller } from '../context/SellerContext';
 import styles from '../styles/seller.module.css';
@@ -18,7 +19,7 @@ import logo from '../../assets/logo.png';
 
 export default function SellerSidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const { logout, theme, toggleTheme } = useSeller();
+  const { logout, theme, siteSettings } = useSeller();
 
   const NavItem = ({ to, icon: Icon, label, end }) => (
     <NavLink 
@@ -125,6 +126,44 @@ export default function SellerSidebar() {
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
+        
+        {/* ── Help Contact CTA ── */}
+        {(siteSettings?.sellerHelpPhone) && (
+          <a
+            href={`https://wa.me/${(siteSettings.sellerHelpPhoneCode || '+91').replace('+', '')}${siteSettings.sellerHelpPhone.replace(/[^0-9]/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Contact Support"
+            style={{ 
+              display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start', gap: '0.6rem',
+              background: 'rgba(21, 101, 192, 0.1)',
+              color: '#1565C0', borderRadius: 14, fontWeight: 700, fontSize: '0.9rem',
+              padding: collapsed ? '0.85rem' : '0.85rem 1.25rem',
+              textDecoration: 'none', border: '1px solid rgba(21, 101, 192, 0.2)',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(21, 101, 192, 0.2)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(21, 101, 192, 0.1)';
+            }}
+          >
+            <MessageSquare size={18} style={{ minWidth: 18 }} />
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
+                >
+                  Contact Help
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </a>
+        )}
 
         {/* Logout — always visible; icon-only when collapsed */}
         <button

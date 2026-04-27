@@ -233,6 +233,8 @@ export function AdminProvider({ children }) {
     googleMapsEmbed: '',
     instagramUrl: '',
     facebookUrl: '',
+    sellerHelpPhone: '',
+    sellerHelpPhoneCode: '+91',
     customCategories: [],
     showReviews: true,
     showContactForm: true,

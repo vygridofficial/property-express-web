@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
 import { useLocation } from 'react-router-dom';
-import { Check, Trash2, X, AlertCircle, Edit2, ArrowUp, ArrowDown, Save } from 'lucide-react';
+import { Check, Trash2, X, AlertCircle, Edit2, ArrowUp, ArrowDown, Save, Headphones } from 'lucide-react';
 import styles from '../styles/admin.module.css';
+import PhoneInput from '../../components/common/PhoneInput';
 
 const ToggleRow = ({ label, checked, onToggle }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 0', borderBottom: '1px solid var(--admin-stroke)' }}>
@@ -202,6 +203,22 @@ export default function Settings() {
               onChange={(e) => handleInputChange('tagline', e.target.value)}
               style={{ width: '100%', maxWidth: 400 }} 
             />
+          </div>
+          
+          <div style={{ marginTop: '0.5rem', padding: '1.5rem 0', borderTop: '1px solid var(--admin-stroke)' }}>
+            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Headphones size={18} /> Owner Portal Settings
+            </h4>
+            <div style={{ maxWidth: 400 }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Help Contact Number (for Owner Portal)</label>
+              <PhoneInput
+                value={draft.sellerHelpPhone || ''}
+                countryCode={draft.sellerHelpPhoneCode || '+91'}
+                onChange={(phone, code) => setDraft(prev => ({ ...prev, sellerHelpPhone: phone, sellerHelpPhoneCode: code }))}
+                placeholder="Phone number"
+              />
+              <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.5rem' }}>This number will be displayed as the primary support contact in the Owner Portal dashboard.</p>
+            </div>
           </div>
 
           <div style={{ marginTop: '0.5rem', padding: '1.5rem 0', borderTop: '1px solid var(--admin-stroke)' }}>
