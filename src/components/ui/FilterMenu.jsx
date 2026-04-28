@@ -79,7 +79,8 @@ export default function FilterMenu({
     status: filters.status || 'sale',
     category: filters.category || '',
     type: filters.type || '',
-    district: filters.district || ''
+    district: filters.district || '',
+    condition: filters.condition || ''
   });
 
   // Sync internal state if props change
@@ -88,7 +89,8 @@ export default function FilterMenu({
       status: filters.status || 'sale',
       category: filters.category || '',
       type: filters.type || '',
-      district: filters.district || ''
+      district: filters.district || '',
+      condition: filters.condition || ''
     });
   }, [filters]);
 
@@ -104,7 +106,7 @@ export default function FilterMenu({
   };
 
   const handleClear = () => {
-    const empty = { status: 'sale', category: '', type: '', district: '' };
+    const empty = { status: 'sale', category: '', type: '', district: '', condition: '' };
     setLocalFilters(empty);
     if (!showApplyButton) onChange(empty);
     if (onClear) onClear();
@@ -198,6 +200,16 @@ export default function FilterMenu({
           options={KERALA_DISTRICTS}
           placeholder="All Districts"
           icon={MapPin}
+        />
+
+        {/* 5. Condition */}
+        <CustomSelect
+          label="Condition"
+          value={localFilters.condition}
+          onChange={(v) => handleChange('condition', v)}
+          options={['New Property', 'Used Property']}
+          placeholder="Any Condition"
+          icon={Layers}
         />
       </div>
 

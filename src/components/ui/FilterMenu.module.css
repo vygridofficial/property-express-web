@@ -139,6 +139,8 @@
   color: #888;
   font-weight: 500;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .valueRow {
@@ -167,6 +169,8 @@
   font-weight: 500;
   color: #aaa;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chevron {
