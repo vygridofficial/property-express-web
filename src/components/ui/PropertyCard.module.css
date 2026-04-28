@@ -54,11 +54,12 @@
   align-items: center;
   justify-content: center;
   z-index: 4;
-  opacity: 1; /* Made persistently visible as requested */
+  opacity: 1;
+  /* Made persistently visible as requested */
   transition: transform 0.2s, background 0.2s;
   line-height: 1;
   padding: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .slideArrow:hover {
@@ -291,7 +292,7 @@
   .slideArrow {
     opacity: 1;
   }
-  
+
   .cardActions {
     flex-direction: row;
     gap: 8px;
@@ -328,6 +329,7 @@
     display: none !important;
   }
 }
+
 .zoomHint {
   position: absolute;
   top: 50%;

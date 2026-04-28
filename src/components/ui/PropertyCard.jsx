@@ -136,17 +136,25 @@ export default function PropertyCard({ property }) {
       </div>
 
       <div className={styles.content}>
-        <div style={{ marginBottom: '0.75rem' }}>
+        <div style={{ marginBottom: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span
             className={styles.badge}
             style={{
-              backgroundColor: status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24'),
+              backgroundColor: status === 'Inactive' ? 'rgba(255,255,255,0.8)' : ((property.listingType === 'Rent' || status === 'For Rent') ? '#007bff' : '#ed1b24'),
               color: status === 'Inactive' ? '#222' : 'white',
               border: status === 'Inactive' ? '1px solid #ccc' : 'none'
             }}
           >
             {status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || status === 'For Rent') ? 'For Rent' : 'For Sale')}
           </span>
+          {property.isUsedProperty && (
+            <span
+              className={styles.badge}
+              style={{ backgroundColor: 'black', color: 'white', border: 'none' }}
+            >
+              Used
+            </span>
+          )}
         </div>
         <div className={styles.price}>
           {displayPrice} {status === 'For Rent' && <span className={styles.perMonth}>/mo</span>}

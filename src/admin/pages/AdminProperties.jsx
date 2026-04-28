@@ -56,6 +56,7 @@ export default function AdminProperties() {
   // Expanded Form State
   const initialForm = {
     title: '', category: '', status: 'Active', isFeatured: false, listingType: 'Sell',
+    isUsedProperty: false,
     price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
     address: '', district: '', mapsUrl: '',
     agentName: 'Property Express',
@@ -116,6 +117,7 @@ export default function AdminProperties() {
         category: selectedProperty.category || 'Apartment',
         status: selectedProperty.status || 'Active',
         isFeatured: selectedProperty.isFeatured || false,
+        isUsedProperty: selectedProperty.isUsedProperty || false,
         price: priceForField,
         area: selectedProperty.area || '',
         areaUnit: selectedProperty.areaUnit || 'sqft',
@@ -125,7 +127,23 @@ export default function AdminProperties() {
         district: selectedProperty.district || '',
         mapsUrl: selectedProperty.mapsUrl || '',
         agentName: selectedProperty.agentName || '',
-        agentPhone: selectedProperty.agentPhone?.replace(/^\+\d+\s*/, '') || selectedProperty.agentPhone || '',
+        agentPhone: (() => {
+          if (!selectedProperty.agentPhone) return '';
+          let phone = selectedProperty.agentPhone;
+          const code = selectedProperty.agentPhoneCode || '+91';
+          
+          // Remove duplicated country codes (e.g. +91+9145146)
+          while (phone.startsWith(code)) {
+            phone = phone.slice(code.length).trim();
+          }
+          
+          // If it still starts with a '+', it's likely a corrupted code
+          if (phone.startsWith('+')) {
+            phone = phone.replace(/^\+\d+\s*/, '');
+          }
+          
+          return phone;
+        })(),
         agentPhoneCode: selectedProperty.agentPhoneCode || '+91',
         agentPhoto: selectedProperty.agentPhoto || null,
         description: selectedProperty.description || '',
@@ -363,6 +381,7 @@ export default function AdminProperties() {
         category: formData.category,
         status: formData.status,
         isFeatured: formData.isFeatured,
+        isUsedProperty: formData.isUsedProperty || false,
         price: formattedPriceValue,
         numericPrice: numericPriceValue,
         area: formData.area,
@@ -405,6 +424,7 @@ export default function AdminProperties() {
         category: '',
         status: 'Active',
         isFeatured: false,
+        isUsedProperty: false,
         price: '',
         area: '',
         bedrooms: 2,
@@ -841,14 +861,26 @@ export default function AdminProperties() {
                         </select>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <label style={{ position: 'relative', display: 'inline-block', width: 44, height: 24 }}>
-                        <input type="checkbox" checked={formData.isFeatured} onChange={e => handleFormChange('isFeatured', e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
-                        <span style={{ position: 'absolute', cursor: 'pointer', inset: 0, background: formData.isFeatured ? '#18181a' : 'rgba(0,0,0,0.1)', borderRadius: 24, transition: '0.3s' }}>
-                          <span style={{ position: 'absolute', height: 18, width: 18, left: 3, bottom: 3, background: 'white', borderRadius: '50%', transition: '0.3s', transform: formData.isFeatured ? 'translateX(20px)' : 'translateX(0)' }}></span>
-                        </span>
-                      </label>
-                      <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Is Featured?</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <label style={{ position: 'relative', display: 'inline-block', width: 44, height: 24 }}>
+                          <input type="checkbox" checked={formData.isFeatured} onChange={e => handleFormChange('isFeatured', e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+                          <span style={{ position: 'absolute', cursor: 'pointer', inset: 0, background: formData.isFeatured ? '#18181a' : 'rgba(0,0,0,0.1)', borderRadius: 24, transition: '0.3s' }}>
+                            <span style={{ position: 'absolute', height: 18, width: 18, left: 3, bottom: 3, background: 'white', borderRadius: '50%', transition: '0.3s', transform: formData.isFeatured ? 'translateX(20px)' : 'translateX(0)' }}></span>
+                          </span>
+                        </label>
+                        <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Is Featured?</span>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <label style={{ position: 'relative', display: 'inline-block', width: 44, height: 24 }}>
+                          <input type="checkbox" checked={formData.isUsedProperty} onChange={e => handleFormChange('isUsedProperty', e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+                          <span style={{ position: 'absolute', cursor: 'pointer', inset: 0, background: formData.isUsedProperty ? '#18181a' : 'rgba(0,0,0,0.1)', borderRadius: 24, transition: '0.3s' }}>
+                            <span style={{ position: 'absolute', height: 18, width: 18, left: 3, bottom: 3, background: 'white', borderRadius: '50%', transition: '0.3s', transform: formData.isUsedProperty ? 'translateX(20px)' : 'translateX(0)' }}></span>
+                          </span>
+                        </label>
+                        <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Is Used Property?</span>
+                      </div>
                     </div>
                   </div>
 

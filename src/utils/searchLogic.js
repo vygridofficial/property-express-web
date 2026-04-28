@@ -9,7 +9,7 @@ export const normalizeSearchQuery = (query) => {
     'plots': 'plot',
     'penthouses': 'penthouse'
   };
-  
+
   if (pluralToSingular[q]) {
     q = pluralToSingular[q];
   } else if (q.endsWith('es') && q.length > 3) {
@@ -75,7 +75,7 @@ export const normalizeLocationsInText = (text) => {
 export const parsePhraseQuery = (query, knownLocations = []) => {
   let result = { type: null, locationSearch: null, freeText: query };
   if (!query) return result;
-  
+
   // Pre-process aliases
   const qLower = normalizeLocationsInText(query);
   result.freeText = qLower;
@@ -94,94 +94,94 @@ export const parsePhraseQuery = (query, knownLocations = []) => {
   // Explicit location preposition matcher "in/at/near/around"
   const inMatch = qLower.match(/^(.*?)\s*((?:in|at|near|around)\s+(.+))$/i);
   if (inMatch) {
-     const locPart = inMatch[2]; 
-     const actualLoc = locPart.replace(/^(in|at|near|around)\s+/i, '').trim();
+    const locPart = inMatch[2];
+    const actualLoc = locPart.replace(/^(in|at|near|around)\s+/i, '').trim();
 
-     result.locationSearch = actualLoc;
-     result.freeText = result.freeText.replace(locPart, '').trim();
-     
-     // Extract type before "in" if not already captured
-     if (!result.type) {
-        const beforeLoc = inMatch[1].trim(); 
-        const parts = beforeLoc.split(/\s+/);
-        if (parts.length > 0) {
-          const typeCatBefore = getCategoryFromKeyword(parts[parts.length - 1]);
-          if (typeCatBefore) {
-            result.type = typeCatBefore;
-            result.freeText = result.freeText.replace(parts[parts.length - 1], '').trim();
-          }
+    result.locationSearch = actualLoc;
+    result.freeText = result.freeText.replace(locPart, '').trim();
+
+    // Extract type before "in" if not already captured
+    if (!result.type) {
+      const beforeLoc = inMatch[1].trim();
+      const parts = beforeLoc.split(/\s+/);
+      if (parts.length > 0) {
+        const typeCatBefore = getCategoryFromKeyword(parts[parts.length - 1]);
+        if (typeCatBefore) {
+          result.type = typeCatBefore;
+          result.freeText = result.freeText.replace(parts[parts.length - 1], '').trim();
         }
-     }
+      }
+    }
   }
 
   // Scan against known Dictionary Locations if no preposition was used
   if (!result.locationSearch && knownLocations && knownLocations.length > 0) {
-      const normalizedLocs = knownLocations
-          .filter(l => l && l !== 'All Locations')
-          .map(l => ({ original: l, normalized: normalizeLocationsInText(l) }));
-          
-      // Sort to match longest location first (e.g. "Navi Mumbai" before "Mumbai")
-      normalizedLocs.sort((a,b) => b.normalized.length - a.normalized.length);
+    const normalizedLocs = knownLocations
+      .filter(l => l && l !== 'All Locations')
+      .map(l => ({ original: l, normalized: normalizeLocationsInText(l) }));
 
-      for (const locObj of normalizedLocs) {
-          // Splitting by comma allows extracting primary city from "Kochi, Kerala"
-          const dbParts = locObj.normalized.split(',').map(p => p.trim()).filter(p => p.length >= 3);
-          
-          let matchedPart = null;
-          for (const part of dbParts) {
-             const regex = new RegExp(`\\b${part}\\b`, 'i');
-             if (regex.test(qLower)) {
-                 matchedPart = part;
-                 break;
-             }
-          }
+    // Sort to match longest location first (e.g. "Navi Mumbai" before "Mumbai")
+    normalizedLocs.sort((a, b) => b.normalized.length - a.normalized.length);
 
-          if (matchedPart) {
-              result.locationSearch = locObj.original;
-              result.freeText = result.freeText.replace(new RegExp(`\\b${matchedPart}\\b`, 'gi'), '').trim();
-              break;
-          }
+    for (const locObj of normalizedLocs) {
+      // Splitting by comma allows extracting primary city from "Kochi, Kerala"
+      const dbParts = locObj.normalized.split(',').map(p => p.trim()).filter(p => p.length >= 3);
+
+      let matchedPart = null;
+      for (const part of dbParts) {
+        const regex = new RegExp(`\\b${part}\\b`, 'i');
+        if (regex.test(qLower)) {
+          matchedPart = part;
+          break;
+        }
       }
+
+      if (matchedPart) {
+        result.locationSearch = locObj.original;
+        result.freeText = result.freeText.replace(new RegExp(`\\b${matchedPart}\\b`, 'gi'), '').trim();
+        break;
+      }
+    }
   }
 
   // Cleanup extra spaces
   result.freeText = result.freeText.replace(/\s+/g, ' ').trim();
-  
+
   return result;
 };
 
 export const filterProperties = (properties, query, filters, knownLocations = []) => {
   let results = [...properties];
-  
+
   // 1. Text Search (Phrase & Tokenized match)
   if (query && query.length >= 3) {
     const parsed = parsePhraseQuery(query, knownLocations);
-    
+
     // Implicit Type from phrase
     if (parsed.type) {
       results = results.filter(p => p.category === parsed.type);
     }
-    
+
     // Implicit Location from phrase 
     if (parsed.locationSearch) {
       const locSearch = normalizeLocationsInText(parsed.locationSearch);
       results = results.filter(p => {
-         const pLoc = normalizeLocationsInText(p.location);
-         const pAddress = normalizeLocationsInText(p.address || '');
-         const pDist = normalizeLocationsInText(p.district || '');
-         return pLoc.includes(locSearch) || pAddress.includes(locSearch) || pDist.includes(locSearch);
+        const pLoc = normalizeLocationsInText(p.location);
+        const pAddress = normalizeLocationsInText(p.address || '');
+        const pDist = normalizeLocationsInText(p.district || '');
+        return pLoc.includes(locSearch) || pAddress.includes(locSearch) || pDist.includes(locSearch);
       });
     }
-    
+
     // Remaining free text (tokenized AND match over all searchable fields)
     if (parsed.freeText) {
       const tokens = parsed.freeText.toLowerCase().split(/\s+/).filter(Boolean);
       results = results.filter(p => {
         const targetString = normalizeLocationsInText(`${p.title || ''} ${p.location || ''} ${p.address || ''} ${p.district || ''} ${p.category || ''}`);
         return tokens.every(token => {
-           const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-           const regex = new RegExp(`\\b${escapedToken}`, 'i');
-           return regex.test(targetString);
+          const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`\\b${escapedToken}`, 'i');
+          return regex.test(targetString);
         });
       });
     }
@@ -195,8 +195,8 @@ export const filterProperties = (properties, query, filters, knownLocations = []
   // 3. Location Filter
   if (filters.location && filters.location !== 'All Locations') {
     const loc = filters.location.toLowerCase();
-    results = results.filter(p => 
-      (p.location || '').toLowerCase() === loc || 
+    results = results.filter(p =>
+      (p.location || '').toLowerCase() === loc ||
       (p.district || '').toLowerCase() === loc
     );
   }

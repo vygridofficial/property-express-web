@@ -96,13 +96,13 @@ export default function Results() {
 
       if (filters.category) {
         const selectedCategories = filters.category.split(',').map(c => c.toLowerCase());
-        
+
         let catMatch = false;
         for (const cat of selectedCategories) {
-           const mappedAllowed = categoryToTypesMap[cat] || [cat];
-           if (mappedAllowed.includes(propCategory) || mappedAllowed.includes(propType)) {
-             catMatch = true;
-           }
+          const mappedAllowed = categoryToTypesMap[cat] || [cat];
+          if (mappedAllowed.includes(propCategory) || mappedAllowed.includes(propType)) {
+            catMatch = true;
+          }
         }
         if (!catMatch) match = false;
       }
@@ -113,18 +113,18 @@ export default function Results() {
           match = false;
         }
       }
-      
+
       if (filters.bhk) {
         const selectedBhkValues = filters.bhk.split(',').map(bhk => {
-           if (bhk === '4BHK+') return 4;
-           return parseInt(bhk.replace(/\D/g, ''), 10);
+          if (bhk === '4BHK+') return 4;
+          return parseInt(bhk.replace(/\D/g, ''), 10);
         });
         const propBeds = prop.bedrooms || prop.beds || 0;
-        
+
         let bhkMatch = false;
         for (const val of selectedBhkValues) {
-           if (val === 4 && propBeds >= 4) bhkMatch = true;
-           else if (val === propBeds) bhkMatch = true;
+          if (val === 4 && propBeds >= 4) bhkMatch = true;
+          else if (val === propBeds) bhkMatch = true;
         }
         if (!bhkMatch) match = false;
       }
@@ -132,12 +132,12 @@ export default function Results() {
       if (filters.status) {
         const selectedStatuses = filters.status.split(',').map(s => s.toLowerCase());
         const propStatusStr = prop.status?.toLowerCase() || '';
-        const propPurposeStr = prop.purpose?.toLowerCase() || prop.listingType?.toLowerCase() || ''; 
-        
+        const propPurposeStr = prop.purpose?.toLowerCase() || prop.listingType?.toLowerCase() || '';
+
         let statusMatch = false;
         for (const selectedStatus of selectedStatuses) {
-           if (selectedStatus === 'rent' && (propStatusStr.includes('rent') || propPurposeStr.includes('rent'))) statusMatch = true;
-           if (selectedStatus === 'sale' && (propStatusStr.includes('sale') || propPurposeStr.includes('sale') || propStatusStr === 'active')) statusMatch = true;
+          if (selectedStatus === 'rent' && (propStatusStr.includes('rent') || propPurposeStr.includes('rent'))) statusMatch = true;
+          if (selectedStatus === 'sale' && (propStatusStr.includes('sale') || propPurposeStr.includes('sale') || propStatusStr === 'active')) statusMatch = true;
         }
         if (!statusMatch) match = false;
       }
@@ -148,9 +148,9 @@ export default function Results() {
       if (filters.features) {
         const requiredFeatures = filters.features.split(',').filter(Boolean);
         const propFeatures = [...(prop.amenities || []), ...(prop.features || [])].map(f => f.toLowerCase());
-        
+
         // Ensure property has ALL required features
-        const hasAllFeatures = requiredFeatures.every(reqFeature => 
+        const hasAllFeatures = requiredFeatures.every(reqFeature =>
           propFeatures.includes(reqFeature.toLowerCase())
         );
         if (!hasAllFeatures) match = false;
@@ -176,7 +176,7 @@ export default function Results() {
   return (
     <div className={styles.resultsPage}>
       <SEO title="Property Results | Property Express" description="Filter and find your ideal property." />
-      
+
       {/* Top Header Section */}
       <div className={styles.header}>
         <div className="container">
@@ -188,7 +188,7 @@ export default function Results() {
                 {activeFilterCount > 0 && ` matching your criteria`}
               </p>
             </div>
-            <button 
+            <button
               className={styles.mobileFilterBtn}
               onClick={() => setShowMobileFilters(true)}
             >
@@ -210,10 +210,10 @@ export default function Results() {
               </button>
             </div>
 
-            <FilterMenu 
-              filters={filters} 
-              properties={properties} 
-              onChange={handleFilterChange} 
+            <FilterMenu
+              filters={filters}
+              properties={properties}
+              onChange={handleFilterChange}
               onClear={clearFilters}
               showApplyButton={false}
               isHorizontal={true}
@@ -236,7 +236,7 @@ export default function Results() {
               <p>Finding perfect properties...</p>
             </div>
           ) : filteredProperties.length > 0 ? (
-            <motion.div 
+            <motion.div
               className={styles.grid}
               variants={containerVariants}
               initial="hidden"
@@ -265,7 +265,7 @@ export default function Results() {
 
       {/* Mobile Filter Backdrop */}
       {showMobileFilters && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

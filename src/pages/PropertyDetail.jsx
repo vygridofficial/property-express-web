@@ -315,7 +315,7 @@ export default function PropertyDetail() {
               <span
                 className={styles.badge}
                 style={{
-                  background: (property.listingType === 'Rent' || property.status === 'For Rent') ? 'var(--color-primary)' : '#ed1b24',
+                  background: (property.listingType === 'Rent' || property.status === 'For Rent') ? '#007bff' : '#ed1b24',
                   color: 'white',
                   fontWeight: '600',
                   textTransform: 'uppercase',
@@ -324,6 +324,12 @@ export default function PropertyDetail() {
               >
                 {(property.listingType === 'Rent' || property.status === 'For Rent') ? 'For Rent' : 'For Sale'}
               </span>
+
+              {property.isUsedProperty && (
+                <span className={styles.badge} style={{ background: 'black', color: 'white', padding: '0.5rem 1.25rem' }}>
+                  Used
+                </span>
+              )}
 
               {property.status && property.status !== 'Active' && property.status !== 'For Rent' && property.status !== 'For Sale' && (
                 <span className={styles.badge} style={{ background: '#eee', color: '#333' }}>{property.status}</span>

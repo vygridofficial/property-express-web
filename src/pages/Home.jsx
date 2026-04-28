@@ -29,7 +29,7 @@ const InteractiveCluster = ({ cluster, isMobile, navigate }) => {
         <div style={{ position: 'absolute', top: '-24px', left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.8)', color: '#18181a', padding: '2px 8px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 'bold', whiteSpace: 'nowrap', backdropFilter: 'blur(4px)', pointerEvents: 'none' }}>
           {cluster.location}
         </div>
-        <div 
+        <div
           onClick={(e) => { e.stopPropagation(); navigate(`/properties/${cluster.properties[0].id}`, { state: { property: cluster.properties[0] } }); }}
           style={{ position: 'relative', width: isMobile ? '60px' : '150px', height: isMobile ? '30px' : '90px', cursor: 'pointer' }}
         >
@@ -222,22 +222,22 @@ export default function Home() {
     getAllReviews().then(data => {
       setReviews(data.filter(r => r.status?.toLowerCase() === 'approved'));
     });
-    
-    return () => {};
+
+    return () => { };
   }, []);
 
   // Group properties by matching location string (case-insensitive approximation)
   const clusters = useMemo(() => {
     if (!allProps || allProps.length === 0) return [];
 
-      // First, filter by 100km radius if coords are known
-      const radiusFiltered = allProps.filter(prop => {
-        if (!isLocationDetected) return true; // Show all if location isn't detected or before detecting
-        const coords = getPropertyCoordinates(prop);
-        if (!coords) return false; // If location is totally unknown, hide it to maintain strict radius rules
-        const dist = getDistanceFromLatLonInKm(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
-        return dist <= 100;
-      });
+    // First, filter by 100km radius if coords are known
+    const radiusFiltered = allProps.filter(prop => {
+      if (!isLocationDetected) return true; // Show all if location isn't detected or before detecting
+      const coords = getPropertyCoordinates(prop);
+      if (!coords) return false; // If location is totally unknown, hide it to maintain strict radius rules
+      const dist = getDistanceFromLatLonInKm(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
+      return dist <= 100;
+    });
 
     const grouped = radiusFiltered.reduce((acc, prop) => {
       const coords = getPropertyCoordinates(prop);
@@ -284,8 +284,8 @@ export default function Home() {
     const scroll = () => {
       if (trackRef.current && !isHovered.current) {
         // Adjust speed by changing the increment value
-        trackRef.current.scrollLeft += 0.8; 
-        
+        trackRef.current.scrollLeft += 0.8;
+
         // When we've scrolled exactly halfway (the end of the first original set), loop back to 0
         if (trackRef.current.scrollLeft >= (trackRef.current.scrollWidth - trackRef.current.clientWidth) / 2) {
           trackRef.current.scrollLeft = 0;
@@ -293,11 +293,11 @@ export default function Home() {
       }
       animationId = requestAnimationFrame(scroll);
     };
-    
+
     if (reviews.length > 0) {
       animationId = requestAnimationFrame(scroll);
     }
-    
+
     return () => cancelAnimationFrame(animationId);
   }, [reviews.length]);
 
@@ -312,9 +312,9 @@ export default function Home() {
       transition={{ duration: 0.3 }}
     >
       <SEO />
-      
+
       {/* Hero Section */}
-      <section 
+      <section
         className={styles.hero}
         style={{
           backgroundImage: `url("${siteSettings?.heroImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'}")`,
@@ -336,7 +336,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             <div>
-              <FilterMenu 
+              <FilterMenu
                 filters={{ category: '', type: '', bhk: '', status: '', district: '', features: '' }}
                 properties={allProps}
                 isHorizontal={true}
@@ -371,7 +371,7 @@ export default function Home() {
             >
               {siteSettings.heroDescription || 'Discover the most premium luxury villas, apartments, and plots available.'}
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -533,7 +533,7 @@ export default function Home() {
 
           {reviews.length > 0 ? (
             <div className={styles.marqueeContainer}>
-              <div 
+              <div
                 className={styles.marqueeTrack}
                 ref={trackRef}
                 onMouseEnter={() => isHovered.current = true}
@@ -592,7 +592,7 @@ export default function Home() {
       {/* Seller Portal CTA */}
       <section className="section" style={{ background: 'var(--color-bg)', padding: '2rem 0 4rem 0' }}>
         <div className="container">
-          <motion.div 
+          <motion.div
             className={styles.sellerPortalCta}
             variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}
           >
@@ -841,9 +841,9 @@ export default function Home() {
                   <div className={styles.ctaRadar2}></div>
                 </>
               )}
-              <Link 
-                to="/properties" 
-                className={styles.btnMapCta} 
+              <Link
+                to="/properties"
+                className={styles.btnMapCta}
                 style={isLocationDetected ? { padding: '0.6rem 1.5rem', fontSize: '0.9rem', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' } : {}}
                 onClick={() => {
                   if (isLocationDetected) {
