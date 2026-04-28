@@ -1,22 +1,63 @@
 /**
- * Smartly formats a price value into the Indian Rupee (₹) standard.
- * Prevents redundant symbols (₹₹) and uses Indian numbering format (Lakhs/Crores).
+ * Formats a price value into compact Indian Rupee notation.
+ * Handles raw numbers AND pre-formatted strings (e.g. "0.2L", "1.5Cr", "20000").
+ *
+ * Examples:
+ *   18000       → ₹18K
+ *   20000       → ₹20K
+ *   150000      → ₹1.5L
+ *   6900000     → ₹69L
+ *   10000000    → ₹1Cr
+ *   "0.2L"      → ₹20K  (converts old format to proper value first)
+ *   "1.5Cr"     → ₹1.5Cr
  */
+
+const formatNumber = (n) => {
+  if (isNaN(n) || n === null || n === undefined) return '₹0';
+  const num = Number(n);
+
+  if (num >= 1_00_00_000) {
+    const val = num / 1_00_00_000;
+    return `₹${val % 1 === 0 ? val : val.toFixed(2).replace(/\.?0+$/, '')}Cr`;
+  }
+  if (num >= 1_00_000) {
+    const val = num / 1_00_000;
+    return `₹${val % 1 === 0 ? val : val.toFixed(2).replace(/\.?0+$/, '')}L`;
+  }
+  if (num >= 1_000) {
+    const val = num / 1_000;
+    return `₹${val % 1 === 0 ? val : val.toFixed(1).replace(/\.?0+$/, '')}K`;
+  }
+  return `₹${num}`;
+};
+
 export const formatPrice = (price) => {
-  if (price === undefined || price === null) return '₹ 0';
+  if (price === undefined || price === null || price === '') return '₹0';
 
   if (typeof price === 'string') {
-    // If it's already a formatted string, just clean up and ensure it has exactly one ₹
-    let cleaned = price.replace(/\$/g, '').replace(/₹/g, '').trim();
-    
-    // If it was just a number string, format it properly
-    if (!isNaN(parseFloat(cleaned)) && !cleaned.toLowerCase().includes('cr') && !cleaned.toLowerCase().includes('l')) {
-      return `₹${Number(cleaned).toLocaleString('en-IN')}`;
+    // Strip currency symbol and whitespace
+    const cleaned = price.replace(/₹|\$/g, '').trim();
+
+    // Detect and parse pre-formatted unit strings: e.g. "0.2L", "1.5Cr", "20K"
+    const unitMatch = cleaned.match(/^([\d.]+)\s*(cr|l|k)$/i);
+    if (unitMatch) {
+      const numPart = parseFloat(unitMatch[1]);
+      const unit = unitMatch[2].toLowerCase();
+      let rawValue;
+      if (unit === 'cr') rawValue = numPart * 1_00_00_000;
+      else if (unit === 'l') rawValue = numPart * 1_00_000;
+      else if (unit === 'k') rawValue = numPart * 1_000;
+      return formatNumber(rawValue);
     }
-    
+
+    // Plain number string → run through formatter
+    if (!isNaN(parseFloat(cleaned))) {
+      return formatNumber(Number(cleaned));
+    }
+
+    // Unrecognised string — just prepend ₹
     return `₹${cleaned}`;
   }
 
-  // Handle number format with Indian numbering system (Commas at 3, 2, 2...)
-  return `₹${Number(price).toLocaleString('en-IN')}`;
+  return formatNumber(Number(price));
 };

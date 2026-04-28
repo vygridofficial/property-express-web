@@ -592,14 +592,19 @@
   .featuredGrid {
     display: grid !important;
     grid-template-columns: 1fr !important;
-    gap: 1.25rem !important;
+    gap: 1rem !important;
     padding: 0 !important;
-    overflow: visible !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
-  .featuredGrid > div {
-    flex: unset !important;
+  .featuredGrid > * {
     width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    flex: unset !important;
   }
 }
 

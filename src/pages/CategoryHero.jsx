@@ -99,7 +99,7 @@ function PropertyListingCard({ property, index }) {
     ? rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '')
     : [PLACEHOLDER];
 
-  const displayPrice = formatPrice(property.price);
+  const displayPrice = formatPrice(property.numericPrice || property.price);
 
   // ── Contact Logic ──
   const propertyPhone = property.sellerPhone || property.agentPhone;

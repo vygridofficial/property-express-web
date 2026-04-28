@@ -11,6 +11,7 @@ import { KERALA_DISTRICTS } from '../../data/districts';
 import FilterManagementModal from '../components/FilterManagementModal';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 import { FILTER_TAXONOMY } from '../../data/filterTaxonomy';
+import { formatPrice } from '../../utils/formatPrice';
 
 export default function AdminProperties() {
   const { siteSettings, properties, setProperties, propertyTypes, addPropertyType, loading: contextLoading } = useAdmin();
@@ -22,6 +23,7 @@ export default function AdminProperties() {
 
   // Filters State
   const [searchTerm, setSearchTerm] = useState('');
+  const [idSearchTerm, setIdSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priceFilter, setPriceFilter] = useState('All');
   const [locFilter, setLocFilter] = useState('All');
@@ -131,17 +133,17 @@ export default function AdminProperties() {
           if (!selectedProperty.agentPhone) return '';
           let phone = selectedProperty.agentPhone;
           const code = selectedProperty.agentPhoneCode || '+91';
-          
+
           // Remove duplicated country codes (e.g. +91+9145146)
           while (phone.startsWith(code)) {
             phone = phone.slice(code.length).trim();
           }
-          
+
           // If it still starts with a '+', it's likely a corrupted code
           if (phone.startsWith('+')) {
             phone = phone.replace(/^\+\d+\s*/, '');
           }
-          
+
           return phone;
         })(),
         agentPhoneCode: selectedProperty.agentPhoneCode || '+91',
@@ -215,6 +217,43 @@ export default function AdminProperties() {
     setPropertyToDelete(null);
   };
 
+  // Ensure every property has a sequential ID starting with PE
+  // This handles existing properties that don't have an ID in the database yet.
+  const propertiesWithIds = useMemo(() => {
+    // 1. Sort all properties by their original creation date (oldest first)
+    // This ensures IDs are assigned in the order properties were originally listed.
+    const sorted = [...properties].sort((a, b) => {
+      const dateA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
+      const dateB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
+      return dateA - dateB;
+    });
+
+    // 2. Track assigned numbers to avoid duplicates
+    let lastNum = 0;
+    const assignedIds = new Map();
+
+    // First pass: identify existing PE IDs
+    sorted.forEach(p => {
+      if (p.propertyId && p.propertyId.startsWith('PE')) {
+        const num = parseInt(p.propertyId.replace('PE', ''));
+        if (!isNaN(num)) {
+          assignedIds.set(p.id, p.propertyId);
+          if (num > lastNum) lastNum = num;
+        }
+      }
+    });
+
+    // Second pass: assign PE IDs to properties that don't have one
+    return sorted.map(p => {
+      if (assignedIds.has(p.id)) {
+        return { ...p, propertyId: assignedIds.get(p.id) };
+      }
+      lastNum++;
+      const newId = `PE${lastNum.toString().padStart(3, '0')}`;
+      return { ...p, propertyId: newId };
+    });
+  }, [properties]);
+
   const filteredProperties = useMemo(() => {
     const path = location.pathname;
     const isBaseRoute = path.endsWith('/admin/properties') || path.endsWith('/admin/properties/');
@@ -227,7 +266,7 @@ export default function AdminProperties() {
       plots: ['plot']
     };
 
-    return properties.filter(p => {
+    return propertiesWithIds.filter(p => {
       let matchRouteCat = true;
       if (!isBaseRoute) {
         const activeLower = activeCategory.toLowerCase();
@@ -240,11 +279,15 @@ export default function AdminProperties() {
       }
 
       const term = searchTerm.toLowerCase();
+      const idTerm = idSearchTerm.toLowerCase();
       const loc = (p.address || p.location || '').toLowerCase();
+      const pId = (p.propertyId || '').toLowerCase();
+      
       const matchSearch = p.title.toLowerCase().includes(term) || loc.includes(term);
+      const matchIdSearch = !idTerm || pId.includes(idTerm);
       const matchStatus = statusFilter === 'All' || p.status === statusFilter;
       const matchLoc = locFilter === 'All' || loc === locFilter.toLowerCase();
-      const matchCat = catFilter === 'All' || p.category.toLowerCase() === catFilter.toLowerCase();
+      const matchCat = catFilter === 'All' || (p.category || '').toLowerCase() === catFilter.toLowerCase();
       const matchDist = distFilter === 'All' || (p.district || '').toLowerCase() === distFilter.toLowerCase();
 
       let matchPrice = true;
@@ -253,23 +296,29 @@ export default function AdminProperties() {
       if (priceFilter === '₹1Cr–₹5Cr') matchPrice = (p.numericPrice || 0) > 10000000 && (p.numericPrice || 0) <= 50000000;
       if (priceFilter === 'Above ₹5Cr') matchPrice = (p.numericPrice || 0) > 50000000;
 
-      return matchRouteCat && matchSearch && matchStatus && matchLoc && matchDist && matchCat && matchPrice;
+      return matchRouteCat && matchSearch && matchIdSearch && matchStatus && matchLoc && matchDist && matchCat && matchPrice;
     }).sort((a, b) => {
       if (sortOrder === 'Price: Low to High') return a.numericPrice - b.numericPrice;
       if (sortOrder === 'Price: High to Low') return b.numericPrice - a.numericPrice;
+      if (sortOrder === 'Property ID (Asc)') {
+        return (a.propertyId || '').localeCompare(b.propertyId || '', undefined, { numeric: true, sensitivity: 'base' });
+      }
+      if (sortOrder === 'Property ID (Desc)') {
+        return (b.propertyId || '').localeCompare(a.propertyId || '', undefined, { numeric: true, sensitivity: 'base' });
+      }
       return 0;
     });
-  }, [properties, activeCategory, searchTerm, statusFilter, locFilter, catFilter, priceFilter, distFilter, sortOrder]);
+  }, [propertiesWithIds, activeCategory, searchTerm, idSearchTerm, statusFilter, locFilter, catFilter, priceFilter, distFilter, sortOrder]);
 
   const clearFilters = () => {
-    setSearchTerm(''); setStatusFilter('All'); setPriceFilter('All'); setLocFilter('All'); setDistFilter('All'); setCatFilter('All'); setSortOrder('Newest First');
+    setSearchTerm(''); setIdSearchTerm(''); setStatusFilter('All'); setPriceFilter('All'); setLocFilter('All'); setDistFilter('All'); setCatFilter('All'); setSortOrder('Newest First');
   };
 
   useEffect(() => {
     clearFilters();
   }, [activeCategory]);
 
-  const hasActiveFilters = searchTerm || statusFilter !== 'All' || priceFilter !== 'All' || locFilter !== 'All' || distFilter !== 'All' || catFilter !== 'All' || sortOrder !== 'Newest First';
+  const hasActiveFilters = searchTerm || idSearchTerm || statusFilter !== 'All' || priceFilter !== 'All' || locFilter !== 'All' || distFilter !== 'All' || catFilter !== 'All' || sortOrder !== 'Newest First';
 
   const handleAgentPhoto = (e) => {
     if (!e.target.files || !e.target.files[0]) return;
@@ -358,13 +407,8 @@ export default function AdminProperties() {
       }
 
       const numericPriceValue = parseInt(formData.price?.toString().replace(/[^0-9]/g, '')) || 0;
-      let formattedPriceValue = "₹" + formData.price;
-
-      if (numericPriceValue > 0) {
-        formattedPriceValue = numericPriceValue >= 10000000
-          ? `₹${(numericPriceValue / 10000000).toFixed(1)}Cr`
-          : `₹${(numericPriceValue / 100000).toFixed(1)}L`;
-      }
+      // Store the raw number — formatPrice() handles display formatting (K / L / Cr) at render time
+      const formattedPriceValue = numericPriceValue;
 
       const DEFAULT_UNSPLASH = {
         Flat: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
@@ -375,6 +419,19 @@ export default function AdminProperties() {
       };
       const fallbackImage = DEFAULT_UNSPLASH[formData.category] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80';
 
+      // Generate Property ID for new listings if not editing
+      let propertyId = formData.propertyId;
+      if (!editingId) {
+        const peIds = properties
+          .map(p => p.propertyId)
+          .filter(id => id && typeof id === 'string' && id.startsWith('PE'))
+          .map(id => parseInt(id.replace('PE', '')))
+          .filter(num => !isNaN(num));
+
+        const nextNum = peIds.length > 0 ? Math.max(...peIds) + 1 : 1;
+        propertyId = `PE${nextNum.toString().padStart(3, '0')}`;
+      }
+
       const finalData = {
         title: formData.title,
         listingType: formData.listingType || 'Sell',
@@ -384,6 +441,7 @@ export default function AdminProperties() {
         isUsedProperty: formData.isUsedProperty || false,
         price: formattedPriceValue,
         numericPrice: numericPriceValue,
+        propertyId: propertyId,
         area: formData.area,
         bedrooms: formData.bedrooms,
         bathrooms: formData.bathrooms,
@@ -558,7 +616,7 @@ export default function AdminProperties() {
 
         {/* Filter Bar */}
         <div className={`${styles.glassCard} ${styles.adminReviewGrid}`} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', marginBottom: '1rem' }}>
-          <div style={{ display: 'flex', width: '100%' }}>
+          <div style={{ display: 'flex', width: '100%', gap: '0.5rem' }}>
             <div style={{ position: 'relative', flex: '1 1 auto' }}>
               <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }} />
               <input
@@ -567,6 +625,15 @@ export default function AdminProperties() {
                 style={{ width: '100%', paddingLeft: '2.5rem', height: 40, borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', color: 'var(--admin-text-main)' }}
               />
               {searchTerm && <X size={16} onClick={() => setSearchTerm('')} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--admin-text-muted)' }} />}
+            </div>
+            <div style={{ position: 'relative', flex: '0 0 180px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }} />
+              <input
+                type="text" placeholder="Property ID (PE001)"
+                value={idSearchTerm} onChange={(e) => setIdSearchTerm(e.target.value)}
+                style={{ width: '100%', paddingLeft: '2.2rem', height: 40, borderRadius: 8, border: '1px solid var(--admin-stroke)', background: 'rgba(255,255,255,0.5)', outline: 'none', color: 'var(--admin-text-main)', fontSize: '0.85rem' }}
+              />
+              {idSearchTerm && <X size={14} onClick={() => setIdSearchTerm('')} style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--admin-text-muted)' }} />}
             </div>
           </div>
 
@@ -601,6 +668,8 @@ export default function AdminProperties() {
               <option value="Newest First">Newest First</option>
               <option value="Price: Low to High">Price: Low to High</option>
               <option value="Price: High to Low">Price: High to Low</option>
+              <option value="Property ID (Asc)">Property ID (Asc)</option>
+              <option value="Property ID (Desc)">Property ID (Desc)</option>
             </select>
           </div>
 
@@ -656,8 +725,15 @@ export default function AdminProperties() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prop.title}</h4>
-                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.75rem', color: 'var(--admin-text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>{prop.category}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                          <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prop.title}</h4>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 800, padding: '0.1rem 0.4rem', borderRadius: 4, background: 'rgba(0,0,0,0.05)', color: 'var(--admin-text-muted)' }}>{prop.propertyId || '---'}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--admin-text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>{prop.category}</p>
+                          <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--admin-text-muted)' }} />
+                          <p style={{ margin: 0, fontSize: '0.75rem', color: (prop.listingType === 'Rent' || prop.status === 'For Rent') ? '#007bff' : '#ed1b24', fontWeight: 700, textTransform: 'uppercase' }}>{prop.listingType || 'Sell'}</p>
+                        </div>
                       </div>
                       <div style={{ flexShrink: 0, marginLeft: '0.5rem', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
                         <Plus size={18} />
@@ -683,7 +759,7 @@ export default function AdminProperties() {
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Price</span>
-                              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ed1b24' }}>{prop.price}</span>
+                              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ed1b24' }}>{formatPrice(prop.numericPrice || prop.price)}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <span style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>Status</span>
@@ -730,7 +806,9 @@ export default function AdminProperties() {
               <motion.table initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }} style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--admin-stroke)' }}>
+                    <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem', minWidth: '80px' }}>ID</th>
                     <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Title</th>
+                    <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Type</th>
                     <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Category</th>
                     <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Location</th>
                     <th style={{ padding: '1rem', fontWeight: 600, color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>Price</th>
@@ -741,10 +819,12 @@ export default function AdminProperties() {
                 <tbody>
                   {filteredProperties.map((prop, i) => (
                     <motion.tr key={prop.id} variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} style={{ borderBottom: '1px solid var(--admin-stroke)', background: i % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.02)' }}>
+                      <td style={{ padding: '1rem', fontWeight: 700, color: 'var(--admin-text-muted)', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>{prop.propertyId}</td>
                       <td style={{ padding: '1rem', fontWeight: 600 }}>{prop.title}</td>
+                      <td style={{ padding: '1rem', fontWeight: 700, color: (prop.listingType === 'Rent' || prop.status === 'For Rent') ? '#007bff' : '#ed1b24', fontSize: '0.75rem' }}>{prop.listingType || 'Sell'}</td>
                       <td style={{ padding: '1rem', fontWeight: 300 }}>{prop.category}</td>
                       <td style={{ padding: '1rem', fontWeight: 300, color: 'var(--admin-text-muted)' }}>{prop.address || prop.location}</td>
-                      <td style={{ padding: '1rem', fontWeight: 400, fontVariantNumeric: 'tabular-nums' }}>{prop.price}</td>
+                      <td style={{ padding: '1rem', fontWeight: 400, fontVariantNumeric: 'tabular-nums' }}>{formatPrice(prop.numericPrice || prop.price)}</td>
                       <td style={{ padding: '1rem' }}>
                         <button
                           onClick={() => togglePropertyStatus(prop.id, prop.status)}
@@ -871,7 +951,7 @@ export default function AdminProperties() {
                         </label>
                         <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Is Featured?</span>
                       </div>
-                      
+
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <label style={{ position: 'relative', display: 'inline-block', width: 44, height: 24 }}>
                           <input type="checkbox" checked={formData.isUsedProperty} onChange={e => handleFormChange('isUsedProperty', e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
@@ -1022,15 +1102,15 @@ export default function AdminProperties() {
                       ))}
                       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         <input type="text" placeholder="Type custom amenity..." value={customAmenity} onChange={e => setCustomAmenity(e.target.value)} onKeyDown={handleCustomAmenity} style={{ ...getInputStyle('customAmenity'), padding: '0.4rem 1rem', width: 220, borderRadius: 20 }} />
-                        <button 
-                          className="btn" 
-                          onClick={(e) => { 
-                            e.preventDefault(); 
-                            if(customAmenity.trim()) { 
-                              toggleAmenity(customAmenity.trim()); 
-                              setCustomAmenity(''); 
-                            } 
-                          }} 
+                        <button
+                          className="btn"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (customAmenity.trim()) {
+                              toggleAmenity(customAmenity.trim());
+                              setCustomAmenity('');
+                            }
+                          }}
                           style={{ background: '#18181a', color: 'white', border: 'none', borderRadius: 20, padding: '0 1.2rem', height: '100%', minHeight: 38, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
                         >
                           Add

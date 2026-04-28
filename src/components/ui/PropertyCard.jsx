@@ -66,7 +66,9 @@ export default function PropertyCard({ property }) {
     setImgErrors(prev => ({ ...prev, [idx]: true }));
   };
 
-  const displayPrice = formatPrice(price);
+  // Prefer numericPrice (raw number) so formatPrice() can correctly render K/L/Cr.
+  // Falls back to the old pre-formatted price string for backward compatibility.
+  const displayPrice = formatPrice(property.numericPrice || price);
 
   // ── Contact Logic ──
   const propertyPhone = property.sellerPhone || property.agentPhone;
@@ -80,10 +82,12 @@ export default function PropertyCard({ property }) {
   const callLink = cleanPhone ? `tel:${cleanPhone}` : null;
   
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
   return (
     <motion.article
       className={styles.propertyCard}
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={isMobile ? {} : { y: -8, scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >
       {/* Image Slideshow/Carousel — click navigates to detail page */}
@@ -136,7 +140,7 @@ export default function PropertyCard({ property }) {
       </div>
 
       <div className={styles.content}>
-        <div style={{ marginBottom: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div style={{ marginBottom: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <span
             className={styles.badge}
             style={{
@@ -155,11 +159,14 @@ export default function PropertyCard({ property }) {
               Used
             </span>
           )}
+          {property.isFeatured && (
+            <span className={styles.featuredTag} style={{ marginLeft: 0 }}>Featured</span>
+          )}
         </div>
         <div className={styles.price}>
-          {displayPrice} {status === 'For Rent' && <span className={styles.perMonth}>/mo</span>}
-          {property.isFeatured && (
-            <span className={styles.featuredTag}>Featured</span>
+          {displayPrice}
+          {(property.listingType === 'Rent' || status === 'For Rent') && (
+            <span className={styles.perMonth}>/month</span>
           )}
         </div>
         <div className={styles.titleWrap}>

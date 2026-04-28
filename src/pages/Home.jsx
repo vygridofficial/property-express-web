@@ -385,8 +385,8 @@ export default function Home() {
       </section>
 
       {/* Featured Properties */}
-      <section className="section" style={{ backgroundColor: 'var(--color-surface)' }}>
-        <div className="container">
+      <section className="section" style={{ backgroundColor: 'var(--color-surface)', overflowX: 'hidden' }}>
+        <div className="container" style={{ overflowX: 'hidden' }}>
           <motion.div
             className="section-header flex-between"
             style={{ textAlign: 'left', marginBottom: '3rem' }}
