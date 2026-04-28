@@ -335,8 +335,8 @@ export default function AdminProperties() {
     const newErrors = [];
     required.forEach(req => { if (!formData[req]) newErrors.push(req); });
 
-    // Enforce minimum 5 images
-    if (images.length < 5) newErrors.push('images');
+    // Enforce minimum 2 images
+    if (images.length < 2) newErrors.push('images');
 
     if (newErrors.length > 0) {
       setFormErrors(newErrors);
@@ -1118,7 +1118,7 @@ export default function AdminProperties() {
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                       <Label required>Upload Images</Label>
-                      <span style={{ fontSize: '0.8rem', color: images.length >= 8 ? '#ed1b24' : 'var(--admin-text-muted)' }}>{images.length}/8 — min 5 required</span>
+                      <span style={{ fontSize: '0.8rem', color: images.length >= 8 ? '#ed1b24' : 'var(--admin-text-muted)' }}>{images.length}/8 — min 2 required</span>
                     </div>
 
                     <div onClick={() => images.length < 8 && fileInputRef.current?.click()} style={{ border: formErrors.includes('images') ? '2px dashed #ed1b24' : '2px dashed var(--admin-stroke)', borderRadius: 12, padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.4)', cursor: images.length < 8 ? 'pointer' : 'not-allowed', opacity: images.length < 8 ? 1 : 0.5 }}>
@@ -1126,7 +1126,7 @@ export default function AdminProperties() {
                       <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--admin-text-body)', fontWeight: 300 }}>Drag images here or click to browse</p>
                       <input type="file" multiple accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
                     </div>
-                    {formErrors.includes('images') && <span style={{ color: '#ed1b24', fontSize: '12px', marginTop: '0.25rem', display: 'block' }}>Please upload at least 5 images (minimum required).</span>}
+                    {formErrors.includes('images') && <span style={{ color: '#ed1b24', fontSize: '12px', marginTop: '0.25rem', display: 'block' }}>Please upload at least 2 images (minimum required).</span>}
 
                     {images.length > 0 && (
                       <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', padding: '1rem 0', marginTop: '0.5rem' }}>

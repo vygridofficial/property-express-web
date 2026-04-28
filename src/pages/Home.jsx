@@ -429,7 +429,14 @@ export default function Home() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
                 <h2 className={styles.statNumber}>
-                  <CountUp end={parseFloat(siteSettings?.achievementsPropertiesSold || 1.2)} decimals={1} suffix="K+" />
+                  {(() => {
+                    const rawVal = parseFloat(siteSettings?.achievementsPropertiesSold || 1200);
+                    return rawVal >= 1000 ? (
+                      <CountUp end={rawVal / 1000} decimals={1} suffix="K+" />
+                    ) : (
+                      <CountUp end={rawVal} decimals={0} suffix="+" />
+                    );
+                  })()}
                 </h2>
                 <div className={styles.statFooter}>
                   <p>Properties Sold</p>

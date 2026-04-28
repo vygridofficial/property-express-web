@@ -584,10 +584,10 @@ export default function Settings() {
         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '1.5rem' }}>Company Achievements</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Properties Sold (K+)</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--admin-text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Properties Sold</label>
             <input 
               type="text" 
-              value={draft.achievementsPropertiesSold ?? '1.2'} 
+              value={draft.achievementsPropertiesSold ?? '1200'} 
               onChange={(e) => handleInputChange('achievementsPropertiesSold', e.target.value)}
               style={{ width: '100%', maxWidth: 400 }} 
             />
