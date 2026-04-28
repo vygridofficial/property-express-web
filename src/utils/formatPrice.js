@@ -18,17 +18,14 @@ const formatNumber = (n) => {
 
   if (num >= 1_00_00_000) {
     const val = num / 1_00_00_000;
-    return `₹${val % 1 === 0 ? val : val.toFixed(2).replace(/\.?0+$/, '')}Cr`;
+    return `₹${val % 1 === 0 ? val : val.toFixed(2).replace(/\.?0+$/, '')} Crore`;
   }
   if (num >= 1_00_000) {
-    const val = num / 1_00_000;
-    return `₹${val % 1 === 0 ? val : val.toFixed(2).replace(/\.?0+$/, '')}L`;
+    const val = num / 1_00_00_000;
+    const val_actual = num / 1_00_000;
+    return `₹${val_actual % 1 === 0 ? val_actual : val_actual.toFixed(2).replace(/\.?0+$/, '')} Lakhs`;
   }
-  if (num >= 1_000) {
-    const val = num / 1_000;
-    return `₹${val % 1 === 0 ? val : val.toFixed(1).replace(/\.?0+$/, '')}K`;
-  }
-  return `₹${num}`;
+  return `₹${num.toLocaleString('en-IN')}`;
 };
 
 export const formatPrice = (price) => {

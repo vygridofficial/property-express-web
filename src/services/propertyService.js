@@ -14,7 +14,7 @@ export const getCachedProperties = (category) => {
 export const getFeaturedProperties = async (includeInactive = false) => {
   let q = query(collection(db, PROPERTIES_COLLECTION), where("isFeatured", "==", true));
   if (!includeInactive) {
-    q = query(q, where("status", "==", "Active"));
+    q = query(q, where("status", "in", ["Active", "live"]));
   }
   
   const [snapshot, typesSnapshot] = await Promise.all([
@@ -54,7 +54,7 @@ export const getAllProperties = async (filters = {}, includeInactive = false) =>
 
   if (!includeInactive) {
     const activeTypes = typesSnapshot.docs.map(d => d.data()).filter(t => t.isActive !== false).map(t => (t.name || '').toLowerCase());
-    results = results.filter(p => p.status === "Active" && (!p.category || activeTypes.includes(p.category.toLowerCase()) || p.category.toLowerCase() === 'uncategorized'));
+    results = results.filter(p => (p.status === "Active" || p.status === "live") && (!p.category || activeTypes.includes(p.category.toLowerCase()) || p.category.toLowerCase() === 'uncategorized'));
   }
 
   if (filters.location && filters.location !== "") {
@@ -125,7 +125,7 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
   );
 
   if (!includeInactive) {
-    q = query(q, where("status", "==", "Active"));
+    q = query(q, where("status", "in", ["Active", "live"]));
   }
   
   const snapshot = await getDocs(q);
@@ -139,7 +139,7 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
       .map(doc => ({ id: doc.id, ...doc.data() }))
       .filter(p => {
         const matchesCat = normalizedSyns.includes((p.category || '').toLowerCase());
-        const matchesStatus = includeInactive || p.status === "Active";
+        const matchesStatus = includeInactive || p.status === "Active" || p.status === "live";
         return matchesCat && matchesStatus;
       });
   }

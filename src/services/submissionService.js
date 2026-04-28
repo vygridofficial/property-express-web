@@ -106,7 +106,7 @@ export const approveSubmission = async (submissionId, adminSignature) => {
     sellerName: submissionData.sellerName,
     sellerEmail: submissionData.sellerEmail,
     sellerPhone: submissionData.sellerPhone,
-    status: 'live',
+    status: 'Active',
     isFeatured: false, // Default not featured
     createdAt: serverTimestamp()
   });

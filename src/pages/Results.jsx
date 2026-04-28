@@ -5,6 +5,7 @@ import { Search as SearchIcon, SlidersHorizontal, X } from 'lucide-react';
 import { getAllProperties } from '../services/propertyService';
 import PropertyCard from '../components/ui/PropertyCard';
 import FilterMenu from '../components/ui/FilterMenu';
+import { useAdmin } from '../admin/context/AdminContext';
 import SEO from '../components/common/SEO';
 import styles from './Results.module.css';
 
@@ -26,7 +27,8 @@ export default function Results() {
     bhk: query.get('bhk') || '',
     status: query.get('status') || '',
     district: query.get('district') || '',
-    features: query.get('features') || ''
+    features: query.get('features') || '',
+    condition: query.get('condition') || ''
   });
 
   useEffect(() => {
@@ -37,7 +39,8 @@ export default function Results() {
       bhk: query.get('bhk') || '',
       status: query.get('status') || '',
       district: query.get('district') || '',
-      features: query.get('features') || ''
+      features: query.get('features') || '',
+      condition: query.get('condition') || ''
     });
   }, [location.search]);
 
@@ -71,21 +74,43 @@ export default function Results() {
   };
 
   const clearFilters = () => {
-    const emptyFilters = { category: '', type: '', bhk: '', status: '', district: '', features: '' };
+    const emptyFilters = { category: '', type: '', bhk: '', status: '', district: '', features: '', condition: '' };
     setFilters(emptyFilters);
     updateURLParams(emptyFilters);
   };
 
-  const categoryToTypesMap = {
-    'residential': ['villa', 'apartment', 'flat', 'residential'],
-    'residential properties': ['villa', 'apartment', 'flat', 'residential'],
-    'commercial': ['commercial', 'office', 'shop', 'warehouse'],
-    'commercial properties': ['commercial', 'office', 'shop', 'warehouse'],
-    'industrial': ['industrial', 'factory', 'land', 'warehouse'],
-    'industrial properties': ['industrial', 'factory', 'land', 'warehouse'],
-    'agricultural': ['agricultural', 'farm', 'land'],
-    'plot': ['plot', 'land', 'residential plot', 'commercial plot']
-  };
+  const { propertyTypes } = useAdmin();
+  
+  // Build dynamic category to types map from admin property types
+  const categoryToTypesMap = useMemo(() => {
+    const map = {
+      'residential': ['villa', 'apartment', 'flat', 'residential'],
+      'residential properties': ['villa', 'apartment', 'flat', 'residential'],
+      'commercial': ['commercial', 'office', 'shop', 'warehouse'],
+      'commercial properties': ['commercial', 'office', 'shop', 'warehouse'],
+      'industrial': ['industrial', 'factory', 'land', 'warehouse'],
+      'industrial properties': ['industrial', 'factory', 'land', 'warehouse'],
+      'agricultural': ['agricultural', 'farm', 'land'],
+      'plot': ['plot', 'land', 'residential plot', 'commercial plot']
+    };
+
+    if (propertyTypes && propertyTypes.length > 0) {
+      propertyTypes.forEach(pt => {
+        const cat = pt.category?.toLowerCase();
+        if (cat) {
+          if (!map[cat]) map[cat] = [];
+          if (!map[`${cat} properties`]) map[`${cat} properties`] = [];
+          
+          const typeName = pt.name?.toLowerCase();
+          if (typeName) {
+            if (!map[cat].includes(typeName)) map[cat].push(typeName);
+            if (!map[`${cat} properties`].includes(typeName)) map[`${cat} properties`].push(typeName);
+          }
+        }
+      });
+    }
+    return map;
+  }, [propertyTypes]);
 
   // Apply active filters
   const filteredProperties = useMemo(() => {
@@ -132,17 +157,36 @@ export default function Results() {
       if (filters.status) {
         const selectedStatuses = filters.status.split(',').map(s => s.toLowerCase());
         const propStatusStr = prop.status?.toLowerCase() || '';
-        const propPurposeStr = prop.purpose?.toLowerCase() || prop.listingType?.toLowerCase() || '';
+        const propPurposeStr = (prop.purpose || prop.listingType || '').toLowerCase();
 
         let statusMatch = false;
         for (const selectedStatus of selectedStatuses) {
-          if (selectedStatus === 'rent' && (propStatusStr.includes('rent') || propPurposeStr.includes('rent'))) statusMatch = true;
-          if (selectedStatus === 'sale' && (propStatusStr.includes('sale') || propPurposeStr.includes('sale') || propStatusStr === 'active')) statusMatch = true;
+          if (selectedStatus === 'rent') {
+            if (propStatusStr.includes('rent') || propPurposeStr.includes('rent')) {
+              statusMatch = true;
+            }
+          }
+          if (selectedStatus === 'sale') {
+            if (propStatusStr.includes('sale') || propPurposeStr.includes('sale') || propPurposeStr.includes('sell')) {
+              statusMatch = true;
+            } else if ((propStatusStr === 'active' || propStatusStr === 'live') && !propPurposeStr.includes('rent')) {
+              statusMatch = true;
+            }
+          }
         }
         if (!statusMatch) match = false;
       }
 
       if (filters.district && prop.district?.toLowerCase() !== filters.district.toLowerCase()) match = false;
+
+      // Filter by condition (New vs Used)
+      if (filters.condition) {
+        if (filters.condition === 'Used Property') {
+          if (prop.isUsedProperty !== true) match = false;
+        } else if (filters.condition === 'New Property') {
+          if (prop.isUsedProperty === true) match = false;
+        }
+      }
 
       // Check features
       if (filters.features) {
@@ -158,7 +202,7 @@ export default function Results() {
 
       return match;
     });
-  }, [properties, filters]);
+  }, [properties, filters, categoryToTypesMap]);
 
   // Antigravity animation variants
   const containerVariants = {
