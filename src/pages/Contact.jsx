@@ -148,7 +148,7 @@ export default function Contact() {
           "mainEntity": {
             "@type": "RealEstateAgent",
             "name": "Property Express",
-            "image": "https://propertyexpress-mu.vercel.app/logo.png",
+            "image": "https://propertyxpress.in/logo.png",
             "telephone": settings?.primaryPhone || "+919876543210",
             "email": settings?.supportEmail || "contact@property-express.com",
             "address": {

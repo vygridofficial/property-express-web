@@ -214,7 +214,7 @@ export default function PropertyDetail() {
             "@type": "RealEstateListing",
             "name": property.title,
             "description": property.description,
-            "url": `https://propertyexpress-mu.vercel.app/properties/${property.id}`,
+            "url": `https://propertyxpress.in/properties/${property.id}`,
             "image": [property.imageUrls?.[0] || property.images?.[0] || property.image],
             "address": {
               "@type": "PostalAddress",
@@ -353,7 +353,6 @@ export default function PropertyDetail() {
               <ShareMenu 
                 title={property.title} 
                 url={`/properties/${property.id}`} 
-                image={property.imageUrls?.[0] || property.images?.[0] || property.image} 
               />
             </div>
 
@@ -604,10 +603,10 @@ export default function PropertyDetail() {
                       </a>
                     )}
                     {agent && (() => {
-                      const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'https://propertyexpress-mu.vercel.app';
+                      const PROD_URL = 'https://propertyxpress.in';
                       return (
                         <a
-                          href={`https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, I'm interested in the property: ${property.title}\n\nLink: ${currentDomain}/properties/${property.id}\n\n${(property.imageUrls?.[0] || property.images?.[0] || property.image) ? `Cover Image: ${property.imageUrls?.[0] || property.images?.[0] || property.image}` : ''}`)}`}
+                          href={`https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, I'm interested in the property: ${property.title}\n\nLink: ${PROD_URL}/properties/${property.id}`)}`}
                           target="_blank"
                           rel="noreferrer"
                           className={styles.btnWhatsapp}

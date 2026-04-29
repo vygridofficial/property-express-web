@@ -18,7 +18,7 @@ const SEO = ({
   const { siteSettings } = useAdmin();
   const siteName = siteSettings?.siteName || 'Property Express';
   const tagline = siteSettings?.tagline || 'Premium Real Estate';
-  const baseUrl = 'https://propertyexpress-mu.vercel.app';
+  const baseUrl = 'https://propertyxpress.in';
 
   const fullTitle = title ? `${title} | ${siteName}` : `${siteName} | ${tagline}`;
   const canonicalUrl = url ? `${baseUrl}${url}` : baseUrl;

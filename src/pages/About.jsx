@@ -25,9 +25,9 @@ export default function About() {
           "@context": "https://schema.org",
           "@type": "RealEstateAgent",
           "name": "Property Express",
-          "image": "https://propertyexpress-mu.vercel.app/logo.png",
+          "image": "https://propertyxpress.in/logo.png",
           "description": "Redefining luxury real estate with trust and transparency.",
-          "url": "https://propertyexpress-mu.vercel.app/about",
+          "url": "https://propertyxpress.in/about",
           "address": "Trivandrum, Kerala, India"
         }}
       />

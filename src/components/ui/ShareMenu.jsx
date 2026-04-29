@@ -27,10 +27,11 @@ const LinkedinIcon = ({ size = 20 }) => (
   </svg>
 );
 
+const BASE_URL = 'https://propertyxpress.in';
+
 export default function ShareMenu({ 
   title, 
   url, 
-  image,
   text = "Check out this property on Property Express!", 
   className = "" 
 }) {
@@ -38,19 +39,18 @@ export default function ShareMenu({
   const [copied, setCopied] = useState(false);
   const menuRef = useRef(null);
 
-  // Full absolute URL
+  // Full absolute URL — always uses the production domain so shared links open the live site
   const shareUrl = url.startsWith('http') 
     ? url 
-    : `${window.location.origin}${url}`;
+    : `${BASE_URL}${url}`;
 
-  // Build the rich share text
+  // Build the share message: title + body + link
   const messageTitle = title ? `Property: ${title}` : '';
   const messageBody = text;
-  const messageImage = image ? `Cover Image: ${image}` : '';
   const messageLink = `Link: ${shareUrl}`;
 
-  const messageWithImage = [messageTitle, messageBody, messageImage].filter(Boolean).join('\n\n');
-  const whatsappMessage = [messageTitle, messageBody, messageImage, messageLink].filter(Boolean).join('\n\n');
+  const shareText = [messageTitle, messageBody].filter(Boolean).join('\n\n');
+  const whatsappMessage = [messageTitle, messageBody, messageLink].filter(Boolean).join('\n\n');
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -67,7 +67,7 @@ export default function ShareMenu({
       try {
         await navigator.share({
           title,
-          text: messageWithImage,
+          text: shareText,
           url: shareUrl,
         });
       } catch (err) {
@@ -104,7 +104,7 @@ export default function ShareMenu({
       name: 'Twitter',
       icon: TwitterIcon,
       color: '#1DA1F2',
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title ? `${title}\n${text}` : text)}&url=${encodeURIComponent(shareUrl)}`,
+      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
     },
     {
       name: 'LinkedIn',
