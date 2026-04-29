@@ -78,8 +78,9 @@ export default function PropertyCard({ property }) {
   const finalPhone = (propertyPhone || globalPhone || '').toString();
   const cleanPhone = finalPhone.replace(/\D/g, '');
 
+  const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'https://propertyexpress-mu.vercel.app';
   const waLink = cleanPhone
-    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi, I'm interested in ${title}`)}`
+    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi, I'm interested in the property: ${title}\n\nLink: ${currentDomain}/properties/${id}\n\n${allImages[0] !== PLACEHOLDER ? `Cover Image: ${allImages[0]}` : ''}`)}`
     : null;
   const callLink = cleanPhone ? `tel:${cleanPhone}` : null;
 
@@ -210,6 +211,7 @@ export default function PropertyCard({ property }) {
           <ShareMenu
             title={title}
             url={`/properties/${id}`}
+            image={allImages[0] !== PLACEHOLDER ? allImages[0] : null}
             className="property-card-share"
           />
         </div>

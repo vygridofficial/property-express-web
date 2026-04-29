@@ -30,6 +30,7 @@ const LinkedinIcon = ({ size = 20 }) => (
 export default function ShareMenu({ 
   title, 
   url, 
+  image,
   text = "Check out this property on Property Express!", 
   className = "" 
 }) {
@@ -41,6 +42,15 @@ export default function ShareMenu({
   const shareUrl = url.startsWith('http') 
     ? url 
     : `${window.location.origin}${url}`;
+
+  // Build the rich share text
+  const messageTitle = title ? `Property: ${title}` : '';
+  const messageBody = text;
+  const messageImage = image ? `Cover Image: ${image}` : '';
+  const messageLink = `Link: ${shareUrl}`;
+
+  const messageWithImage = [messageTitle, messageBody, messageImage].filter(Boolean).join('\n\n');
+  const whatsappMessage = [messageTitle, messageBody, messageImage, messageLink].filter(Boolean).join('\n\n');
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -57,7 +67,7 @@ export default function ShareMenu({
       try {
         await navigator.share({
           title,
-          text,
+          text: messageWithImage,
           url: shareUrl,
         });
       } catch (err) {
@@ -82,7 +92,7 @@ export default function ShareMenu({
       name: 'WhatsApp',
       icon: WhatsAppIcon,
       color: '#25D366',
-      url: `https://wa.me/?text=${encodeURIComponent(text + " " + shareUrl)}`,
+      url: `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`,
     },
     {
       name: 'Facebook',
@@ -94,7 +104,7 @@ export default function ShareMenu({
       name: 'Twitter',
       icon: TwitterIcon,
       color: '#1DA1F2',
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`,
+      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title ? `${title}\n${text}` : text)}&url=${encodeURIComponent(shareUrl)}`,
     },
     {
       name: 'LinkedIn',

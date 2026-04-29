@@ -350,7 +350,11 @@ export default function PropertyDetail() {
                   Featured
                 </span>
               )}
-              <ShareMenu title={property.title} url={`/properties/${property.id}`} />
+              <ShareMenu 
+                title={property.title} 
+                url={`/properties/${property.id}`} 
+                image={property.imageUrls?.[0] || property.images?.[0] || property.image} 
+              />
             </div>
 
             {/* Property Videos — only rendered if at least one link exists */}
@@ -599,16 +603,19 @@ export default function PropertyDetail() {
                         <Phone size={18} /> Call Now
                       </a>
                     )}
-                    {agent && (
-                      <a
-                        href={`https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`I am interested in ${property.title}`)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={styles.btnWhatsapp}
-                      >
-                        <MessageCircle size={18} /> WhatsApp
-                      </a>
-                    )}
+                    {agent && (() => {
+                      const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'https://propertyexpress-mu.vercel.app';
+                      return (
+                        <a
+                          href={`https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, I'm interested in the property: ${property.title}\n\nLink: ${currentDomain}/properties/${property.id}\n\n${(property.imageUrls?.[0] || property.images?.[0] || property.image) ? `Cover Image: ${property.imageUrls?.[0] || property.images?.[0] || property.image}` : ''}`)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.btnWhatsapp}
+                        >
+                          <MessageCircle size={18} /> WhatsApp
+                        </a>
+                      );
+                    })()}
                   </div>
                   {formStatus === 'error' && (
                     <div style={{ color: '#ed1b24', marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
