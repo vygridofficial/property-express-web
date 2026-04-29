@@ -36,6 +36,8 @@ export default function PropertyDetail() {
   const [currentMainIndex, setCurrentMainIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   // Initialize agent from cached state immediately for fast render
   useEffect(() => {
@@ -68,16 +70,13 @@ export default function PropertyDetail() {
     });
   }, [id]);
 
-  if (!property) return <div style={{ padding: '8rem 2rem', textAlign: 'center' }}>Loading or not found...</div>;
+  // Prepare images logic (safe to run before property is loaded)
+  const allImages = useMemo(() => {
+    if (!property) return [];
+    return property.imageUrls || property.images || (property.image ? [property.image] : []);
+  }, [property]);
 
-  // Prepare images to ensure we always have 3 for the gallery layout
-  const allImages = property.imageUrls || property.images || (property.image ? [property.image] : []);
-  const safeImg = allImages[0] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80';
-  const displayImages = [
-    safeImg,
-    allImages[1] || safeImg,
-    allImages[2] || safeImg
-  ];
+  const safeImg = 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80';
 
   // Auto-slide logic for main image
   const cycleIndices = useMemo(() => {
@@ -95,6 +94,8 @@ export default function PropertyDetail() {
 
     return () => clearInterval(interval);
   }, [cycleIndices]);
+
+  if (!property) return <div style={{ padding: '8rem 2rem', textAlign: 'center' }}>Loading or not found...</div>;
 
   const activeMainImage = allImages[cycleIndices[currentMainIndex]] || safeImg;
 
@@ -172,9 +173,6 @@ export default function PropertyDetail() {
     }
   };
 
-  // Touch handlers for mobile swiping
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
   const minSwipeDistance = 50;
 
   const onTouchStart = (e) => {
