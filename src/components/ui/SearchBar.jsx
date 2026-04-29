@@ -405,7 +405,7 @@ export default function SearchBar({ properties = [] }) {
                                 <div className={styles.resultBody}>
                                   <div className={styles.resultTitle}>{prop.title}</div>
                                   <div className={styles.resultMeta}>{prop.category} &middot; {prop.location}</div>
-                                  <div className={styles.resultPrice}>{formatPrice(prop.price)}</div>
+                                  <div className={styles.resultPrice}>{formatPrice(prop.numericPrice || prop.price)}</div>
                                 </div>
                               </div>
                               {activeIndex === flatIndex && (

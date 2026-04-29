@@ -196,7 +196,7 @@ function PropertyListingCard({ property, index }) {
           >
             {property.status === 'Inactive' ? 'Inactive' : ((property.listingType === 'Rent' || property.status === 'For Rent') ? 'For Rent' : 'For Sale')}
           </span>
-          {property.isUsedProperty && (
+          {(property.condition === 'Used' || (property.isUsedProperty && property.condition !== 'New' && property.condition !== 'Default')) && (
             <span
               className={styles.listingBadge}
               style={{
@@ -214,6 +214,26 @@ function PropertyListingCard({ property, index }) {
               }}
             >
               Used
+            </span>
+          )}
+          {property.condition === 'New' && (
+            <span
+              className={styles.listingBadge}
+              style={{
+                background: 'black',
+                color: 'white',
+                display: 'inline-block',
+                padding: '0.4rem 1rem',
+                borderRadius: '30px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+                marginLeft: '0.5rem'
+              }}
+            >
+              New
             </span>
           )}
         </div>

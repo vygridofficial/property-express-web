@@ -80,7 +80,7 @@ export default function Results() {
   };
 
   const { propertyTypes } = useAdmin();
-  
+
   // Build dynamic category to types map from admin property types
   const categoryToTypesMap = useMemo(() => {
     const map = {
@@ -100,7 +100,7 @@ export default function Results() {
         if (cat) {
           if (!map[cat]) map[cat] = [];
           if (!map[`${cat} properties`]) map[`${cat} properties`] = [];
-          
+
           const typeName = pt.name?.toLowerCase();
           if (typeName) {
             if (!map[cat].includes(typeName)) map[cat].push(typeName);
@@ -181,10 +181,11 @@ export default function Results() {
 
       // Filter by condition (New vs Used)
       if (filters.condition) {
+        const propCondition = prop.condition || (prop.isUsedProperty ? 'Used' : 'New');
         if (filters.condition === 'Used Property') {
-          if (prop.isUsedProperty !== true) match = false;
+          if (propCondition !== 'Used') match = false;
         } else if (filters.condition === 'New Property') {
-          if (prop.isUsedProperty === true) match = false;
+          if (propCondition !== 'New') match = false;
         }
       }
 

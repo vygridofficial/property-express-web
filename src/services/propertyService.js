@@ -1,5 +1,6 @@
 import { db } from '../firebase';
-import { collection, getDocs, getDoc, query, where, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, query, where, doc, updateDoc, deleteDoc, addDoc, getDocFromServer } from 'firebase/firestore';
+
 
 const PROPERTIES_COLLECTION = 'properties';
 
@@ -71,7 +72,9 @@ export const getAllProperties = async (filters = {}, includeInactive = false) =>
 
 export const getPropertyById = async (id) => {
   const docRef = doc(db, PROPERTIES_COLLECTION, id);
-  const docSnap = await getDoc(docRef);
+  // Always fetch from server to bypass Firestore's local IndexedDB cache.
+  // This ensures admin image/content updates are immediately visible.
+  const docSnap = await getDocFromServer(docRef);
   if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
   return null;
 };

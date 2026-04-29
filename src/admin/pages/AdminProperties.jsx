@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Edit2, Trash2, X, UploadCloud, User } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, X, UploadCloud, User, PauseCircle, PlayCircle } from 'lucide-react';
 import PhoneInput from '../../components/common/PhoneInput';
 import { FlatIcon, PlotIcon, WarehouseIcon, VillaIcon } from '../components/icons/PropertyIcons';
 import { useAdmin } from '../context/AdminContext';
@@ -58,14 +58,13 @@ export default function AdminProperties() {
   // Expanded Form State
   const initialForm = {
     title: '', category: '', status: 'Active', isFeatured: false, listingType: 'Sell',
-    isUsedProperty: false,
+    condition: 'Default',
     price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
     address: '', district: '', mapsUrl: '',
     agentName: 'Property Express',
-    agentPhone: '97787 45146',
     agentPhoneCode: '+91',
     agentPhoto: null,
-    description: '', amenities: [], dynamicFilters: {},
+    description: '', propertyHighlights: '', locationHighlights: '', amenities: [], dynamicFilters: {},
     addedOn: new Date().toISOString().slice(0, 10),
     instagramLink: '',
     facebookLink: '',
@@ -119,7 +118,7 @@ export default function AdminProperties() {
         category: selectedProperty.category || 'Apartment',
         status: selectedProperty.status || 'Active',
         isFeatured: selectedProperty.isFeatured || false,
-        isUsedProperty: selectedProperty.isUsedProperty || false,
+        condition: selectedProperty.condition || (selectedProperty.isUsedProperty ? 'Used' : 'Default'),
         price: priceForField,
         area: selectedProperty.area || '',
         areaUnit: selectedProperty.areaUnit || 'sqft',
@@ -149,9 +148,12 @@ export default function AdminProperties() {
         agentPhoneCode: selectedProperty.agentPhoneCode || '+91',
         agentPhoto: selectedProperty.agentPhoto || null,
         description: selectedProperty.description || '',
+        propertyHighlights: selectedProperty.propertyHighlights || '',
+        locationHighlights: selectedProperty.locationHighlights || '',
         amenities: selectedProperty.amenities || [],
         dynamicFilters: selectedProperty.dynamicFilters || {},
         addedOn: selectedProperty.addedOn || new Date().toISOString().slice(0, 10),
+        propertyId: selectedProperty.propertyId || '',
         instagramLink: selectedProperty.instagramLink || '',
         facebookLink: selectedProperty.facebookLink || '',
         youtubeLink: selectedProperty.youtubeLink || '',
@@ -282,7 +284,7 @@ export default function AdminProperties() {
       const idTerm = idSearchTerm.toLowerCase();
       const loc = (p.address || p.location || '').toLowerCase();
       const pId = (p.propertyId || '').toLowerCase();
-      
+
       const matchSearch = p.title.toLowerCase().includes(term) || loc.includes(term);
       const matchIdSearch = !idTerm || pId.includes(idTerm);
       const matchStatus = statusFilter === 'All' || p.status === statusFilter;
@@ -419,9 +421,19 @@ export default function AdminProperties() {
       };
       const fallbackImage = DEFAULT_UNSPLASH[formData.category] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80';
 
-      // Generate Property ID for new listings if not editing
-      let propertyId = formData.propertyId;
-      if (!editingId) {
+      // Resolve propertyId — never write undefined to Firestore
+      let propertyId;
+      if (editingId) {
+        // 1. Use what was pre-filled into the form (from selectedProperty)
+        // 2. Fall back to the computed propertyId from propertiesWithIds (in-memory)
+        // 3. Fall back to the raw selectedProperty.propertyId
+        // 4. Final fallback: empty string (Firestore rejects undefined)
+        const computedProp = propertiesWithIds.find(p => p.id === editingId);
+        propertyId = formData.propertyId
+          || computedProp?.propertyId
+          || selectedProperty?.propertyId
+          || '';
+      } else {
         const peIds = properties
           .map(p => p.propertyId)
           .filter(id => id && typeof id === 'string' && id.startsWith('PE'))
@@ -438,9 +450,10 @@ export default function AdminProperties() {
         category: formData.category,
         status: formData.status,
         isFeatured: formData.isFeatured,
-        isUsedProperty: formData.isUsedProperty || false,
+        condition: formData.condition || 'Default',
         price: formattedPriceValue,
         numericPrice: numericPriceValue,
+        // Preserve the existing propertyId when editing; only generate a new one for new listings
         propertyId: propertyId,
         area: formData.area,
         bedrooms: formData.bedrooms,
@@ -454,6 +467,8 @@ export default function AdminProperties() {
         agentPhoneCode: formData.agentPhoneCode || '+91',
         agentPhoto: uploadedAgentPhotoUrl,
         description: formData.description,
+        propertyHighlights: formData.propertyHighlights || '',
+        locationHighlights: formData.locationHighlights || '',
         amenities: formData.amenities,
         dynamicFilters: formData.dynamicFilters || {},
         addedOn: formData.addedOn || new Date().toISOString().slice(0, 10),
@@ -771,7 +786,7 @@ export default function AdminProperties() {
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
                             <button
                               className="btn"
                               style={{ flex: 1, background: '#18181a', color: 'white', border: 'none', borderRadius: 12, padding: '0.75rem', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
@@ -784,6 +799,13 @@ export default function AdminProperties() {
                               }}
                             >
                               <Edit2 size={16} /> Edit
+                            </button>
+                            <button
+                              className="btn"
+                              style={{ flex: 1, background: prop.status === 'Active' ? 'rgba(0,0,0,0.05)' : 'rgba(46,204,113,0.1)', color: prop.status === 'Active' ? '#555' : '#2ecc71', border: 'none', borderRadius: 12, padding: '0.75rem', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                              onClick={(e) => { e.stopPropagation(); togglePropertyStatus(prop.id, prop.status); }}
+                            >
+                              {prop.status === 'Active' ? 'Hide' : 'Show'}
                             </button>
                             <button
                               className="btn"
@@ -839,7 +861,15 @@ export default function AdminProperties() {
                             setEditingId(prop.id);
                             setIsDrawerOpen(true);
                             setFormErrors([]);
-                          }}><Edit2 size={16} /></button>
+                          }} title="Edit"><Edit2 size={16} /></button>
+                          
+                          <button
+                            onClick={() => togglePropertyStatus(prop.id, prop.status)}
+                            style={{ background: 'none', border: 'none', fontSize: '0.75rem', fontWeight: 700, color: prop.status === 'Active' ? '#888' : '#2ecc71', cursor: 'pointer' }}
+                          >
+                            {prop.status === 'Active' ? 'Hide' : 'Show'}
+                          </button>
+
                           <button
                             className={styles.iconBtn}
                             style={{ color: '#ed1b24' }}
@@ -952,15 +982,24 @@ export default function AdminProperties() {
                         <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Is Featured?</span>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <label style={{ position: 'relative', display: 'inline-block', width: 44, height: 24 }}>
-                          <input type="checkbox" checked={formData.isUsedProperty} onChange={e => handleFormChange('isUsedProperty', e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
-                          <span style={{ position: 'absolute', cursor: 'pointer', inset: 0, background: formData.isUsedProperty ? '#18181a' : 'rgba(0,0,0,0.1)', borderRadius: 24, transition: '0.3s' }}>
-                            <span style={{ position: 'absolute', height: 18, width: 18, left: 3, bottom: 3, background: 'white', borderRadius: '50%', transition: '0.3s', transform: formData.isUsedProperty ? 'translateX(20px)' : 'translateX(0)' }}></span>
-                          </span>
-                        </label>
-                        <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Is Used Property?</span>
+                      <div style={{ flex: 1, minWidth: '150px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.5rem' }}>Property Condition</label>
+                        <select
+                          value={formData.condition}
+                          onChange={e => handleFormChange('condition', e.target.value)}
+                          style={{
+                            width: '100%', padding: '8px 12px', background: 'rgba(255,255,255,0.4)',
+                            border: formErrors.includes('condition') ? '1px solid #ed1b24' : '1px solid var(--admin-glass-border)',
+                            borderRadius: 12, outline: 'none', color: 'var(--admin-text-main)',
+                            backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', fontFamily: 'Outfit'
+                          }}
+                        >
+                          <option value="Default">Default (No tag)</option>
+                          <option value="New">New</option>
+                          <option value="Used">Used</option>
+                        </select>
                       </div>
+
                     </div>
                   </div>
 
@@ -1047,10 +1086,20 @@ export default function AdminProperties() {
                   </div>
 
                   {/* Section 5 */}
-                  <SectionHeading>Section 5 — Description</SectionHeading>
-                  <div>
-                    <Label required>Property Description</Label>
-                    <textarea placeholder="Write a detailed description..." rows={4} value={formData.description} onChange={e => handleFormChange('description', e.target.value)} style={{ ...getInputStyle('description'), minHeight: 120, resize: 'vertical' }} />
+                  <SectionHeading>Section 5 — Descriptions</SectionHeading>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <div>
+                      <Label required>Introduction</Label>
+                      <textarea placeholder="Write a brief introduction..." rows={3} value={formData.description} onChange={e => handleFormChange('description', e.target.value)} style={{ ...getInputStyle('description'), minHeight: 80, resize: 'vertical' }} />
+                    </div>
+                    <div>
+                      <Label>Property Highlights</Label>
+                      <textarea placeholder="List key property highlights..." rows={4} value={formData.propertyHighlights} onChange={e => handleFormChange('propertyHighlights', e.target.value)} style={{ ...getInputStyle('propertyHighlights'), minHeight: 100, resize: 'vertical' }} />
+                    </div>
+                    <div>
+                      <Label>Location Highlights</Label>
+                      <textarea placeholder="List key location highlights..." rows={4} value={formData.locationHighlights} onChange={e => handleFormChange('locationHighlights', e.target.value)} style={{ ...getInputStyle('locationHighlights'), minHeight: 100, resize: 'vertical' }} />
+                    </div>
                   </div>
 
                   {/* Social Media Links (Optional) */}

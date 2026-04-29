@@ -15,6 +15,8 @@ import { getPropertyCoordinates } from '../utils/geo';
 import SEO from '../components/common/SEO';
 import { isValidEmail, isValidPhone } from '../utils/validation';
 import PhoneInput from '../components/common/PhoneInput';
+import ShareMenu from '../components/ui/ShareMenu';
+
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -35,8 +37,8 @@ export default function PropertyDetail() {
   const [showLightbox, setShowLightbox] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  // Initialize agent from cached state immediately for fast render
   useEffect(() => {
-    // If we have data from state, we can already initialize agent info
     if (property) {
       if (property.sellerName || property.agentName) {
         setAgent({
@@ -47,8 +49,10 @@ export default function PropertyDetail() {
         });
       }
     }
+  }, [property]);
 
-    // Always fetch in background to get latest stats/availability
+  // Always fetch fresh data from Firestore on load (never rely solely on router state)
+  useEffect(() => {
     getPropertyById(id).then(data => {
       if (data) {
         setProperty(data);
@@ -62,7 +66,7 @@ export default function PropertyDetail() {
         }
       }
     });
-  }, [id, property]);
+  }, [id]);
 
   if (!property) return <div style={{ padding: '8rem 2rem', textAlign: 'center' }}>Loading or not found...</div>;
 
@@ -325,9 +329,15 @@ export default function PropertyDetail() {
                 {(property.listingType === 'Rent' || property.status === 'For Rent') ? 'For Rent' : 'For Sale'}
               </span>
 
-              {property.isUsedProperty && (
+              {(property.condition === 'Used' || (property.isUsedProperty && property.condition !== 'New' && property.condition !== 'Default')) && (
                 <span className={styles.badge} style={{ background: 'black', color: 'white', padding: '0.5rem 1.25rem' }}>
                   Used
+                </span>
+              )}
+
+              {property.condition === 'New' && (
+                <span className={styles.badge} style={{ background: 'black', color: 'white', padding: '0.5rem 1.25rem' }}>
+                  New
                 </span>
               )}
 
@@ -340,6 +350,7 @@ export default function PropertyDetail() {
                   Featured
                 </span>
               )}
+              <ShareMenu title={property.title} url={`/properties/${property.id}`} />
             </div>
 
             {/* Property Videos — only rendered if at least one link exists */}
@@ -406,7 +417,23 @@ export default function PropertyDetail() {
           {/* Description Section */}
           <motion.div className={styles.descriptionSection} variants={revealVariants} initial="hidden" whileInView="visible" viewport={revealViewport}>
             <h3>Property Description</h3>
-            <p style={{ whiteSpace: 'pre-line' }}>{property.description}</p>
+            {property.description && (
+              <p style={{ whiteSpace: 'pre-line' }}>{property.description}</p>
+            )}
+            
+            {property.propertyHighlights && (
+              <div style={{ marginTop: '1.5rem' }}>
+                <strong style={{ display: 'block', marginBottom: '0.5rem', fontSize: '1.1rem', color: '#1a1a1a' }}>Property Highlights</strong>
+                <p style={{ whiteSpace: 'pre-line', margin: 0 }}>{property.propertyHighlights}</p>
+              </div>
+            )}
+            
+            {property.locationHighlights && (
+              <div style={{ marginTop: '1.5rem' }}>
+                <strong style={{ display: 'block', marginBottom: '0.5rem', fontSize: '1.1rem', color: '#1a1a1a' }}>Location Highlights</strong>
+                <p style={{ whiteSpace: 'pre-line', margin: 0 }}>{property.locationHighlights}</p>
+              </div>
+            )}
           </motion.div>
 
           {/* Amenities Section */}
