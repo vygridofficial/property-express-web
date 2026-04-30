@@ -179,6 +179,9 @@ export default function PropertyCard({ property }) {
           {(property.listingType === 'Rent' || status === 'For Rent') && (
             <span className={styles.perMonth}>/month</span>
           )}
+          {property.cent && (
+            <span className={styles.perMonth}>/cent</span>
+          )}
         </div>
         <div className={styles.titleWrap}>
           <Link to={`/properties/${id}`} state={{ property }} className={styles.titleLink}>

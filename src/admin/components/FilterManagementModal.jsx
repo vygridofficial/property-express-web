@@ -71,10 +71,17 @@ export default function FilterManagementModal({ isOpen, onClose, categoryName })
     setNewFilter({ label: '', key: '', type: 'dropdown', options: '' });
   };
 
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
   const onDeleteFilter = (index) => {
-    if (window.confirm('Are you sure you want to delete this filter? This will remove it from the frontend search.')) {
-      const newFilters = filters.filter((_, i) => i !== index);
+    setDeleteTarget(index);
+  };
+
+  const confirmDeleteFilter = () => {
+    if (deleteTarget !== null) {
+      const newFilters = filters.filter((_, i) => i !== deleteTarget);
       handleSave(newFilters);
+      setDeleteTarget(null);
     }
   };
 
@@ -285,6 +292,33 @@ export default function FilterManagementModal({ isOpen, onClose, categoryName })
           </button>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {deleteTarget !== null && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(4px)' }}
+            onClick={() => setDeleteTarget(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              onClick={e => e.stopPropagation()}
+              style={{ width: '100%', maxWidth: 400, padding: '2rem', textAlign: 'center', background: '#ffffff', borderRadius: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.1)' }}
+            >
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(237,27,36,0.1)', color: '#ed1b24', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Trash2 size={32} />
+              </div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.75rem', color: '#18181b' }}>Delete Filter?</h2>
+              <p style={{ color: '#71717a', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.5 }}>Are you sure you want to delete this filter? This will remove it from the frontend search.</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button onClick={() => setDeleteTarget(null)} style={{ flex: 1, padding: '0.875rem', background: '#f4f4f5', color: '#18181b', border: 'none', fontWeight: 600, borderRadius: 12, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={confirmDeleteFilter} style={{ flex: 1, padding: '0.875rem', background: '#ed1b24', color: 'white', border: 'none', fontWeight: 700, borderRadius: 12, cursor: 'pointer' }}>Confirm Delete</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

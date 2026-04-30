@@ -59,7 +59,7 @@ export default function AdminProperties() {
   const initialForm = {
     title: '', category: '', status: 'Active', isFeatured: false, listingType: 'Sell',
     condition: 'Default',
-    price: '', area: '', areaUnit: 'sqft', bedrooms: '', bathrooms: '',
+    price: '', area: '', areaUnit: 'sqft', cent: '', bedrooms: '', bathrooms: '',
     address: '', district: '', mapsUrl: '',
     agentName: 'Property Express',
     agentPhoneCode: '+91',
@@ -122,6 +122,7 @@ export default function AdminProperties() {
         price: priceForField,
         area: selectedProperty.area || '',
         areaUnit: selectedProperty.areaUnit || 'sqft',
+        cent: selectedProperty.cent || '',
         bedrooms: selectedProperty.bedrooms || '',
         bathrooms: selectedProperty.bathrooms || '',
         address: selectedProperty.address || selectedProperty.location || '',
@@ -200,15 +201,15 @@ export default function AdminProperties() {
     }
   };
 
-  const handleDeleteProperty = (id) => {
-    setPropertyToDelete(id);
+  const handleDeleteProperty = (property) => {
+    setPropertyToDelete(property);
   };
 
   const confirmDeleteProperty = async () => {
     if (!propertyToDelete) return;
     try {
-      await deleteProperty(propertyToDelete);
-      setProperties(prev => prev.filter(p => p.id !== propertyToDelete));
+      await deleteProperty(propertyToDelete.id);
+      setProperties(prev => prev.filter(p => p.id !== propertyToDelete.id));
       setShowToast('Property deleted successfully');
       setTimeout(() => setShowToast(''), 3000);
     } catch (error) {
@@ -456,6 +457,7 @@ export default function AdminProperties() {
         // Preserve the existing propertyId when editing; only generate a new one for new listings
         propertyId: propertyId,
         area: formData.area,
+        cent: formData.cent,
         bedrooms: formData.bedrooms,
         bathrooms: formData.bathrooms,
         location: formData.address,
@@ -500,6 +502,7 @@ export default function AdminProperties() {
         isUsedProperty: false,
         price: '',
         area: '',
+        cent: '',
         bedrooms: 2,
         bathrooms: 2,
         address: '',
@@ -810,7 +813,7 @@ export default function AdminProperties() {
                             <button
                               className="btn"
                               style={{ flex: 1, background: 'rgba(237,27,36,0.1)', color: '#ed1b24', border: 'none', borderRadius: 12, padding: '0.75rem', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                              onClick={(e) => { e.stopPropagation(); handleDeleteProperty(prop.id); }}
+                              onClick={(e) => { e.stopPropagation(); handleDeleteProperty(prop); }}
                             >
                               <Trash2 size={16} /> Delete
                             </button>
@@ -873,7 +876,7 @@ export default function AdminProperties() {
                           <button
                             className={styles.iconBtn}
                             style={{ color: '#ed1b24' }}
-                            onClick={() => handleDeleteProperty(prop.id)}
+                            onClick={() => handleDeleteProperty(prop)}
                           >
                             <Trash2 size={16} />
                           </button>
@@ -1024,6 +1027,12 @@ export default function AdminProperties() {
                     <div>
                       <Label required>Area (sqft)</Label>
                       <input type="number" placeholder="Enter area in sqft..." className="no-spinners" value={formData.area} onChange={e => handleFormChange('area', e.target.value)} style={getInputStyle('area')} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                    <div>
+                      <Label>Cent (Optional)</Label>
+                      <input type="number" placeholder="Enter cent..." className="no-spinners" value={formData.cent} onChange={e => handleFormChange('cent', e.target.value)} style={getInputStyle('cent')} />
                     </div>
                   </div>
                   <AnimatePresence>
@@ -1432,7 +1441,9 @@ export default function AdminProperties() {
                 <Trash2 size={32} />
               </div>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.75rem', color: '#18181b' }}>Delete Property?</h2>
-              <p style={{ color: '#71717a', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.5 }}>Are you sure you want to delete this property? This action cannot be undone.</p>
+              <p style={{ color: '#71717a', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.5 }}>
+                Are you sure you want to delete <strong>"{propertyToDelete.title}"</strong>? This action cannot be undone.
+              </p>
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <button className="btn" onClick={() => setPropertyToDelete(null)} style={{ flex: 1, padding: '0.875rem', background: '#f4f4f5', color: '#18181b', border: 'none', fontWeight: 600, borderRadius: 12 }}>Cancel</button>
                 <button className="btn" onClick={confirmDeleteProperty} style={{ flex: 1, padding: '0.875rem', background: '#ed1b24', color: 'white', border: 'none', fontWeight: 700, borderRadius: 12 }}>Confirm Delete</button>

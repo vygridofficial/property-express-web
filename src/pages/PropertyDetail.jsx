@@ -348,9 +348,9 @@ export default function PropertyDetail() {
                   Featured
                 </span>
               )}
-              <ShareMenu 
-                title={property.title} 
-                url={`/properties/${property.id}`} 
+              <ShareMenu
+                title={property.title}
+                url={`/properties/${property.id}`}
               />
             </div>
 
@@ -391,6 +391,9 @@ export default function PropertyDetail() {
                 {(property.listingType === 'Rent' || property.status === 'For Rent') && (
                   <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>/month</span>
                 )}
+                {property.cent && (
+                  <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>/cent</span>
+                )}
               </div>
             </div>
             <div className={styles.location}>
@@ -413,6 +416,9 @@ export default function PropertyDetail() {
             {(property.area || property.sqft) > 0 && (
               <div className={styles.featureItem}><Scaling size={20} /> <span>{Number(property.area || property.sqft || 0).toLocaleString()} sqft</span></div>
             )}
+            {property.cent && (
+              <div className={styles.featureItem}><Scaling size={20} /> <span>{property.cent} Cent</span></div>
+            )}
           </motion.div>
 
           {/* Description Section */}
@@ -421,14 +427,14 @@ export default function PropertyDetail() {
             {property.description && (
               <p style={{ whiteSpace: 'pre-line' }}>{property.description}</p>
             )}
-            
+
             {property.propertyHighlights && (
               <div style={{ marginTop: '1.5rem' }}>
                 <strong style={{ display: 'block', marginBottom: '0.5rem', fontSize: '1.1rem', color: '#1a1a1a' }}>Property Highlights</strong>
                 <p style={{ whiteSpace: 'pre-line', margin: 0 }}>{property.propertyHighlights}</p>
               </div>
             )}
-            
+
             {property.locationHighlights && (
               <div style={{ marginTop: '1.5rem' }}>
                 <strong style={{ display: 'block', marginBottom: '0.5rem', fontSize: '1.1rem', color: '#1a1a1a' }}>Location Highlights</strong>

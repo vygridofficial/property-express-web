@@ -17,7 +17,7 @@ export const getFeaturedProperties = async (includeInactive = false) => {
   if (!includeInactive) {
     q = query(q, where("status", "in", ["Active", "live"]));
   }
-  
+
   const [snapshot, typesSnapshot] = await Promise.all([
     getDocs(q),
     getDocs(collection(db, 'propertyTypes'))
@@ -50,7 +50,7 @@ export const getAllProperties = async (filters = {}, includeInactive = false) =>
     getDocs(collection(db, PROPERTIES_COLLECTION)),
     getDocs(collection(db, 'propertyTypes'))
   ]);
-  
+
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   if (!includeInactive) {
@@ -113,24 +113,24 @@ const CATEGORY_SYNONYMS = {
 
 export const getPropertiesByCategory = async (category, includeInactive = false) => {
   const normalizedCategory = category?.toString().trim() || '';
-  
+
   // Return from cache immediately if available (instant render for back-navigation)
   if (categoryCache.has(normalizedCategory) && !includeInactive) {
     return categoryCache.get(normalizedCategory);
   }
 
   const synonyms = CATEGORY_SYNONYMS[normalizedCategory] || [normalizedCategory];
-  
+
   // Use 'in' query to fetch all synonym matches in one go
   let q = query(
-    collection(db, PROPERTIES_COLLECTION), 
+    collection(db, PROPERTIES_COLLECTION),
     where("category", "in", synonyms)
   );
 
   if (!includeInactive) {
     q = query(q, where("status", "in", ["Active", "live"]));
   }
-  
+
   const snapshot = await getDocs(q);
   let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -151,13 +151,13 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
   if (!includeInactive) {
     const typesSnapshot = await getDocs(collection(db, 'propertyTypes'));
     const activeTypes = typesSnapshot.docs.map(d => d.data()).filter(t => t.isActive !== false).map(t => (t.name || '').toLowerCase());
-    
+
     // Check if the requested category translates to an active type
     const requestedCats = synonyms.map(s => s.toLowerCase());
     const isCategoryActive = requestedCats.some(c => activeTypes.includes(c));
-    
+
     if (!isCategoryActive) {
-       results = [];
+      results = [];
     }
   }
 
@@ -171,10 +171,10 @@ export const getPropertiesByCategory = async (category, includeInactive = false)
 
 export const backfillPropertiesAgentDetails = async (agentName, agentPhone) => {
   const snapshot = await getDocs(collection(db, PROPERTIES_COLLECTION));
-  const updates = snapshot.docs.map(d => 
-    updateDoc(doc(db, PROPERTIES_COLLECTION, d.id), { 
-      agentName, 
-      agentPhone 
+  const updates = snapshot.docs.map(d =>
+    updateDoc(doc(db, PROPERTIES_COLLECTION, d.id), {
+      agentName,
+      agentPhone
     })
   );
   await Promise.all(updates);

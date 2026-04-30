@@ -93,11 +93,11 @@ function AppContent() {
       const savedScroll = sessionStorage.getItem(`scroll_${location.key}`);
       if (savedScroll) {
         const targetScroll = parseInt(savedScroll, 10);
-        
+
         // Use multiple attempts to overcome async content loading / height clamping
         const timer = setTimeout(() => {
           window.scrollTo({ top: targetScroll, behavior: 'instant' });
-          
+
           // Retry #1 after a short delay if we didn't reach the target (clamped)
           setTimeout(() => {
             if (Math.abs(window.scrollY - targetScroll) > 10) {
@@ -117,7 +117,7 @@ function AppContent() {
       }
     }
   }, [location.pathname, location.key, navType]);
-  
+
   if (settingsLoading && !isAdminPath) {
     return null; // Or a minimal branded loader if preferred
   }
@@ -128,12 +128,12 @@ function AppContent() {
   return (
     <>
       <AnimatePresence mode="wait">
-        <Routes 
-          location={location} 
+        <Routes
+          location={location}
           key={
-            location.pathname.startsWith('/admin') ? 'admin' : 
-            location.pathname.startsWith('/agreements') ? 'seller' : 
-            location.pathname
+            location.pathname.startsWith('/admin') ? 'admin' :
+              location.pathname.startsWith('/agreements') ? 'seller' :
+                location.pathname
           }
         >
 
@@ -154,8 +154,8 @@ function AppContent() {
           </Route>
 
           {/* Standalone Seller Portal Routes (Isolated) */}
-          <Route 
-            path="/agreements/*" 
+          <Route
+            path="/agreements/*"
             element={
               <SellerProvider>
                 <SellerLayout />
