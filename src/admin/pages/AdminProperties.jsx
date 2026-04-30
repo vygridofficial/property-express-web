@@ -383,7 +383,7 @@ export default function AdminProperties() {
   };
 
   const handleSaveProperty = async () => {
-    const required = ['title', 'category', 'status', 'price', 'area', 'address', 'district', 'mapsUrl', 'description'];
+    const required = ['title', 'category', 'status', 'price', 'address', 'district', 'mapsUrl', 'description'];
     const newErrors = [];
     required.forEach(req => { if (!formData[req]) newErrors.push(req); });
 
@@ -1025,13 +1025,13 @@ export default function AdminProperties() {
                       <input type="number" placeholder="Enter price in ₹..." className="no-spinners" value={formData.price} onChange={e => handleFormChange('price', e.target.value)} style={getInputStyle('price')} />
                     </div>
                     <div>
-                      <Label required>Area (sqft)</Label>
+                      <Label>Area (sqft)</Label>
                       <input type="number" placeholder="Enter area in sqft..." className="no-spinners" value={formData.area} onChange={e => handleFormChange('area', e.target.value)} style={getInputStyle('area')} />
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
                     <div>
-                      <Label>Cent (Optional)</Label>
+                      <Label>Cent</Label>
                       <input type="number" placeholder="Enter cent..." className="no-spinners" value={formData.cent} onChange={e => handleFormChange('cent', e.target.value)} style={getInputStyle('cent')} />
                     </div>
                   </div>
