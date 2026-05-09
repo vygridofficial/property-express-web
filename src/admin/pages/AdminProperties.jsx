@@ -59,7 +59,7 @@ export default function AdminProperties() {
   const initialForm = {
     title: '', category: '', status: 'Active', isFeatured: false, listingType: 'Sell',
     condition: 'Default',
-    price: '', area: '', areaUnit: 'sqft', cent: '', bedrooms: '', bathrooms: '',
+    price: '', rentUnit: '', area: '', areaUnit: 'sqft', cent: '', bedrooms: '', bathrooms: '',
     address: '', district: '', mapsUrl: '',
     agentName: 'Property Express',
     agentPhoneCode: '+91',
@@ -120,6 +120,7 @@ export default function AdminProperties() {
         isFeatured: selectedProperty.isFeatured || false,
         condition: selectedProperty.condition || (selectedProperty.isUsedProperty ? 'Used' : 'Default'),
         price: priceForField,
+        rentUnit: selectedProperty.rentUnit || '',
         area: selectedProperty.area || '',
         areaUnit: selectedProperty.areaUnit || 'sqft',
         cent: selectedProperty.cent || '',
@@ -454,6 +455,7 @@ export default function AdminProperties() {
         condition: formData.condition || 'Default',
         price: formattedPriceValue,
         numericPrice: numericPriceValue,
+        rentUnit: formData.rentUnit || '',
         // Preserve the existing propertyId when editing; only generate a new one for new listings
         propertyId: propertyId,
         area: formData.area,
@@ -1022,7 +1024,20 @@ export default function AdminProperties() {
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <Label required>Price (₹)</Label>
-                      <input type="number" placeholder="Enter price in ₹..." className="no-spinners" value={formData.price} onChange={e => handleFormChange('price', e.target.value)} style={getInputStyle('price')} />
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <input type="number" placeholder="Enter price in ₹..." className="no-spinners" value={formData.price} onChange={e => handleFormChange('price', e.target.value)} style={{ ...getInputStyle('price'), flex: 1 }} />
+                        {formData.listingType === 'Rent' && (
+                          <select 
+                            value={formData.rentUnit} 
+                            onChange={e => handleFormChange('rentUnit', e.target.value)}
+                            style={{ ...getInputStyle('rentUnit'), width: 'auto' }}
+                          >
+                            <option value="">None</option>
+                            <option value="month">Per Month</option>
+                            <option value="sqft">Per Sq.Ft</option>
+                          </select>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label>Area (sqft)</Label>

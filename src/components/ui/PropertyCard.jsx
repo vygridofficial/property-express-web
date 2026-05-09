@@ -178,7 +178,10 @@ export default function PropertyCard({ property }) {
           {displayPrice}
           {(property.listingType === 'Rent' || status === 'For Rent') && (
             <span className={styles.perMonth}>
-              {property.category === 'Warehouse' ? '/sq.ft' : '/month'}
+              {property.rentUnit === 'month' ? '/month' : 
+               property.rentUnit === 'sqft' ? '/sq.ft' : 
+               property.rentUnit === '' ? '' : 
+               (property.category === 'Warehouse' ? '/sq.ft' : '/month')}
             </span>
           )}
           {property.cent && (

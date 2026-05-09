@@ -390,7 +390,10 @@ export default function PropertyDetail() {
                 {formatPrice(property.numericPrice || property.price)}
                 {(property.listingType === 'Rent' || property.status === 'For Rent') && (
                   <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>
-                    {property.category === 'Warehouse' ? '/sq.ft' : '/month'}
+                    {property.rentUnit === 'month' ? '/month' : 
+                     property.rentUnit === 'sqft' ? '/sq.ft' : 
+                     property.rentUnit === '' ? '' : 
+                     (property.category === 'Warehouse' ? '/sq.ft' : '/month')}
                   </span>
                 )}
                 {property.cent && (
