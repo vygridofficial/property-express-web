@@ -389,7 +389,9 @@ export default function PropertyDetail() {
               <div className={styles.price}>
                 {formatPrice(property.numericPrice || property.price)}
                 {(property.listingType === 'Rent' || property.status === 'For Rent') && (
-                  <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>/month</span>
+                  <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>
+                    {property.category === 'Warehouse' ? '/sq.ft' : '/month'}
+                  </span>
                 )}
                 {property.cent && (
                   <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>/cent</span>

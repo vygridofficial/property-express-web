@@ -177,7 +177,9 @@ export default function PropertyCard({ property }) {
         <div className={styles.price}>
           {displayPrice}
           {(property.listingType === 'Rent' || status === 'For Rent') && (
-            <span className={styles.perMonth}>/month</span>
+            <span className={styles.perMonth}>
+              {property.category === 'Warehouse' ? '/sq.ft' : '/month'}
+            </span>
           )}
           {property.cent && (
             <span className={styles.perMonth}>/cent</span>
