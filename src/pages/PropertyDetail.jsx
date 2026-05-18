@@ -388,15 +388,20 @@ export default function PropertyDetail() {
               <h1>{property.title}</h1>
               <div className={styles.price}>
                 {formatPrice(property.numericPrice || property.price)}
-                {(property.listingType === 'Rent' || property.status === 'For Rent') && (
+                {property.rentUnit && (
                   <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>
                     {property.rentUnit === 'month' ? '/month' : 
                      property.rentUnit === 'sqft' ? '/sq.ft' : 
-                     property.rentUnit === '' ? '' : 
-                     (property.category === 'Warehouse' ? '/sq.ft' : '/month')}
+                     property.rentUnit === 'cent' ? '/cent' : 
+                     property.rentUnit === 'acre' ? '/acre' : ''}
                   </span>
                 )}
-                {property.cent && (
+                {!property.rentUnit && (property.listingType === 'Rent' || property.status === 'For Rent') && (
+                  <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>
+                    {property.category === 'Warehouse' ? '/sq.ft' : '/month'}
+                  </span>
+                )}
+                {!property.rentUnit && property.listingType !== 'Rent' && property.status !== 'For Rent' && property.cent && (
                   <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-light)', marginLeft: '4px' }}>/cent</span>
                 )}
               </div>

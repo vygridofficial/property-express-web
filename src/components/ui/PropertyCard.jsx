@@ -176,15 +176,20 @@ export default function PropertyCard({ property }) {
         </div>
         <div className={styles.price}>
           {displayPrice}
-          {(property.listingType === 'Rent' || status === 'For Rent') && (
+          {property.rentUnit && (
             <span className={styles.perMonth}>
               {property.rentUnit === 'month' ? '/month' : 
                property.rentUnit === 'sqft' ? '/sq.ft' : 
-               property.rentUnit === '' ? '' : 
-               (property.category === 'Warehouse' ? '/sq.ft' : '/month')}
+               property.rentUnit === 'cent' ? '/cent' : 
+               property.rentUnit === 'acre' ? '/acre' : ''}
             </span>
           )}
-          {property.cent && (
+          {!property.rentUnit && (property.listingType === 'Rent' || status === 'For Rent') && (
+            <span className={styles.perMonth}>
+              {property.category === 'Warehouse' ? '/sq.ft' : '/month'}
+            </span>
+          )}
+          {!property.rentUnit && property.listingType !== 'Rent' && status !== 'For Rent' && property.cent && (
             <span className={styles.perMonth}>/cent</span>
           )}
         </div>

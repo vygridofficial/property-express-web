@@ -1026,17 +1026,17 @@ export default function AdminProperties() {
                       <Label required>Price (₹)</Label>
                       <div style={{ display: 'flex', gap: '0.5rem' }}>
                         <input type="number" placeholder="Enter price in ₹..." className="no-spinners" value={formData.price} onChange={e => handleFormChange('price', e.target.value)} style={{ ...getInputStyle('price'), flex: 1 }} />
-                        {formData.listingType === 'Rent' && (
-                          <select 
-                            value={formData.rentUnit} 
-                            onChange={e => handleFormChange('rentUnit', e.target.value)}
-                            style={{ ...getInputStyle('rentUnit'), width: 'auto' }}
-                          >
-                            <option value="">None</option>
-                            <option value="month">Per Month</option>
-                            <option value="sqft">Per Sq.Ft</option>
-                          </select>
-                        )}
+                        <select 
+                          value={formData.rentUnit} 
+                          onChange={e => handleFormChange('rentUnit', e.target.value)}
+                          style={{ ...getInputStyle('rentUnit'), width: 'auto', marginLeft: '0.5rem' }}
+                        >
+                          <option value="">None</option>
+                          <option value="month">Per Month</option>
+                          <option value="sqft">Per Sq.Ft</option>
+                          <option value="cent">Per Cent</option>
+                          <option value="acre">Per Acre</option>
+                        </select>
                       </div>
                     </div>
                     <div>

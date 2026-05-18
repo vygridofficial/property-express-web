@@ -101,6 +101,7 @@ export default function ListProperty() {
     configuration: '1BHK',
     area: '',
     price: '',
+    rentUnit: '',
     location: '',
     district: '',
     address: '',
@@ -368,11 +369,25 @@ export default function ListProperty() {
 
                   <div>
                     <label style={label}>Expected Price (₹) *</label>
-                    <input
-                      type="number" value={details.price}
-                      onChange={e => setDetails({ ...details, price: e.target.value })}
-                      style={inp} onFocus={onFocus} onBlur={onBlur}
-                    />
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input
+                        type="number" value={details.price}
+                        onChange={e => setDetails({ ...details, price: e.target.value })}
+                        style={{ ...inp, flex: 1 }} onFocus={onFocus} onBlur={onBlur}
+                      />
+                      <select
+                        value={details.rentUnit || ''}
+                        onChange={e => setDetails({ ...details, rentUnit: e.target.value })}
+                        style={{ ...inp, width: 'auto', appearance: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '12px', paddingRight: '2rem' }}
+                        onFocus={onFocus} onBlur={onBlur}
+                      >
+                        <option value="">None</option>
+                        <option value="month">Per Month</option>
+                        <option value="sqft">Per Sq.Ft</option>
+                        <option value="cent">Per Cent</option>
+                        <option value="acre">Per Acre</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
