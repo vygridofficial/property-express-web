@@ -54,8 +54,13 @@ export default function Agreements() {
       ...formData,
       sellerPhone: fullPhone,
       propertyTitle: selectedProp?.title || 'Unknown Property',
+      propertyType: selectedProp?.propertyType || selectedProp?.type || selectedProp?.category || 'Property',
       propertyCategory: selectedProp?.category || 'Residential',
-      propertyAddress: selectedProp?.address || 'N/A'
+      propertyAddress: selectedProp?.address || 'N/A',
+      address: selectedProp?.address || 'N/A',
+      location: selectedProp?.location || selectedProp?.district || '',
+      area: selectedProp?.area || selectedProp?.builtUpArea || '',
+      price: selectedProp?.price || selectedProp?.expectedPrice || ''
     };
 
     try {
