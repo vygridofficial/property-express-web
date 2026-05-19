@@ -195,14 +195,14 @@ const generateMouAgreementPDF = async (submissionData, adminSignatureData, downl
   else drawCheckbox(doc, 111, 270);
 
   doc.setPage(3);
-  drawFitText(doc, price, 12, 50, 75, { fontSize: 7.5 });
-  drawFitText(doc, duration, 111, 50, 75, { fontSize: 7.5 });
+  drawFitText(doc, price, 12, 57, 75, { fontSize: 7.5 });
+  drawFitText(doc, duration, 111, 57, 75, { fontSize: 7.5 });
   drawFitText(doc, tokenAdvance, 76, 90, 80);
   drawFitText(doc, validUntil, 56, 226, 74);
 
   doc.setPage(4);
   drawFitText(doc, sellerName, 32, 130, 70);
-  drawDateSlots(doc, date, 40, 150);
+  drawDateSlots(doc, date, 40, 160);
   drawFitText(doc, authorizedSignatory, 80, 175, 58);
   drawFitText(doc, designation, 64, 191, 70);
   drawDateSlots(doc, date, 30, 229);
